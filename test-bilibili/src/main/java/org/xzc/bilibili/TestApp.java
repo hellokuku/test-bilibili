@@ -271,28 +271,10 @@ public class TestApp {
 		public void onParsed(Video v) {
 			//System.out.println( "开始评估视频" + v );
 			//我们只想评论 "连载动画" 并且还没有人评论它! 这些是可以马上评论的!
-			if (v.status == 0) {
-				if (v.typeid == 33 || v.typeid == 31 || v.typeid == 20) {
-					if (simpleBilibiliService.isCommentListEmpty( v.aid )) {
-						CommentTask ct = new CommentTask();
-						ct.aid = v.aid;
-						if (doComment( v )) {
-							ct.status = 1;
-						} else {//评论失败 加入任务
-							ct.status = 0;
-						}
-						db.addOrUpdateCommentTask( ct );
-
-					} else {
-						System.out.println( "因为评论列表不为空, 放弃 " + v );
-					}
-				}
-			} else if (/*v.status == -4 &&*/( v.typeid == 33 || v.typeid == 31 || v.typeid == 20 )) {
-				//无权限
-				//先加入到任务列表
-				System.out.println( "status=-4 加入到任务列表 " + v );
+			if (commentService.accept( v )) {
 				CommentTask ct = new CommentTask();
 				ct.aid = v.aid;
+				ct.status = 0;
 				db.addOrUpdateCommentTask( ct );
 			}
 		}
