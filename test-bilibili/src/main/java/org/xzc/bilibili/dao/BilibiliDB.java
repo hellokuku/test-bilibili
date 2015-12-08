@@ -69,6 +69,7 @@ public class BilibiliDB {
 	}
 
 	public void createOrUpdate(Video v) {
+		v.updateAt=new Date();
 		videoDao.createOrUpdate( v );
 	}
 
