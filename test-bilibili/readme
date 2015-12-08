@@ -1,0 +1,41 @@
+Cookie解释:
+	DedeID 最近一次看的视频的aid 没太大用处
+	
+	关键是下面2个Cookie
+	DedeUserID 用户的id, 这个必须要正确
+	SESSDATA 跟用户的session相关 必须要正确
+
+03fc8eb101b091fb
+
+http://api.bilibili.com/favourite/add&type=json&sid=acg5g1e7&fav_box=0&id=3334566
+
+http://api.bilibili.com/favourite/add&type=json&sid=acg5g1e7&fav_box=0&id=3334566
+
+http://api.bilibili.com/favourite/add?callback=abc&type=json&sid=acg5g1e7&fav_box=0&id=3334566&_=1449372727252
+
+http://api.bilibili.com/favourite/add?callback=abc&type=json&id=3334566
+
+通过这个将东西加入到收藏夹 id是视频的id
+http://api.bilibili.com/favourite/add?id=3334603
+通过这个获取收藏夹的内容 mid是用户的id fid是用户收藏夹的id
+http://space.bilibili.com/ajax/fav/getList?mid=1655915&pagesize=1&fid=2424663&order=ftime
+删除 aids用逗号分隔开
+必须要用post 方式
+http://space.bilibili.com/ajax/fav/mdel?fid=2424663&aids=3334571
+获取视频信息
+http://api.bilibili.cn/view?appkey=03fc8eb101b091fb&id=3337524
+
+
+http://api.bilibili.com/favourite/add?id=3334571
+
+
+
+http://space.bilibili.com/ajax/fav/getList?mid=1655915&pagesize=1&fid=2424663&order=ftime
+http://space.bilibili.com/ajax/fav/getList?mid=1655915&pagesize=30&fid=2424663&tid=0&kw=&pid=1&order=ftime
+http://space.bilibili.com/ajax/fav/getList?mid=1655915&pagesize=2&fid=2424663&tid=0&kw=&pid=1&order=ftime
+http://space.bilibili.com/ajax/fav/getList?mid=1655915&pagesize=30&fid=2424663&tid=0&order=ftime
+http://space.bilibili.com/ajax/fav/getList?mid=1655915&pagesize=1&fid=2424663&order=ftime
+
+
+
+http://www.bilibili.com/index/index-bangumi-timeline.json
