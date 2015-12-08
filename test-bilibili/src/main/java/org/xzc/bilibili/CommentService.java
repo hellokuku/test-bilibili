@@ -12,8 +12,9 @@ public class CommentService {
 	public boolean accept(Video v) {
 		if (v.mid == 1643718) //up主是山下智博
 			return true;
-		return v.typeid == 33 || v.typeid == 31 || v.typeid == 20 || v.typeid == 32||v.typeid==15;
+		return v.typeid == 33 || v.typeid == 31 || v.typeid == 20 || v.typeid == 32 || v.typeid == 15;
 	}
+
 	private Map<Integer, String> 预定的文本 = new HashMap<Integer, String>();
 
 	private Random random = new Random();
@@ -23,6 +24,9 @@ public class CommentService {
 	}
 
 	public String getComment(Video v) {
+		if (v.mid == 1643718) {
+			return "喂, 110, 这里有大绅(变)士(态), 请速速前来!";
+		}
 		String msg = 预定的文本.get( v.aid );
 		if (msg != null)
 			return msg;
