@@ -10,8 +10,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import javax.crypto.interfaces.PBEKey;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -256,11 +254,11 @@ public class TestApp {
 	}
 
 	@Autowired
-	private CommentTextProvider commentTextProvider;
+	private CommentService commentService;
 
 	private boolean doComment(Video v) {
 		//做评论
-		String msg = commentTextProvider.getComment( v );
+		String msg = commentService.getComment( v );
 		String result = mainBilibiliService.comment( v.aid, msg );
 		System.out.println( "0尝试对aid=" + v.aid + " 评论 " + msg + ", 结果是" + result );
 		if (result.contains( "禁言" )) {
@@ -324,7 +322,7 @@ public class TestApp {
 						}
 					}
 					try {
-						Thread.sleep( 5000 );
+						Thread.sleep( 5000 );//休息5秒
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
@@ -336,23 +334,30 @@ public class TestApp {
 		int batch = 10;//每次检测50个aid
 		boolean reachBoundary = false;//是否达到边界
 		int aid = db.getMaxAid( 3349048 ) + 1;//aid起点
+		List<Integer> successAidList = new ArrayList<Integer>();
 		while (true) {
 			int count = 0;
 			while (count < batch) {
 				++count;
-				Video v = simpleBilibiliService.getVideo1( aid );
-				if (v.notExists()) {//不存在可能是遇到了边界 或者 是假的, 可能再往后几个aid又可以用了! 真是的...
-					v = 处理伪边界( aid );//当前aid是notExists 看看它后面是否有可以用的aid, 如果有那么就使用它
-					if (v == null) {//真的到边界了
-						System.out.println( "边界! aid=" + aid );
+				int code = simpleBilibiliService.addFavotite( aid );//直接加入收藏夹
+				if (code == 0 || code == 11007) {//成功
+					successAidList.add( aid );
+				} else if (code == -1111) {//不存在可能是遇到了边界 或者 是假的, 可能再往后几个aid又可以用了! 真是的...
+					for (int i = 0; i < 16; ++i) {
+						code = simpleBilibiliService.addFavotite( aid + i );
+						if (code == 0 || code == 11007) {//找到一个!
+							aid = aid + i;
+							successAidList.add( aid );
+							break;
+						}
+					}
+					if (code == -1111) {
 						reachBoundary = true;
 						break;
-					} else {//假的! aid从这里再继续
-						aid = v.aid;
 					}
+				} else {
+					throw new RuntimeException( "未知的code=" + code );
 				}
-				db.add( v );
-				simpleBilibiliService.addFavotite( aid );//加入收藏夹
 				++aid;
 			}
 			消耗收藏夹( parsedCallback );
