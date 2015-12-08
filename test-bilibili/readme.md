@@ -42,7 +42,7 @@ http://api.bilibili.com/feedback?page=1&mode=arc&type=json&ver=3&order=default&p
 # 用户 #
 获取用户信息
 两种方式获取的数据基本一致, 推荐第二种
-http://space.bilibili.com/ajax/member/GetInfo?mid=19161363
+http://space.bilibili.com/ajax/member/GetInfo?mid=1643718
 http://api.bilibili.cn/userinfo?user=xuzhichaoxh1
 	或mid=?
 
@@ -187,3 +187,28 @@ message:呵呵 真刺激.
 rnd:761437893
 playTime:628.993
 fontsize:25
+
+
+# 视频类型 #
+33 连载动画
+138 搞笑
+126 人力VOCALOID
+22 三次元鬼畜
+26 二次元鬼畜
+28 同人音乐
+30 VOCALOID·UTAU
+21 生活
+154 三次元舞蹈
+32 完结动画
+15 连载聚集
+20 宅舞
+31翻唱
+27综合
+31翻唱
+
+
+
+
+
+
+

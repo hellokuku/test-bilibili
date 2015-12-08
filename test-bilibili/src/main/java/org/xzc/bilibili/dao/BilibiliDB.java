@@ -3,6 +3,7 @@ package org.xzc.bilibili.dao;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import javax.annotation.PostConstruct;
 
@@ -136,4 +137,5 @@ public class BilibiliDB {
 		ct.status = 3;
 		commentTaskDao.update( ct );
 	}
+
 }

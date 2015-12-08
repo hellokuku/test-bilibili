@@ -124,6 +124,7 @@ public class BilibiliService {
 
 	/**
 	 * 添加视频到收藏夹
+	 * 0成功 11007 重复 -1111不存在
 	 * @param aid
 	 * @return
 	 */
