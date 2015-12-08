@@ -444,7 +444,7 @@ public class TestApp {
 		ExecutorService es = Executors.newFixedThreadPool( 1 );//4个线程
 		List<Future<?>> list = new ArrayList<Future<?>>();
 		List<CommentTask> taskList = new ArrayList<CommentTask>();
-		taskList.add( new CommentTask( 3351269, "喝大力, 每天看一家." ) );
+		taskList.add( new CommentTask( 3351273, "喝大力, 必须拿第一. 今天终于要主线了么?!" ) );
 		//		taskList.add( new CommentTask( 3347427, "喝大力, 网球打得好." ) );
 		//		taskList.add( new CommentTask( 3347425, "喝大力, 不吃JK做的饭." ) );
 		//		taskList.add( new CommentTask( 3347415, "喝大力, 我也要做偶像." ) );
@@ -453,8 +453,10 @@ public class TestApp {
 			Future<?> submit = es.submit( new Runnable() {
 				public void run() {
 					while (true) {
+						long beg = System.currentTimeMillis();
 						String result = mainBilibiliService.comment( ct.aid, ct.msg );
-						System.out.println( "对" + ct.aid + "进行评论" + ct.msg + ", 结果是" + result );
+						long end = System.currentTimeMillis();
+						System.out.println( "对 " + ct.aid + " 进行评论 " + ct.msg + " , 结果是 " + result + " 时间=" + ( end - beg ) );
 						if ("OK".equals( result )) {
 							break;
 						}

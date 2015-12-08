@@ -132,7 +132,8 @@ public class BilibiliService {
 		return safeRun( new SafeRunner<Integer>() {
 			public Integer run() throws Exception {
 				String url = "http://api.bilibili.com/favourite/add?id=" + aid;
-				return asJSON( url ).getIntValue( "code" );
+				String content = asString( url );
+				return JSON.parseObject( content ).getIntValue( "code" );
 			}
 		} );
 	}
