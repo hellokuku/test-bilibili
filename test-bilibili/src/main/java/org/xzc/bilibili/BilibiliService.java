@@ -97,6 +97,7 @@ public class BilibiliService {
 		m.setMaxTotal( 20 );
 
 		hc = HttpClients.custom().setConnectionManager( m ).build();
+		
 		rebuildContext();
 	}
 

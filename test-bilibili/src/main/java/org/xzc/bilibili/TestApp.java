@@ -5,6 +5,8 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Callable;
@@ -269,7 +271,7 @@ public class TestApp {
 		}
 		if (result.contains( "验证码" )) {//验证码 睡觉18秒
 			try {
-				System.out.println("由于验证码错误， 睡觉20秒");
+				System.out.println( "由于验证码错误， 睡觉20秒" );
 				Thread.sleep( 20000 );
 			} catch (InterruptedException e) {
 				e.printStackTrace();
@@ -482,6 +484,37 @@ public class TestApp {
 
 	private char randomChar() {
 		return (char) ( 'A' + random.nextInt( 26 ) );
+	}
+
+	private static void 阻塞直到(int month, int day, int hour, int minute) {
+		Calendar c = Calendar.getInstance();
+		c.set( Calendar.MONTH, month - 1 );
+		c.set( Calendar.DAY_OF_MONTH, day );
+		c.set( Calendar.HOUR_OF_DAY, hour );
+		c.set( Calendar.MINUTE, minute );
+		c.set( Calendar.SECOND, 0 );
+		Date d = c.getTime();
+		int count = 0;
+		while (true) {
+			Date now = new Date();
+			if (now.after( d ))
+				return;
+			try {
+				if (++count == 10) {
+					System.out.println( "时间没到, 继续睡觉, 还差" + ( d.getTime() - now.getTime() ) / 1000 + "秒" );
+					count = 0;
+				}
+				Thread.sleep( 1000 );
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	@Test
+	public void 测试阻塞时间() {
+		阻塞直到( 12, 9, 23, 10 );
+		System.out.println( "ok" );
 	}
 
 	@Test
