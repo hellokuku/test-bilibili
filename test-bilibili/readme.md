@@ -1,3 +1,79 @@
+# 视频 #
+添加到收藏夹
+http://api.bilibili.com/favourite/add?id=3335348
+
+获取用户的收藏夹
+这个似乎没有做权限认证, 所以可以获取其他人的收藏夹?
+http://space.bilibili.com/ajax/fav/getList?mid=19161363&pagesize=30&fid=19407652
+和[获取收藏的视频]搭配使用可以获取别人的收藏信息!
+
+收藏列表
+http://space.bilibili.com/ajax/fav/getList?mid=19216452&pagesize=30&fid=19453437
+pagesize最大在70左右
+
+获得评论列表
+http://api.bilibili.com/feedback?page=1&mode=arc&type=json&ver=3&order=default&pagesize=1&aid=2007731
+
+获得视频信息
+http://api.bilibili.cn/view?appkey=03fc8eb101b091fb&id=3342515
+这个只能获得正常状态的视频信息
+其他状态(无权限,已删除,不存在)会有code=404
+
+删除收藏的视频
+需要post操作, 还需要Refer头
+http://space.bilibili.com/ajax/fav/mdel
+fid:2424663
+aids:3296072
+返回值{"status":true}
+
+# 视频类型 #
+15 连载聚集
+17 单机联机
+20 宅舞
+21 生活
+22 三次元鬼畜
+24 MAD·AMV
+25 MMD·3D
+26 二次元鬼畜
+27综合
+28 同人音乐
+29 三次元音乐
+30 VOCALOID·UTAU			**初音,天依**
+31翻唱						**全部**
+32 完结动画					**全部**
+33 连载动画					**全部**
+51 咨询
+65 网游·电竞
+71 综艺						**暴走大事件**
+126 人力VOCALOID
+128 电视剧相关
+131 Korea相关
+137 娱乐圈
+138 搞笑					** 山下**
+152 官方眼神
+154 三次元舞蹈
+
+# 用户 #
+获取用户信息
+两种方式获取的数据基本一致, 推荐第二种
+http://space.bilibili.com/ajax/member/GetInfo?mid=1643718
+http://api.bilibili.cn/userinfo?user=xuzhichaoxh1
+	或mid=?
+	
+# 数据库维护 #
+通过下面这个语句获取某个时间点以前的视频， 虽然不是非常精确 但也是够用了， updateAt 一般是只我扫描到的时间
+select aid from video where updateAt < '2015-12-09 00:00:00';
+
+通过下面的一句将过期的任务（可能是已完成）删掉
+delete from commenttask where aid in ( select aid from video where updateAt < '某个时间' );
+
+通过下面的一句将视频删掉
+delete from video where updateAt < '某个时间'
+
+或者先将视频删除， 然后再执行下面的语句删除task
+delete from commenttask where ait not in (select aid from video)
+
+
 # API收藏 #
 http://www.scriptsuser.org/code.php?hc=206
 http://www.fuckbilibili.com/biliapi.html
@@ -11,78 +87,6 @@ http://api.bilibili.cn/sp?spid=56746
 查看某用户的投稿
 http://space.bilibili.com/ajax/member/getSubmitVideos?mid=928123&pagesize=30&page=1
 
-# 视频 #
-获得视频信息
-http://api.bilibili.cn/view?appkey=03fc8eb101b091fb&id=3342515
-这个只能获得正常状态的视频信息
-其他状态(无权限,已删除,不存在)会有code=404
-
-添加
-http://api.bilibili.com/favourite/add?id=3335348
-
-获取用户的收藏夹
-这个似乎没有做权限认证, 所以可以获取其他人的收藏夹?
-http://space.bilibili.com/ajax/fav/getList?mid=19161363&pagesize=30&fid=19407652
-和[获取收藏的视频]搭配使用可以获取别人的收藏信息!
-
-收藏列表
-http://space.bilibili.com/ajax/fav/getList?mid=19216452&pagesize=30&fid=19453437
-pagesize最大在70左右
-
-删除收藏的视频
-需要post操作, 还需要Refer头
-http://space.bilibili.com/ajax/fav/mdel
-fid:2424663
-aids:3296072
-返回值{"status":true}
-
-获得评论列表
-http://api.bilibili.com/feedback?page=1&mode=arc&type=json&ver=3&order=default&pagesize=1&aid=2007731
-
-# 用户 #
-获取用户信息
-两种方式获取的数据基本一致, 推荐第二种
-http://space.bilibili.com/ajax/member/GetInfo?mid=1643718
-http://api.bilibili.cn/userinfo?user=xuzhichaoxh1
-	或mid=?
-
-
-注册成功
-http://www.bilibili.com/account/register_success
-
-礼仪答题
-https://account.bilibili.com/answer/base
-
-答题2
-https://account.bilibili.com/answer/promotion
-获得要答的类型
-https://account.bilibili.com/answer/getProType
-
-
-提交答题1
-https://account.bilibili.com/answer/goPromotion
-post数据
-qs_ids:36625,43658,43664,43678,43691,43698,43701,43703,43707,43709,43710,43711,43715,43716,43727,43730,43738,43743,43751,43752
-ans_hash_36625:ee125761ed535882c5af48d357fd75a6
-ans_hash_43658:8e448f66849f734ab4733c0348e297fd
-ans_hash_43664:a1b9131d01ca672e7f33d47317049d10
-ans_hash_43678:7432cc1849a67f7f628c7bd0d5e06643
-ans_hash_43691:7c79f251d5acc9dc0dd05a0dce9cccd2
-ans_hash_43698:b5e2dc15ae44c5e5674d651e0aa87ce3
-ans_hash_43701:75949db722fadfc3f37fd47d8fda763d
-ans_hash_43703:48dcd3bc89203e0afec4a0ffff88be0f
-ans_hash_43707:505aa06250d15909db0387ecf34f0e97
-ans_hash_43709:3500a5442c8a3058fc7958191342eb4f
-ans_hash_43710:ec892540106e43f66c36329930d7d2f1
-ans_hash_43711:5acf3cd7074fdff326a3d5c75370b939
-ans_hash_43715:821f6cd4733ebb1d27bc205a866a91b3
-ans_hash_43716:0347026f44bc3ab426a214bbd548ad28
-ans_hash_43727:176b0d8590e5c3476893eab80adda753
-ans_hash_43730:af9484131ab7244cb169e9fdeb3b1a49
-ans_hash_43738:01f0e66b37ad0d62a752aa131cb93355
-ans_hash_43743:432a9076fe40a11a00d92585215b8181
-ans_hash_43751:186e389f768c8043a20a47627f01e35c
-ans_hash_43752:18bf7fb552c45f63541518b8d7c984cb
 
 
 # 弹幕地址 #
@@ -189,47 +193,41 @@ playTime:628.993
 fontsize:25
 
 
-# 视频类型 #
-15 连载聚集
-17 单机联机
-20 宅舞
-21 生活
-22 三次元鬼畜
-24 MAD·AMV
-25 MMD·3D
-26 二次元鬼畜
-27综合
-28 同人音乐
-29 三次元音乐
-30 VOCALOID·UTAU			**初音,天依**
-31翻唱						**全部**
-32 完结动画					**全部**
-33 连载动画					**全部**
-51 咨询
-65 网游·电竞
-71 综艺						**暴走大事件**
-126 人力VOCALOID
-128 电视剧相关
-131 Korea相关
-137 娱乐圈
-138 搞笑					** 山下**
-152 官方眼神
-154 三次元舞蹈
-
-typeid	count(typeid)
-17	831
-65	547
-128	288
-21	243
-131	235
-29	234
-137	221
-71	168
 
 
+注册成功
+http://www.bilibili.com/account/register_success
+
+礼仪答题
+https://account.bilibili.com/answer/base
+
+答题2
+https://account.bilibili.com/answer/promotion
+获得要答的类型
+https://account.bilibili.com/answer/getProType
 
 
-
-
-
-
+提交答题1
+https://account.bilibili.com/answer/goPromotion
+post数据
+qs_ids:36625,43658,43664,43678,43691,43698,43701,43703,43707,43709,43710,43711,43715,43716,43727,43730,43738,43743,43751,43752
+ans_hash_36625:ee125761ed535882c5af48d357fd75a6
+ans_hash_43658:8e448f66849f734ab4733c0348e297fd
+ans_hash_43664:a1b9131d01ca672e7f33d47317049d10
+ans_hash_43678:7432cc1849a67f7f628c7bd0d5e06643
+ans_hash_43691:7c79f251d5acc9dc0dd05a0dce9cccd2
+ans_hash_43698:b5e2dc15ae44c5e5674d651e0aa87ce3
+ans_hash_43701:75949db722fadfc3f37fd47d8fda763d
+ans_hash_43703:48dcd3bc89203e0afec4a0ffff88be0f
+ans_hash_43707:505aa06250d15909db0387ecf34f0e97
+ans_hash_43709:3500a5442c8a3058fc7958191342eb4f
+ans_hash_43710:ec892540106e43f66c36329930d7d2f1
+ans_hash_43711:5acf3cd7074fdff326a3d5c75370b939
+ans_hash_43715:821f6cd4733ebb1d27bc205a866a91b3
+ans_hash_43716:0347026f44bc3ab426a214bbd548ad28
+ans_hash_43727:176b0d8590e5c3476893eab80adda753
+ans_hash_43730:af9484131ab7244cb169e9fdeb3b1a49
+ans_hash_43738:01f0e66b37ad0d62a752aa131cb93355
+ans_hash_43743:432a9076fe40a11a00d92585215b8181
+ans_hash_43751:186e389f768c8043a20a47627f01e35c
+ans_hash_43752:18bf7fb552c45f63541518b8d7c984cb
