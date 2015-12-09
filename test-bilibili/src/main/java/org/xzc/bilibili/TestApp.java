@@ -267,6 +267,7 @@ public class TestApp {
 		if (result.contains( "禁言" )) {
 			mainBilibiliService.rebuildContext();
 		}
+		//有的时候即使已经OK了, 但是实际上没有评论成功!
 		return "OK".equals( result );
 	}
 
@@ -296,22 +297,23 @@ public class TestApp {
 				while (true) {
 					List<CommentTask> taskList = db.getCommentTaskList();
 					System.out.println( "开始执行自动评论任务, 任务数量=" + taskList.size() );
-					try{
-					//评论!
-					for (CommentTask ct : taskList) {
-						if (!simpleBilibiliService.isCommentListEmpty( ct.aid )) {
-							//评论已经不为空了
-							System.out.println( "评论已经不为空, 放弃. " + ct.aid );
-							db.markFailed( ct );
-						} else if (doComment( db.getVideo( ct.aid ) )) {
-							db.markFinished( ct );
+					try {
+						//评论!
+						for (CommentTask ct : taskList) {
+							if (!simpleBilibiliService.isCommentListEmpty( ct.aid )) {
+								//评论已经不为空了
+								System.out.println( "评论已经不为空, 放弃. " + ct.aid );
+								db.markFailed( ct );
+							} else if (doComment( db.getVideo( ct.aid ) )) {
+								//判断一下第一是不是自己
+								db.markFinished( ct );
+							}
 						}
-					}
-					}catch(RuntimeException e){
+					} catch (RuntimeException e) {
 						simpleBilibiliService.rebuildContext();
 						mainBilibiliService.rebuildContext();
 						try {
-							FileUtils.writeStringToFile( new File( "error.log" ), e.getMessage()+"\r\n", true );
+							FileUtils.writeStringToFile( new File( "error.log" ), e.getMessage() + "\r\n", true );
 						} catch (IOException e1) {
 							e1.printStackTrace();
 						}
@@ -365,7 +367,7 @@ public class TestApp {
 					continue;
 				} else {
 					String content = simpleBilibiliService.getLastFavoriteContent();
-					FileUtils.writeStringToFile( new File( "error.log" ), content+"\r\n", true );
+					FileUtils.writeStringToFile( new File( "error.log" ), content + "\r\n", true );
 					simpleBilibiliService.rebuildContext();
 					mainBilibiliService.rebuildContext();
 					System.out.println( "出问题了, 睡觉20秒" );
@@ -491,8 +493,8 @@ public class TestApp {
 						long beg = System.currentTimeMillis();
 						String result = mainBilibiliService.comment( ct.aid, ct.msg );
 						long end = System.currentTimeMillis();
-						System.out.println( "对 " + ct.aid + " 进行评论 " + ct.msg + " , 结果是 " + result + " 时间="
-								+ ( end - beg ) );
+						System.out.println(
+								"对 " + ct.aid + " 进行评论 " + ct.msg + " , 结果是 " + result + " 时间=" + ( end - beg ) );
 						if ("OK".equals( result )) {
 							break;
 						}

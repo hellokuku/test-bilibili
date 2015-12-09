@@ -69,7 +69,7 @@ public class BilibiliDB {
 	}
 
 	public void createOrUpdate(Video v) {
-		v.updateAt=new Date();
+		v.updateAt = new Date();
 		videoDao.createOrUpdate( v );
 	}
 
@@ -138,5 +138,5 @@ public class BilibiliDB {
 		ct.status = 3;
 		commentTaskDao.update( ct );
 	}
-
+	
 }
