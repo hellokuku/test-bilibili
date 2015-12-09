@@ -492,14 +492,17 @@ public class TestApp {
 		return (char) ( 'A' + random.nextInt( 26 ) );
 	}
 
-	private static void 阻塞直到(int month, int day, int hour, int minute) {
+	private static Date makeDate(int month, int day, int hour, int minute) {
 		Calendar c = Calendar.getInstance();
 		c.set( Calendar.MONTH, month - 1 );
 		c.set( Calendar.DAY_OF_MONTH, day );
 		c.set( Calendar.HOUR_OF_DAY, hour );
 		c.set( Calendar.MINUTE, minute );
 		c.set( Calendar.SECOND, 0 );
-		Date d = c.getTime();
+		return c.getTime();
+	}
+
+	private static void 阻塞直到(Date d) {
 		int count = 0;
 		while (true) {
 			Date now = new Date();
@@ -519,7 +522,7 @@ public class TestApp {
 
 	@Test
 	public void 测试阻塞时间() {
-		阻塞直到( 12, 9, 23, 10 );
+		阻塞直到( makeDate( 12, 9, 23, 18 ) );
 		System.out.println( "ok" );
 	}
 
@@ -528,20 +531,24 @@ public class TestApp {
 		ExecutorService es = Executors.newFixedThreadPool( 1 );//4个线程
 		List<Future<?>> list = new ArrayList<Future<?>>();
 		List<CommentTask> taskList = new ArrayList<CommentTask>();
-		taskList.add( new CommentTask( 3356685, "上一集太正常了，这集再看看。" ) );
+		List<Date> taskBlockTimeList = new ArrayList<Date>();
+		taskList.add( new CommentTask( 3356688, "整个人都ですわ了" ) );
+		taskBlockTimeList.add( makeDate( 12, 9, 23, 23 ) );
 		//		taskList.add( new CommentTask( 3347427, "喝大力, 网球打得好." ) );
 		//		taskList.add( new CommentTask( 3347425, "喝大力, 不吃JK做的饭." ) );
 		//		taskList.add( new CommentTask( 3347415, "喝大力, 我也要做偶像." ) );
 		for (int i = 0; i < taskList.size(); ++i) {
 			final CommentTask ct = taskList.get( i );
+			final Date blockTime=taskBlockTimeList.get( i );
 			Future<?> submit = es.submit( new Runnable() {
 				public void run() {
+					阻塞直到( blockTime );
 					while (true) {
 						long beg = System.currentTimeMillis();
 						String result = mainBilibiliService.comment( ct.aid, ct.msg );
 						long end = System.currentTimeMillis();
-						System.out.println( "对 " + ct.aid + " 进行评论 " + ct.msg + " , 结果是 " + result + " 时间="
-								+ ( end - beg ) );
+						System.out.println(
+								"对 " + ct.aid + " 进行评论 " + ct.msg + " , 结果是 " + result + " 时间=" + ( end - beg ) );
 						if ("OK".equals( result )) {
 							break;
 						}
