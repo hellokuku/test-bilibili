@@ -305,9 +305,9 @@ public class TestApp {
 		Thread thread = new Thread() {
 			public void run() {
 				while (true) {
-					List<CommentTask> taskList = db.getCommentTaskList();
-					System.out.println( "开始执行自动评论任务, 任务数量=" + taskList.size() );
 					try {
+						List<CommentTask> taskList = db.getCommentTaskList();
+						System.out.println( "开始执行自动评论任务, 任务数量=" + taskList.size() );
 						//评论!
 						for (CommentTask ct : taskList) {
 							if (!simpleBilibiliService.isCommentListEmpty( ct.aid )) {
@@ -349,51 +349,57 @@ public class TestApp {
 		int aid = db.getMaxAid( 3349048 ) + 1;//aid起点
 		List<Integer> successAidList = new ArrayList<Integer>();
 		while (true) {
-			int count = 0;
-			while (count < batch) {
-				++count;
-				int code = simpleBilibiliService.addFavotite( aid );//直接加入收藏夹
-				if (code == 0 || code == 11007) {//成功
-					successAidList.add( aid );
-				} else if (code == -1111) {//不存在可能是遇到了边界 或者 是假的, 可能再往后几个aid又可以用了! 真是的...
-					for (int i = 0; i < 16; ++i) {
-						code = simpleBilibiliService.addFavotite( aid + i );
-						if (code == 0 || code == 11007) {//找到一个!
-							aid = aid + i;
-							successAidList.add( aid );
+			try {
+				int count = 0;
+				while (count < batch) {
+					++count;
+					int code = simpleBilibiliService.addFavotite( aid );//直接加入收藏夹
+					if (code == 0 || code == 11007) {//成功
+						successAidList.add( aid );
+					} else if (code == -1111) {//不存在可能是遇到了边界 或者 是假的, 可能再往后几个aid又可以用了! 真是的...
+						for (int i = 0; i < 16; ++i) {
+							code = simpleBilibiliService.addFavotite( aid + i );
+							if (code == 0 || code == 11007) {//找到一个!
+								aid = aid + i;
+								successAidList.add( aid );
+								break;
+							}
+						}
+						if (code == -1111) {
+							reachBoundary = true;
 							break;
 						}
+					} else if (code == -101) {
+						//{"code":-101,"message":"Account is not logined.","ts":1449589626}
+						simpleBilibiliService.rebuildContext();
+						mainBilibiliService.rebuildContext();
+						System.out.println( "出问题了code=-101, 睡觉20秒" );
+						Thread.sleep( 20000 );
+						continue;
+					} else {
+						String content = simpleBilibiliService.getLastFavoriteContent();
+						FileUtils.writeStringToFile( new File( "error.log" ), content + "\r\n", true );
+						simpleBilibiliService.rebuildContext();
+						mainBilibiliService.rebuildContext();
+						System.out.println( "出问题了, 睡觉20秒" );
+						Thread.sleep( 20000 );
+						continue;
 					}
-					if (code == -1111) {
-						reachBoundary = true;
-						break;
-					}
-				} else if (code == -101) {
-					//{"code":-101,"message":"Account is not logined.","ts":1449589626}
-					simpleBilibiliService.rebuildContext();
-					mainBilibiliService.rebuildContext();
-					System.out.println( "出问题了code=-101, 睡觉20秒" );
-					Thread.sleep( 20000 );
-					continue;
-				} else {
-					String content = simpleBilibiliService.getLastFavoriteContent();
-					FileUtils.writeStringToFile( new File( "error.log" ), content + "\r\n", true );
-					simpleBilibiliService.rebuildContext();
-					mainBilibiliService.rebuildContext();
-					System.out.println( "出问题了, 睡觉20秒" );
-					Thread.sleep( 20000 );
-					continue;
-					//System.out.println( content );
-					//throw new RuntimeException( "未知的code=" + code );
+					++aid;
 				}
-				++aid;
-			}
-			消耗收藏夹( parsedCallback );
-			if (reachBoundary) {
-				reachBoundary = false;
-				System.out.println( "真的达到边界了, 休息10秒,再继续" );
-				//FileUtils.writeStringToFile( new File( "error.log" ), "测试测试\r\n", true);
-				Thread.sleep( 10000 );
+				消耗收藏夹( parsedCallback );
+				if (reachBoundary) {
+					reachBoundary = false;
+					System.out.println( "真的达到边界了, 休息10秒,再继续" );
+					Thread.sleep( 10000 );
+				}
+			} catch (Exception ex) {
+				FileUtils.writeStringToFile( new File( "error.log" ), ex.getMessage() + "\r\n", true );
+				simpleBilibiliService.rebuildContext();
+				mainBilibiliService.rebuildContext();
+				System.out.println( "出问题了, 睡觉20秒" );
+				Thread.sleep( 20000 );
+				continue;
 			}
 		}
 	}
@@ -522,7 +528,7 @@ public class TestApp {
 		ExecutorService es = Executors.newFixedThreadPool( 1 );//4个线程
 		List<Future<?>> list = new ArrayList<Future<?>>();
 		List<CommentTask> taskList = new ArrayList<CommentTask>();
-		taskList.add( new CommentTask( 3351273, "喝大力, 必须拿第一. 今天终于要主线了么?!" ) );
+		taskList.add( new CommentTask( 3356685, "上一集太正常了，这集再看看。" ) );
 		//		taskList.add( new CommentTask( 3347427, "喝大力, 网球打得好." ) );
 		//		taskList.add( new CommentTask( 3347425, "喝大力, 不吃JK做的饭." ) );
 		//		taskList.add( new CommentTask( 3347415, "喝大力, 我也要做偶像." ) );
@@ -534,8 +540,8 @@ public class TestApp {
 						long beg = System.currentTimeMillis();
 						String result = mainBilibiliService.comment( ct.aid, ct.msg );
 						long end = System.currentTimeMillis();
-						System.out.println(
-								"对 " + ct.aid + " 进行评论 " + ct.msg + " , 结果是 " + result + " 时间=" + ( end - beg ) );
+						System.out.println( "对 " + ct.aid + " 进行评论 " + ct.msg + " , 结果是 " + result + " 时间="
+								+ ( end - beg ) );
 						if ("OK".equals( result )) {
 							break;
 						}
