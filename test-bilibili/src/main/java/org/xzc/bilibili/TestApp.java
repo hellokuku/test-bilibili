@@ -267,6 +267,14 @@ public class TestApp {
 		if (result.contains( "禁言" )) {
 			mainBilibiliService.rebuildContext();
 		}
+		if (result.contains( "验证码" )) {//验证码 睡觉18秒
+			try {
+				System.out.println("由于验证码错误， 睡觉20秒");
+				Thread.sleep( 20000 );
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 		return "OK".equals( result );
 	}
 
@@ -296,22 +304,22 @@ public class TestApp {
 				while (true) {
 					List<CommentTask> taskList = db.getCommentTaskList();
 					System.out.println( "开始执行自动评论任务, 任务数量=" + taskList.size() );
-					try{
-					//评论!
-					for (CommentTask ct : taskList) {
-						if (!simpleBilibiliService.isCommentListEmpty( ct.aid )) {
-							//评论已经不为空了
-							System.out.println( "评论已经不为空, 放弃. " + ct.aid );
-							db.markFailed( ct );
-						} else if (doComment( db.getVideo( ct.aid ) )) {
-							db.markFinished( ct );
+					try {
+						//评论!
+						for (CommentTask ct : taskList) {
+							if (!simpleBilibiliService.isCommentListEmpty( ct.aid )) {
+								//评论已经不为空了
+								System.out.println( "评论已经不为空, 放弃. " + ct.aid );
+								db.markFailed( ct );
+							} else if (doComment( db.getVideo( ct.aid ) )) {
+								db.markFinished( ct );
+							}
 						}
-					}
-					}catch(RuntimeException e){
+					} catch (RuntimeException e) {
 						simpleBilibiliService.rebuildContext();
 						mainBilibiliService.rebuildContext();
 						try {
-							FileUtils.writeStringToFile( new File( "error.log" ), e.getMessage()+"\r\n", true );
+							FileUtils.writeStringToFile( new File( "error.log" ), e.getMessage() + "\r\n", true );
 						} catch (IOException e1) {
 							e1.printStackTrace();
 						}
@@ -365,7 +373,7 @@ public class TestApp {
 					continue;
 				} else {
 					String content = simpleBilibiliService.getLastFavoriteContent();
-					FileUtils.writeStringToFile( new File( "error.log" ), content+"\r\n", true );
+					FileUtils.writeStringToFile( new File( "error.log" ), content + "\r\n", true );
 					simpleBilibiliService.rebuildContext();
 					mainBilibiliService.rebuildContext();
 					System.out.println( "出问题了, 睡觉20秒" );
