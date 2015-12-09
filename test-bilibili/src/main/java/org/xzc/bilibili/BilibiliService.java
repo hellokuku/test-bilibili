@@ -1,12 +1,16 @@
 package org.xzc.bilibili;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -32,7 +36,6 @@ import org.xzc.bilibili.model.json.FavGetList;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.parser.ParserConfig;
 
 public class BilibiliService {
 	private static final Charset UTF8 = Charset.forName( "utf8" );
@@ -98,14 +101,14 @@ public class BilibiliService {
 	}
 
 	public synchronized void rebuildContext() {
-		boolean ok=false;
-		for(int i=0;i<10;++i){
-			if(rebuildContextInternal()){
-				ok=true;
+		boolean ok = false;
+		for (int i = 0; i < 10; ++i) {
+			if (rebuildContextInternal()) {
+				ok = true;
 				break;
 			}
 		}
-		if (!ok) 
+		if (!ok)
 			throw new RuntimeException( "尽力了,但是initAccount失败." );
 	}
 
@@ -123,7 +126,7 @@ public class BilibiliService {
 	private BasicHttpContext ctx;
 
 	private String lastFavoriteContent;
-	
+
 	public String getLastFavoriteContent() {
 		return lastFavoriteContent;
 	}
@@ -139,7 +142,7 @@ public class BilibiliService {
 			public Integer run() throws Exception {
 				String url = "http://api.bilibili.com/favourite/add?id=" + aid;
 				String content = asString( url );
-				lastFavoriteContent=content;
+				lastFavoriteContent = content;
 				return JSON.parseObject( content ).getIntValue( "code" );
 			}
 		} );
@@ -252,15 +255,28 @@ public class BilibiliService {
 		} );
 	}
 
+	private void log(String content) {
+		try {
+			FileUtils.writeStringToFile( new File( "error.log" ), new Date() + "\r\n" + content + "\r\n", true );
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public FavGetList getFavoriteListJSON(final int pagesize) {
 		return safeRun( new SafeRunner<FavGetList>() {
 			public FavGetList run() throws Exception {
 				HttpUriRequest req = makeGetFavoriteListRequest( pagesize );
 				String content = asString( req );
-				JSONObject data = JSON.parseObject( content ).getJSONObject( "data" );
-				FavGetList json = JSON.toJavaObject( data, FavGetList.class );
-				json.pagesize = pagesize;
-				return json;
+				try {
+					JSONObject data = JSON.parseObject( content ).getJSONObject( "data" );
+					FavGetList json = JSON.toJavaObject( data, FavGetList.class );
+					json.pagesize = pagesize;
+					return json;
+				} catch (Exception e) {
+					log( content );
+					throw new RuntimeException( e );
+				}
 			}
 		} );
 	}

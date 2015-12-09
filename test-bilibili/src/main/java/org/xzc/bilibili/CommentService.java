@@ -15,7 +15,7 @@ public class CommentService {
 		}
 		if (v.typeid == 71 && v.mid == 883968) //暴走漫画
 			return true;
-		return v.typeid == 31 || v.typeid == 32 || v.typeid == 33;
+		return v.typeid == 31 || v.typeid == 32 || v.typeid == 33||v.typeid==17||v.typeid==65;
 	}
 
 	private Random random = new Random();
