@@ -275,6 +275,7 @@ public class TestApp {
 				e.printStackTrace();
 			}
 		}
+		//有的时候即使已经OK了, 但是实际上没有评论成功!
 		return "OK".equals( result );
 	}
 
@@ -312,6 +313,7 @@ public class TestApp {
 								System.out.println( "评论已经不为空, 放弃. " + ct.aid );
 								db.markFailed( ct );
 							} else if (doComment( db.getVideo( ct.aid ) )) {
+								//判断一下第一是不是自己
 								db.markFinished( ct );
 							}
 						}
@@ -499,8 +501,8 @@ public class TestApp {
 						long beg = System.currentTimeMillis();
 						String result = mainBilibiliService.comment( ct.aid, ct.msg );
 						long end = System.currentTimeMillis();
-						System.out.println( "对 " + ct.aid + " 进行评论 " + ct.msg + " , 结果是 " + result + " 时间="
-								+ ( end - beg ) );
+						System.out.println(
+								"对 " + ct.aid + " 进行评论 " + ct.msg + " , 结果是 " + result + " 时间=" + ( end - beg ) );
 						if ("OK".equals( result )) {
 							break;
 						}

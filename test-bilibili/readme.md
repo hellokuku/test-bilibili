@@ -4,15 +4,15 @@ http://api.bilibili.com/favourite/add?id=3335348
 
 获取用户的收藏夹
 这个似乎没有做权限认证, 所以可以获取其他人的收藏夹?
-http://space.bilibili.com/ajax/fav/getList?mid=19161363&pagesize=30&fid=19407652
+http://space.bilibili.com/ajax/fav/getBoxList?mid=
 和[获取收藏的视频]搭配使用可以获取别人的收藏信息!
 
 收藏列表
-http://space.bilibili.com/ajax/fav/getList?mid=19216452&pagesize=30&fid=19453437
+http://space.bilibili.com/ajax/fav/getList?mid=19161363&pagesize=30&fid=19453437
 pagesize最大在70左右
 
 获得评论列表
-http://api.bilibili.com/feedback?page=1&mode=arc&type=json&ver=3&order=default&pagesize=1&aid=2007731
+http://api.bilibili.com/feedback?page=1&mode=arc&type=json&ver=3&order=default&pagesize=1&aid=3356314
 
 获得视频信息
 http://api.bilibili.cn/view?appkey=03fc8eb101b091fb&id=3342515
