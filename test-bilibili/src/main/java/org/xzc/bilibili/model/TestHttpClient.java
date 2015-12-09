@@ -1,13 +1,17 @@
 package org.xzc.bilibili.model;
 
-import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.Date;
+import java.util.zip.GZIPInputStream;
 
-import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.client.utils.HttpClientUtils;
-import org.apache.http.impl.client.AbstractResponseHandler;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -16,7 +20,6 @@ import org.junit.Test;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 
 public class TestHttpClient {
 
@@ -64,17 +67,49 @@ public class TestHttpClient {
 		//		JSON.toJavaObject( json, clazz )
 	}
 
+	private String turl = "http://api.bilibili.com/favourite/add?id=3335348";
+
 	@Test
 	public void test1() throws Exception {
 		BasicCookieStore bcs = new BasicCookieStore();
 		CloseableHttpClient hc = HttpClients.custom().setDefaultCookieStore( bcs ).build();
 		long beg = System.currentTimeMillis();
-		CloseableHttpResponse res = hc.execute( RequestBuilder.get( "http://www.baidu.com" ).build() );
-		System.out.println( System.currentTimeMillis() - beg );
-		EntityUtils.toString( res.getEntity() );
+		CloseableHttpResponse res = hc.execute( RequestBuilder.get( turl ).build() );
+		String content = EntityUtils.toString( res.getEntity(),"utf8" );
 		HttpClientUtils.closeQuietly( res );
-		System.out.println( System.currentTimeMillis() - beg );
 		//System.out.println( result );
 		HttpClientUtils.closeQuietly( hc );
+		//System.out.println( content );
+		System.out.println( content.length() );
+		System.out.println( System.currentTimeMillis() - beg );
+	}
+
+	@Test
+	public void test2() throws Exception {
+		long beg = System.currentTimeMillis();
+		URL url = new URL( turl );
+		HttpURLConnection con = (HttpURLConnection) url.openConnection();
+		con.setRequestProperty( "Accept",
+				"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8" );
+		con.setRequestProperty( "Accept", "Accept-Language:zh-CN,zh;q=0.8" );
+		con.setRequestProperty( "User-Agent",
+				"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.87 Safari/537.36 QQBrowser/9.2.5584.400" );
+		System.out.println( con.getContentType() );
+		System.out.println( con.getContentEncoding() );
+		StringBuffer sb = new StringBuffer();
+		InputStream is = con.getInputStream();
+//		BufferedReader br = new BufferedReader( new InputStreamReader( new GZIPInputStream( is ), "utf-8" ) );
+		BufferedReader br = new BufferedReader( new InputStreamReader( is,  "GBK" ) );
+		String line = null;
+		while (( line = br.readLine() ) != null) {
+			sb.append( line );
+		}
+		String content = sb.toString();
+		//System.out.println( content );
+		System.out.println( content.length() );
+		br.close();
+		is.close();
+		long end = System.currentTimeMillis();
+		System.out.println( end - beg );
 	}
 }
