@@ -2,6 +2,8 @@ package org.xzc.bilibili;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -10,6 +12,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -293,6 +296,7 @@ public class TestApp {
 				while (true) {
 					List<CommentTask> taskList = db.getCommentTaskList();
 					System.out.println( "开始执行自动评论任务, 任务数量=" + taskList.size() );
+					try{
 					//评论!
 					for (CommentTask ct : taskList) {
 						if (!simpleBilibiliService.isCommentListEmpty( ct.aid )) {
@@ -301,6 +305,21 @@ public class TestApp {
 							db.markFailed( ct );
 						} else if (doComment( db.getVideo( ct.aid ) )) {
 							db.markFinished( ct );
+						}
+					}
+					}catch(RuntimeException e){
+						simpleBilibiliService.rebuildContext();
+						mainBilibiliService.rebuildContext();
+						try {
+							FileUtils.writeStringToFile( new File( "error.log" ), e.getMessage()+"\r\n", true );
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}
+						try {
+							Thread.sleep( 20000 );
+						} catch (InterruptedException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
 						}
 					}
 					try {
@@ -337,8 +356,23 @@ public class TestApp {
 						reachBoundary = true;
 						break;
 					}
+				} else if (code == -101) {
+					//{"code":-101,"message":"Account is not logined.","ts":1449589626}
+					simpleBilibiliService.rebuildContext();
+					mainBilibiliService.rebuildContext();
+					System.out.println( "出问题了code=-101, 睡觉20秒" );
+					Thread.sleep( 20000 );
+					continue;
 				} else {
-					throw new RuntimeException( "未知的code=" + code );
+					String content = simpleBilibiliService.getLastFavoriteContent();
+					FileUtils.writeStringToFile( new File( "error.log" ), content+"\r\n", true );
+					simpleBilibiliService.rebuildContext();
+					mainBilibiliService.rebuildContext();
+					System.out.println( "出问题了, 睡觉20秒" );
+					Thread.sleep( 20000 );
+					continue;
+					//System.out.println( content );
+					//throw new RuntimeException( "未知的code=" + code );
 				}
 				++aid;
 			}
@@ -346,6 +380,7 @@ public class TestApp {
 			if (reachBoundary) {
 				reachBoundary = false;
 				System.out.println( "真的达到边界了, 休息10秒,再继续" );
+				//FileUtils.writeStringToFile( new File( "error.log" ), "测试测试\r\n", true);
 				Thread.sleep( 10000 );
 			}
 		}
@@ -456,7 +491,8 @@ public class TestApp {
 						long beg = System.currentTimeMillis();
 						String result = mainBilibiliService.comment( ct.aid, ct.msg );
 						long end = System.currentTimeMillis();
-						System.out.println( "对 " + ct.aid + " 进行评论 " + ct.msg + " , 结果是 " + result + " 时间=" + ( end - beg ) );
+						System.out.println( "对 " + ct.aid + " 进行评论 " + ct.msg + " , 结果是 " + result + " 时间="
+								+ ( end - beg ) );
 						if ("OK".equals( result )) {
 							break;
 						}

@@ -122,6 +122,12 @@ public class BilibiliService {
 
 	private BasicHttpContext ctx;
 
+	private String lastFavoriteContent;
+	
+	public String getLastFavoriteContent() {
+		return lastFavoriteContent;
+	}
+
 	/**
 	 * 添加视频到收藏夹
 	 * 0成功 11007 重复 -1111不存在
@@ -133,6 +139,7 @@ public class BilibiliService {
 			public Integer run() throws Exception {
 				String url = "http://api.bilibili.com/favourite/add?id=" + aid;
 				String content = asString( url );
+				lastFavoriteContent=content;
 				return JSON.parseObject( content ).getIntValue( "code" );
 			}
 		} );
