@@ -107,6 +107,8 @@ http://static.hdslb.com/miniloader.swf?aid=3342515&page=1
 http://cn-zjhz3-dx.acgvideo.com/vg1/5/f5/5278763-1.flv?expires=1449474600&ssig=DPbFhUYY6iJtOabBeNnO7A&oi=1961149960&player=1&or=1902745807&rate=0
 
 http://interface.bilibili.com/player?id=cid:5278763
+http://61.164.47.167/player?id=cid:5278763
+
 http://interface.bilibili.com/playurl?cid=5278763&player=1&ts=1449467419&sign=8be05bfa069879c44d6222e14d285e2a
 http://comment.bilibili.com/cloud/filter/3337525.json
 

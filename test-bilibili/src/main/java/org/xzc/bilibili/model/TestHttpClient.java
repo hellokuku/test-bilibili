@@ -5,10 +5,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.Date;
-import java.util.zip.GZIPInputStream;
 
+import org.apache.http.Header;
+import org.apache.http.HttpHost;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.client.utils.HttpClientUtils;
@@ -67,21 +67,27 @@ public class TestHttpClient {
 		//		JSON.toJavaObject( json, clazz )
 	}
 
-	private String turl = "http://api.bilibili.com/favourite/add?id=3335348";
+	private String turl = "http://api.bilibili.com/feedback?page=1&mode=arc&type=json&ver=3&order=default&pagesize=1&aid=3359166";
 
 	@Test
 	public void test1() throws Exception {
 		BasicCookieStore bcs = new BasicCookieStore();
-		CloseableHttpClient hc = HttpClients.custom().setDefaultCookieStore( bcs ).build();
+		HttpHost proxy = new HttpHost( "cache.sjtu.edu.cn", 8080 );
+		CloseableHttpClient hc = HttpClients.custom().setProxy( proxy ).setDefaultCookieStore( bcs ).build();
+		//CloseableHttpClient hc = HttpClients.custom().setDefaultCookieStore( bcs ).build();
 		long beg = System.currentTimeMillis();
 		CloseableHttpResponse res = hc.execute( RequestBuilder.get( turl ).build() );
-		String content = EntityUtils.toString( res.getEntity(),"utf8" );
+		String content = EntityUtils.toString( res.getEntity(), "utf8" );
 		HttpClientUtils.closeQuietly( res );
 		//System.out.println( result );
 		HttpClientUtils.closeQuietly( hc );
 		//System.out.println( content );
 		System.out.println( content.length() );
 		System.out.println( System.currentTimeMillis() - beg );
+		System.out.println( res.getStatusLine().getStatusCode() );
+		for (Header h : res.getAllHeaders()) {
+			System.out.println( h.toString() );
+		}
 	}
 
 	@Test
@@ -98,8 +104,8 @@ public class TestHttpClient {
 		System.out.println( con.getContentEncoding() );
 		StringBuffer sb = new StringBuffer();
 		InputStream is = con.getInputStream();
-//		BufferedReader br = new BufferedReader( new InputStreamReader( new GZIPInputStream( is ), "utf-8" ) );
-		BufferedReader br = new BufferedReader( new InputStreamReader( is,  "GBK" ) );
+		//		BufferedReader br = new BufferedReader( new InputStreamReader( new GZIPInputStream( is ), "utf-8" ) );
+		BufferedReader br = new BufferedReader( new InputStreamReader( is, "GBK" ) );
 		String line = null;
 		while (( line = br.readLine() ) != null) {
 			sb.append( line );

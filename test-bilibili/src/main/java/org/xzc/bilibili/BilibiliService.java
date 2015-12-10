@@ -157,6 +157,7 @@ public class BilibiliService {
 	public String comment(final int aid, final String msg) {
 		HttpUriRequest req = makeCommentRequest( aid, msg );
 		String content = asString( req );
+		//return content;
 		Matcher matcher = RESULT_PATTERN.matcher( content );
 		matcher.find();
 		return Utils.decodeUnicode( matcher.group( 1 ) );
