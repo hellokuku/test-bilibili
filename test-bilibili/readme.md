@@ -8,7 +8,7 @@ http://space.bilibili.com/ajax/fav/getBoxList?mid=
 和[获取收藏的视频]搭配使用可以获取别人的收藏信息!
 
 收藏列表
-http://space.bilibili.com/ajax/fav/getList?mid=19161363&pagesize=30&fid=19453437
+http://space.bilibili.com/ajax/fav/getList?mid=19161363&pagesize=30&fid=19407652
 pagesize最大在70左右
 
 获得评论列表

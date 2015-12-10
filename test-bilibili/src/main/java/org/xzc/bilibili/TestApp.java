@@ -528,22 +528,18 @@ public class TestApp {
 
 	@Test
 	public void 抢评论() throws Exception {
-		ExecutorService es = Executors.newFixedThreadPool( 3 );//4个线程
+		ExecutorService es = Executors.newFixedThreadPool( 1 );//4个线程
 		List<Future<?>> list = new ArrayList<Future<?>>();
 		List<CommentTask> taskList = new ArrayList<CommentTask>();
 		List<Date> taskBlockTimeList = new ArrayList<Date>();
-		taskList.add( new CommentTask( 3356703, "福利之后是什么。" ) );
-		taskList.add( new CommentTask( 3356698, "每周一埋。" ) );
-		taskList.add( new CommentTask( 3356706, "dance!" ) );
+		taskList.add( new CommentTask( 3356294, "测试测试" ) );
 		taskBlockTimeList.add( makeDate( 12, 10, 1, 33 ) );
-		taskBlockTimeList.add( makeDate( 12, 10, 0, 58 ) );
-		taskBlockTimeList.add( makeDate( 12, 10, 1, 58 ) );
 		for (int i = 0; i < taskList.size(); ++i) {
 			final CommentTask ct = taskList.get( i );
-			final Date blockTime=taskBlockTimeList.get( i );
+			final Date blockTime = taskBlockTimeList.get( i );
 			Future<?> submit = es.submit( new Runnable() {
 				public void run() {
-					阻塞直到( blockTime);
+					阻塞直到( blockTime );
 					while (true) {
 						long beg = System.currentTimeMillis();
 						String result = mainBilibiliService.comment( ct.aid, ct.msg );
@@ -559,9 +555,10 @@ public class TestApp {
 			list.add( submit );
 		}
 		for (Future<?> f : list) {
-			try{
-			f.get();
-			}catch(Exception e){}
+			try {
+				f.get();
+			} catch (Exception e) {
+			}
 		}
 		es.shutdown();
 	}
