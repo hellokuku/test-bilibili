@@ -1,25 +1,37 @@
 package org.xzc.bilibili.model;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Random;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.http.Header;
 import org.apache.http.HttpHost;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.client.utils.HttpClientUtils;
-import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.junit.Test;
+import org.xzc.bilibili.Sign;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 
 public class TestHttpClient {
 
@@ -67,55 +79,200 @@ public class TestHttpClient {
 		//		JSON.toJavaObject( json, clazz )
 	}
 
-	private String turl = "http://api.bilibili.com/feedback?page=1&mode=arc&type=json&ver=3&order=default&pagesize=1&aid=3359166";
+	//	private String turl = "http://api.bilibili.com/feedback/post";
+	private String turl = "http://api.bilibili.com/feedback/post";
+	private Random r = new Random();
+
+	private HttpUriRequest makeCommentRequest(int aid, String msg) {
+		Map<String, String> params = new HashMap<String, String>();
+		params.put( "access_key", "339a4620ad6791660e8a49af49af3add" );
+		params.put( "appkey", "c1b107428d337928" );
+		params.put( "aid", Integer.toString( aid ) );
+		//params.put( "mid", "19161363" );
+		//params.put( "msg", msg );
+		Sign s = new Sign( params );
+		params.put( "sign", s.getSign() );
+		UrlEncodedFormEntity entity = null;
+		try {
+			List<NameValuePair> list = new ArrayList<NameValuePair>();
+			//list.add( new BasicNameValuePair( "aid", Integer.toString( aid ) ) );
+			list.add( new BasicNameValuePair( "msg", msg ) );
+			list.add( new BasicNameValuePair( "mid", "19161363" ) );
+			entity = new UrlEncodedFormEntity( list, "utf-8" );
+		} catch (Exception ex) {
+		}
+		RequestBuilder rb = RequestBuilder.post( "http://api.bilibili.com/feedback/post" ).setEntity( entity );
+		String ip = "222.35.10." + r.nextInt( 256 );
+		rb.addHeader( "X-Client-IP", ip );
+		rb.addHeader( "X-Forwarded-For", ip );
+		for (Entry<String, String> e : params.entrySet()) {
+			rb.addParameter( e.getKey(), e.getValue() );
+		}
+		return rb.build();
+	}
+
+	long last[] = new long[] { 0 };
+	int taid[] = new int[] { 3356294 };//3356294 2356223
+	private AtomicBoolean ab = new AtomicBoolean();
+
+	private void work(Config cfg) throws Exception {
+		ExecutorService es = cfg.es;
+		//SocketConfig sc = SocketConfig.custom().setSoKeepAlive( true ).setSoReuseAddress( true ).build();
+		final CloseableHttpClient hc = cfg.hc;
+		//		final CloseableHttpClient hc = HttpClients.custom().setConnectionManager( p ).build();
+		int batch = 4;
+		List<Future<?>> futureList = new ArrayList<Future<?>>();
+
+		final boolean ok[] = new boolean[] { false };
+		final AtomicInteger ai = new AtomicInteger( 0 );
+		final AtomicInteger tcount = new AtomicInteger( 0 );
+		final long tbeg = System.currentTimeMillis();
+		for (int ii = 0; ii < batch; ++ii) {
+			Future<?> f = es.submit( new Callable<Void>() {
+				public Void call() throws Exception {
+					for (; !ok[0];) {
+						long beg = System.currentTimeMillis();
+						int aid = taid[0];
+						CloseableHttpResponse res = hc.execute( makeCommentRequest( aid, "测试测试6" ) );
+						//						System.out.println( "aid=" + aid + ", 结果=" + json.getString( "message" ) + ", 耗时="
+						//								+ ( end - beg ) + "间隔=" + ( end - last[0] ) );String content = EntityUtils.toString( res.getEntity(), "utf8" );
+						tcount.incrementAndGet();
+						long end = System.currentTimeMillis();
+						String content = EntityUtils.toString( res.getEntity() );
+						HttpClientUtils.closeQuietly( res );
+						//System.out.println( tcount.get() + " 时间=" + ( end - tbeg )/1000+"秒 间隔="+(end-last[0]) + content.trim() );
+						System.out
+								.println( tcount.get() + " 时间=" + ( end - tbeg ) / 1000 + "秒 间隔=" + ( end - last[0] ) );
+
+						last[0] = end;
+						JSONObject json = JSON.parseObject( content );
+						int code = json.getIntValue( "code" );
+						//我们可以利用Feedback duplicate, 它的code也是0 这样可以防止重复
+						//然后由可以利用多线程的并发 简直流弊
+						//System.out.println( content );
+						if (code == 0) {
+							ok[0] = true;
+							ai.incrementAndGet();
+							//{"code":0,"msg":"Feedback duplicate"}
+							//{"code":-503,"result":[],"error":"overspeed"}
+						}
+						if (code == -503) {
+							//超速
+							System.out.println(
+									( System.currentTimeMillis() - tbeg ) / 1000 + "秒 " + tcount.get() + "个" );
+							//						System.out.println( bcs );
+							//							System.exit( 0 );
+							return null;
+						}
+					}
+					return null;
+				}
+			} );
+			futureList.add( f );
+		}
+		/*for (int i = 0; i < 30; ++i) {
+			System.out.println( "睡觉" + i );
+			Thread.sleep( 1000 );
+		}
+		System.out.println( "改变! tid=" + 2356223 );
+		taid[0] = 2356223;
+		*/
+		for (Future<?> f : futureList)
+			f.get();
+		//System.out.println( "重启" );
+		//Thread.sleep( 3000 );
+		//work( es );
+		if (!ok[0]) {
+			Thread.sleep( 2000 );
+			work( cfg );
+		}
+	}
+
+	public static class Config {
+		public ExecutorService es;
+		public CloseableHttpClient hc;
+		public PoolingHttpClientConnectionManager p;
+	}
+	/*private LinkedBlockingQueue<Config> queue;
+	private Thread configProducer=new Thread(){
+		@Override
+		public void run() {
+			super.run();
+		}
+	};*/
 
 	@Test
 	public void test1() throws Exception {
-		BasicCookieStore bcs = new BasicCookieStore();
-		HttpHost proxy = new HttpHost( "cache.sjtu.edu.cn", 8080 );
-		CloseableHttpClient hc = HttpClients.custom().setProxy( proxy ).setDefaultCookieStore( bcs ).build();
-		//CloseableHttpClient hc = HttpClients.custom().setDefaultCookieStore( bcs ).build();
-		long beg = System.currentTimeMillis();
-		CloseableHttpResponse res = hc.execute( RequestBuilder.get( turl ).build() );
-		String content = EntityUtils.toString( res.getEntity(), "utf8" );
-		HttpClientUtils.closeQuietly( res );
-		//System.out.println( result );
-		HttpClientUtils.closeQuietly( hc );
-		//System.out.println( content );
-		System.out.println( content.length() );
-		System.out.println( System.currentTimeMillis() - beg );
-		System.out.println( res.getStatusLine().getStatusCode() );
-		for (Header h : res.getAllHeaders()) {
-			System.out.println( h.toString() );
+		HttpHost proxy1 = new HttpHost( "cache.sjtu.edu.cn", 8080 );
+		HttpHost proxy2 = new HttpHost( "202.120.17.158", 8080 );
+		proxy1 = null;
+		proxy2 = null;
+		ExecutorService es = Executors.newFixedThreadPool( 32 );
+		final Config c1 = new Config();
+		c1.p = new PoolingHttpClientConnectionManager();
+		c1.p.setDefaultMaxPerRoute( 16 );
+		c1.p.setMaxTotal( 64 );
+		c1.hc = HttpClients.custom().setProxy( proxy1 ).setConnectionManager( c1.p ).build();
+		c1.es = es;
+
+		final Config c2 = new Config();
+		c2.p = new PoolingHttpClientConnectionManager();
+		c2.p.setDefaultMaxPerRoute( 16 );
+		c2.p.setMaxTotal( 64 );
+		c2.hc = HttpClients.custom().setProxy( proxy2 ).setConnectionManager( c2.p ).build();
+		c2.es = es;
+
+		new Thread() {
+			public void run() {
+				try {
+					work( c2 );
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}.start();
+		new Thread() {
+			public void run() {
+				try {
+					Thread.sleep( 4000 );
+					work( c1 );
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}.start();
+
+		Thread.sleep( 60000 );
+		taid[0] = 2356223;
+		for (int i = 0; i < 10; ++i) {
+			System.out.println( "睡觉" + i );
+			Thread.sleep( 1000 );
 		}
+		//HttpClientUtils.closeQuietly( hc );
+		//		System.out.println( "全部完成 ai=" + ai.get() );
+	}
+
+	private HttpUriRequest makeCommentRequest2(int aid, String msg) {
+		return RequestBuilder.get( "http://interface.bilibili.com/feedback/post" ).addParameter( "callback", "abc" )
+				.addParameter( "aid", Integer.toString( aid ) ).addParameter( "msg", msg )
+				.addParameter( "action", "send" ).addHeader( "Referer", "http://www.bilibili.com/video/av" + aid )
+				.build();
 	}
 
 	@Test
-	public void test2() throws Exception {
-		long beg = System.currentTimeMillis();
-		URL url = new URL( turl );
-		HttpURLConnection con = (HttpURLConnection) url.openConnection();
-		con.setRequestProperty( "Accept",
-				"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8" );
-		con.setRequestProperty( "Accept", "Accept-Language:zh-CN,zh;q=0.8" );
-		con.setRequestProperty( "User-Agent",
-				"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.87 Safari/537.36 QQBrowser/9.2.5584.400" );
-		System.out.println( con.getContentType() );
-		System.out.println( con.getContentEncoding() );
-		StringBuffer sb = new StringBuffer();
-		InputStream is = con.getInputStream();
-		//		BufferedReader br = new BufferedReader( new InputStreamReader( new GZIPInputStream( is ), "utf-8" ) );
-		BufferedReader br = new BufferedReader( new InputStreamReader( is, "GBK" ) );
-		String line = null;
-		while (( line = br.readLine() ) != null) {
-			sb.append( line );
-		}
-		String content = sb.toString();
-		//System.out.println( content );
-		System.out.println( content.length() );
-		br.close();
-		is.close();
-		long end = System.currentTimeMillis();
-		System.out.println( end - beg );
+	public void testip138() throws Exception {
+		CloseableHttpClient hc = HttpClients.custom().build();
+		String url = "http://1111.ip138.com/ic.asp";
+		String ip = "222.35.11." + r.nextInt( 256 );
+		CloseableHttpResponse res = hc.execute(
+				RequestBuilder.get( url )
+				//.addHeader( "X-Client-IP", ip )
+				.addHeader( "X-Forwarded-For", ip )
+				.build() );
+		String content = EntityUtils.toString( res.getEntity(),"gb2312" );
+		System.out.println( content );
+		res.close();
+		hc.close();
 	}
+
 }

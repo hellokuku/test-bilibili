@@ -1,5 +1,13 @@
 package org.xzc.bilibili;
 
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.http.client.utils.URLEncodedUtils;
+
 public class Utils {
 	public static String decodeUnicode(String theString) {
 		char aChar;
@@ -65,4 +73,5 @@ public class Utils {
 		}
 		return outBuffer.toString();
 	}
+	
 }
