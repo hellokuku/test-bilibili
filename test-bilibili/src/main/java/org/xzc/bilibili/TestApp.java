@@ -528,12 +528,14 @@ public class TestApp {
 
 	@Test
 	public void 抢评论() throws Exception {
-		ExecutorService es = Executors.newFixedThreadPool( 1 );//4个线程
+		ExecutorService es = Executors.newFixedThreadPool( 2 );//4个线程
 		List<Future<?>> list = new ArrayList<Future<?>>();
 		List<CommentTask> taskList = new ArrayList<CommentTask>();
 		List<Date> taskBlockTimeList = new ArrayList<Date>();
-		taskList.add( new CommentTask( 3356294, "测试测试" ) );
-		taskBlockTimeList.add( makeDate( 12, 10, 1, 33 ) );
+		taskList.add( new CommentTask( 3361711, "全部成为F吧!" ) );
+		taskList.add( new CommentTask( 3361703, "这番这么冷。。。" ) );
+		taskBlockTimeList.add( makeDate( 12, 11, 1, 33 ) );
+		taskBlockTimeList.add( makeDate( 12, 11, 0, 28 ) );
 		for (int i = 0; i < taskList.size(); ++i) {
 			final CommentTask ct = taskList.get( i );
 			final Date blockTime = taskBlockTimeList.get( i );
@@ -544,8 +546,8 @@ public class TestApp {
 						long beg = System.currentTimeMillis();
 						String result = mainBilibiliService.comment( ct.aid, ct.msg );
 						long end = System.currentTimeMillis();
-						System.out.println(
-								"对 " + ct.aid + " 进行评论 " + ct.msg + " , 结果是 " + result + " 时间=" + ( end - beg ) );
+						System.out.println( "对 " + ct.aid + " 进行评论 " + ct.msg + " , 结果是 " + result + " 时间="
+								+ ( end - beg ) );
 						if ("OK".equals( result )) {
 							break;
 						}
