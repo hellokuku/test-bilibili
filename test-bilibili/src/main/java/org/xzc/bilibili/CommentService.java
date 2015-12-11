@@ -13,7 +13,7 @@ public class CommentService {
 		if (v.typeid == 30) {
 			return v.title.contains( "初音" ) || v.title.contains( "洛天依" );
 		}
-		if (v.typeid == 71 && v.mid == 883968) //暴走漫画
+		if (( v.typeid == 71 || v.typeid == 138 ) && v.mid == 883968) //暴走漫画
 			return true;
 		return v.typeid == 31 || v.typeid == 32 || v.typeid == 33 /*|| v.typeid == 17 || v.typeid == 65*/;
 	}
@@ -34,7 +34,7 @@ public class CommentService {
 			if (v.title.contains( "洛天依" )) //126 人力VOCALOID
 				return "天依的评论由我来攻占, up主加油.";
 		}
-		if (v.typeid == 71 && v.mid == 883968) {//暴走漫画
+		if (( v.typeid == 71 || v.typeid == 138 ) && v.mid == 883968) {//暴走漫画
 			if (v.title.contains( "暴走大事件第四季" ))
 				return "感谢大事件, 每周都给我们带来欢乐!~";
 			if (v.title.contains( "暴走敖尼玛" ))
