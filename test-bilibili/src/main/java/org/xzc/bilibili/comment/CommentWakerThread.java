@@ -100,7 +100,7 @@ public class CommentWakerThread extends Thread {
 				public Void call() throws Exception {
 					while (!stop.get() && !overspeed.get()) {
 						try {
-							HttpUriRequest req=makeCommentRequest( cfg.aid, cfg.msg );
+							HttpUriRequest req = makeCommentRequest( cfg.aid, cfg.msg );
 							CloseableHttpResponse res = hc.execute( req );
 							String content = EntityUtils.toString( res.getEntity() );
 							HttpClientUtils.closeQuietly( res );
@@ -117,7 +117,7 @@ public class CommentWakerThread extends Thread {
 							//System.out.println( content );
 							if (code == 0) {//{"code":0,"msg":"Feedback duplicate"}
 								stop.set( true );
-								
+
 							}
 							if (code == -503) {
 								//{"code":-503,"result":[],"error":"overspeed"}
