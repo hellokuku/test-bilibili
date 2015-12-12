@@ -319,7 +319,7 @@ public class TestApp {
 								db.markFinished( ct );
 							}
 						}
-					} catch (RuntimeException e) {
+					} catch (Exception e) {
 						simpleBilibiliService.rebuildContext();
 						mainBilibiliService.rebuildContext();
 						try {
@@ -342,7 +342,7 @@ public class TestApp {
 				}
 			}
 		};
-		thread.start();
+		//thread.start();
 
 		int batch = 10;//每次检测50个aid
 		boolean reachBoundary = false;//是否达到边界
@@ -528,14 +528,16 @@ public class TestApp {
 
 	@Test
 	public void 抢评论() throws Exception {
-		ExecutorService es = Executors.newFixedThreadPool( 2 );//4个线程
+		ExecutorService es = Executors.newFixedThreadPool( 3 );//4个线程
 		List<Future<?>> list = new ArrayList<Future<?>>();
 		List<CommentTask> taskList = new ArrayList<CommentTask>();
 		List<Date> taskBlockTimeList = new ArrayList<Date>();
-		taskList.add( new CommentTask( 3361711, "全部成为F吧!" ) );
-		taskList.add( new CommentTask( 3361703, "这番这么冷。。。" ) );
-		taskBlockTimeList.add( makeDate( 12, 11, 1, 33 ) );
-		taskBlockTimeList.add( makeDate( 12, 11, 0, 28 ) );
+		taskList.add( new CommentTask( 3367069, "上周的9.5吓得不轻。" ) );
+		taskList.add( new CommentTask( 3367052, "临近期末考了，求保佑。" ) );
+		taskList.add( new CommentTask( 3367059, "好番就是耐看。" ) );
+		taskBlockTimeList.add( makeDate( 12, 12, 3, 28 ) );
+		taskBlockTimeList.add( makeDate( 12, 12, 1, 03 ) );
+		taskBlockTimeList.add( makeDate( 12, 12, 2, 38 ) );
 		for (int i = 0; i < taskList.size(); ++i) {
 			final CommentTask ct = taskList.get( i );
 			final Date blockTime = taskBlockTimeList.get( i );
