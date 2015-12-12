@@ -133,7 +133,7 @@ public class CommentWokerThread extends Thread {
 							long llast = last.getAndSet( end );
 							String content = EntityUtils.toString( res.getEntity() ).trim();
 							content = Utils.decodeUnicode( content );
-							System.out.println( content );
+							//System.out.println( content );
 							res.close();
 							int count = tcount.incrementAndGet();
 							if (count % 10 == 0) {
