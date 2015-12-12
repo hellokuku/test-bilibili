@@ -1,64 +1,62 @@
 package org.xzc.bilibili.comment;
 
-import org.apache.http.HttpHost;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Config {
-	public int batch;
-	public int aid;
-	public String msg;
-	public HttpHost proxy;
-	public long delay;
-	public String tag;
-	public String sip;
-	public String fip;
+	private int aid;
+	private String msg;
+	private String proxyHost;
+	private int proxyPort;
+	private String tag;
+	private String subTag;
+	private List<Sender> senderList = new ArrayList<Sender>();
+	private int batch;
 
 	public Config() {
 		// this(null, 0, 0, null, null, 0);
 	}
 
-	public Config(String tag, int batch, int aid, String msg, HttpHost proxy, long delay, String sip, String fip) {
+	public Config(String tag, int aid, String msg) {
 		this.tag = tag;
-		this.batch = batch;
 		this.aid = aid;
 		this.msg = msg;
-		this.proxy = proxy;
-		this.delay = delay;
-		this.sip = sip;
 	}
 
 	public Config copy() {
-		return new Config( tag, batch, aid, msg, proxy, delay, sip,fip );
+		return new Config( tag, aid, msg );
 	}
 
-	public String getFip() {
-		return fip;
-	}
-
-	public Config setFip(String fip) {
-		this.fip = fip;
-		return this;
-	}
-
-	public String getSip() {
-		return sip;
-	}
-
-	public Config setSip(String sip) {
-		this.sip = sip;
-		return this;
+	public int getAid() {
+		return aid;
 	}
 
 	public int getBatch() {
 		return batch;
 	}
 
-	public Config setBatch(int batch) {
-		this.batch = batch;
-		return this;
+	public String getMsg() {
+		return msg;
 	}
 
-	public int getAid() {
-		return aid;
+	public String getProxyHost() {
+		return proxyHost;
+	}
+
+	public int getProxyPort() {
+		return proxyPort;
+	}
+
+	public List<Sender> getSenderList() {
+		return senderList;
+	}
+
+	public String getSubTag() {
+		return subTag;
+	}
+
+	public String getTag() {
+		return tag;
 	}
 
 	public Config setAid(int aid) {
@@ -66,8 +64,9 @@ public class Config {
 		return this;
 	}
 
-	public String getMsg() {
-		return msg;
+	public Config setBatch(int batch) {
+		this.batch = batch;
+		return this;
 	}
 
 	public Config setMsg(String msg) {
@@ -75,26 +74,24 @@ public class Config {
 		return this;
 	}
 
-	public HttpHost getProxy() {
-		return proxy;
-	}
-
-	public Config setProxy(HttpHost proxy) {
-		this.proxy = proxy;
+	public Config setProxyHost(String proxyHost) {
+		this.proxyHost = proxyHost;
 		return this;
 	}
 
-	public long getDelay() {
-		return delay;
-	}
-
-	public Config setDelay(long delay) {
-		this.delay = delay;
+	public Config setProxyPort(int proxyPort) {
+		this.proxyPort = proxyPort;
 		return this;
 	}
 
-	public String getTag() {
-		return tag;
+	public Config setSenderList(List<Sender> senderList) {
+		this.senderList = senderList;
+		return this;
+	}
+
+	public Config setSubTag(String subTag) {
+		this.subTag = subTag;
+		return this;
 	}
 
 	public Config setTag(String tag) {
