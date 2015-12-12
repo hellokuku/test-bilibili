@@ -23,11 +23,11 @@ public class CommentJob implements Job {
 		//根据senderList创建多个子线程去工作
 		try {
 			AtomicBoolean stop = new AtomicBoolean( false );
-			AtomicLong last= new AtomicLong( 0);
+			AtomicLong last = new AtomicLong( 0 );
 			for (Sender s : c0.getSenderList()) {
 				Config c1 = c0.copy().setSubTag( s.getTag() ).setBatch( s.getBatch() ).setProxyHost( s.getIp() )
 						.setProxyPort( s.getPort() );
-				CommentWokerThread t1 = new CommentWokerThread( c1, stop,last );
+				CommentWokerThread t1 = new CommentWokerThread( c1, stop, last );
 				t1.start();
 				threadList.add( t1 );
 			}
@@ -41,5 +41,6 @@ public class CommentJob implements Job {
 				e.printStackTrace();
 			}
 		}
+		System.out.println( c0.getTag() + "执行完毕!" );
 	}
 }

@@ -60,13 +60,13 @@ public class CommentRunner {
 		s.addJob( commentJob, false );
 
 		List<Sender> senderList = new ArrayList<Sender>();
-		senderList.add( new Sender( "cache.sjtu.edu.cn", 8080, 8, "sjtu" ) );
-		senderList.add( new Sender( "202.120.17.158", 2076, 8, "158" ) );
-		senderList.add( new Sender( "222.35.17.177", 2076, 8, "177" ) );
-		senderList.add( new Sender( null, 0, 8, "本机" ) );
-		Config cfg = new Config( "学战都市", 3374064, "封面看得我好饿, 拿点东西吃, 边吃边看.",
-				new DateTime( 2015, 12, 12, 20, 47,30 ).toDate(),
-				new DateTime( 2015, 12, 12, 20, 48,0 ).toDate() ).setSenderList( senderList );
+		//senderList.add( new Sender( "cache.sjtu.edu.cn", 8080, 8, "sjtu" ) );
+		//senderList.add( new Sender( "202.120.17.158", 2076, 8, "158" ) );
+		//senderList.add( new Sender( "222.35.17.177", 2076, 8, "177" ) );
+		senderList.add( new Sender( null, 0, 16, "本机" ) );
+		Config cfg = new Config( "落第骑士英雄谭", 3374073, "深夜的一刀修罗!",
+				new DateTime( 2015, 12, 12, 20, 55 ).toDate(),
+				new DateTime( 2015, 12, 12, 21, 26 ).toDate() ).setSenderList( senderList );
 
 		Trigger t1 = addJob( s, commentJob, cfg );
 	}

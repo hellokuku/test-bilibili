@@ -72,7 +72,7 @@ public class CommentWokerThread extends Thread {
 
 	public void run() {
 		PoolingHttpClientConnectionManager p = new PoolingHttpClientConnectionManager();
-		p.setMaxTotal( cfg.getBatch() );
+		p.setMaxTotal( cfg.getBatch() * 4 );
 		p.setDefaultMaxPerRoute( cfg.getBatch() );
 		RequestConfig rc = RequestConfig.custom().setCookieSpec( CookieSpecs.IGNORE_COOKIES ).build();
 		HttpClientBuilder hcb = HttpClients.custom()
@@ -117,6 +117,7 @@ public class CommentWokerThread extends Thread {
 								stop.set( true );
 							long llast = last.getAndSet( end );
 							String content = EntityUtils.toString( res.getEntity() );
+							//System.out.println( content );
 							HttpClientUtils.closeQuietly( res );
 							int count = tcount.incrementAndGet();
 							if (count % 10 == 0) {
