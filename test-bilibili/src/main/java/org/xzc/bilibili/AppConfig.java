@@ -45,7 +45,7 @@ public class AppConfig {
 		return bs;
 	}
 
-	@Bean(name = "mainBilibiliService")
+	//@Bean(name = "mainBilibiliService")
 	public BilibiliService mainBilibiliService(@Qualifier("mainAccount") Account a) {
 		BilibiliService bs = new BilibiliService( a );
 		return bs;

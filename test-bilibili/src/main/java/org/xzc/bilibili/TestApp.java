@@ -36,8 +36,9 @@ public class TestApp {
 	@Autowired
 	@Qualifier("simpleBilibiliService")
 	private BilibiliService simpleBilibiliService;
-	@Autowired
-	@Qualifier("mainBilibiliService")
+
+	//@Autowired
+	//@Qualifier("mainBilibiliService")
 	private BilibiliService mainBilibiliService;
 
 	//测试是否登陆
