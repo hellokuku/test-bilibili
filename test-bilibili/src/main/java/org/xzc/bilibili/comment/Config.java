@@ -1,6 +1,7 @@
 package org.xzc.bilibili.comment;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Config {
@@ -12,19 +13,31 @@ public class Config {
 	private String subTag;
 	private List<Sender> senderList = new ArrayList<Sender>();
 	private int batch;
+	private Date endAt;
+	private Date startAt;
+
+	public Date getStartAt() {
+		return startAt;
+	}
+
+	public void setStartAt(Date startAt) {
+		this.startAt = startAt;
+	}
 
 	public Config() {
 		// this(null, 0, 0, null, null, 0);
 	}
 
-	public Config(String tag, int aid, String msg) {
+	public Config(String tag, int aid, String msg, Date startAt, Date endAt) {
 		this.tag = tag;
 		this.aid = aid;
 		this.msg = msg;
+		this.startAt = startAt;
+		this.endAt = endAt;
 	}
 
 	public Config copy() {
-		return new Config( tag, aid, msg );
+		return new Config( tag, aid, msg, startAt, endAt );
 	}
 
 	public int getAid() {
@@ -33,6 +46,10 @@ public class Config {
 
 	public int getBatch() {
 		return batch;
+	}
+
+	public Date getEndAt() {
+		return endAt;
 	}
 
 	public String getMsg() {
@@ -69,6 +86,11 @@ public class Config {
 		return this;
 	}
 
+	public Config setEndAt(Date endAt) {
+		this.endAt = endAt;
+		return this;
+	}
+
 	public Config setMsg(String msg) {
 		this.msg = msg;
 		return this;
@@ -97,6 +119,12 @@ public class Config {
 	public Config setTag(String tag) {
 		this.tag = tag;
 		return this;
+	}
+
+	@Override
+	public String toString() {
+		return "Config [aid=" + aid + ", msg=" + msg + ", proxyHost=" + proxyHost + ", proxyPort=" + proxyPort
+				+ ", tag=" + tag + ", subTag=" + subTag + ", senderList=" + senderList + ", batch=" + batch + "]";
 	}
 
 }

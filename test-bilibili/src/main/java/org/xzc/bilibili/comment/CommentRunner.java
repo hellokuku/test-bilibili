@@ -5,8 +5,8 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.http.HttpHost;
@@ -25,23 +25,25 @@ import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import org.quartz.SchedulerMetaData;
 import org.quartz.Trigger;
-import org.quartz.Trigger.TriggerState;
 import org.quartz.TriggerBuilder;
 import org.quartz.impl.StdSchedulerFactory;
 
 import com.alibaba.fastjson.JSON;
 
 public class CommentRunner {
-	private static Trigger addJob(Scheduler s, JobDetail job, DateTime startAt, Config cfg)
+	private static final SimpleDateFormat SDF = new SimpleDateFormat( "MM月dd日HH时mm分ss秒" );
+
+	private static Trigger addJob(Scheduler s, JobDetail job, Config cfg)
 			throws SchedulerException {
 		Trigger t = TriggerBuilder.newTrigger()
-				.startAt( startAt.toDate() )
+				.startAt( cfg.getStartAt() )
 				.forJob( job )
 				.usingJobData( CommentJob.ARG_CONFIG, JSON.toJSONString( cfg ) )
 				.build();
 		s.scheduleJob( t );
+		System.out.println( "[" + cfg.getTag() + "] 将会于" + SDF.format( cfg.getStartAt() ) + "开始, 于"
+				+ SDF.format( cfg.getEndAt() ) + "结束." );
 		return t;
 	}
 
@@ -61,10 +63,12 @@ public class CommentRunner {
 		senderList.add( new Sender( "cache.sjtu.edu.cn", 8080, 8, "sjtu" ) );
 		senderList.add( new Sender( "202.120.17.158", 2076, 8, "158" ) );
 		senderList.add( new Sender( "222.35.17.177", 2076, 8, "177" ) );
-		Config cfg = new Config( "一拳超人", 3367236, "怎么会有这个?" ).setSenderList( senderList );
-		Trigger t1 = addJob( s, commentJob, DateTime.now().plusSeconds( 3 ), cfg );
-		SchedulerMetaData md = s.getMetaData();
-		System.out.println( md.getThreadPoolSize() );
+		senderList.add( new Sender( null, 0, 8, "本机" ) );
+		Config cfg = new Config( "学战都市", 3374064, "封面看得我好饿, 拿点东西吃, 边吃边看.",
+				new DateTime( 2015, 12, 12, 20, 47,30 ).toDate(),
+				new DateTime( 2015, 12, 12, 20, 48,0 ).toDate() ).setSenderList( senderList );
+
+		Trigger t1 = addJob( s, commentJob, cfg );
 	}
 
 	public void 强大的抢评论策略(long delay, int aid, String msg) throws Exception {

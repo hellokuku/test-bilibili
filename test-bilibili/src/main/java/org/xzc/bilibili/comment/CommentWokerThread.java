@@ -1,6 +1,7 @@
 package org.xzc.bilibili.comment;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
@@ -73,17 +75,26 @@ public class CommentWokerThread extends Thread {
 		p.setMaxTotal( cfg.getBatch() );
 		p.setDefaultMaxPerRoute( cfg.getBatch() );
 		RequestConfig rc = RequestConfig.custom().setCookieSpec( CookieSpecs.IGNORE_COOKIES ).build();
-		CloseableHttpClient hc = HttpClients.custom().setDefaultRequestConfig( rc )
-				.setProxy( new HttpHost( cfg.getProxyHost(), cfg.getProxyPort() ) )
-				.setConnectionManager( p ).build();
+		HttpClientBuilder hcb = HttpClients.custom()
+				.setDefaultRequestConfig( rc )
+				.setConnectionManager( p );
+		if (cfg.getProxyHost() != null) {
+			hcb.setProxy( new HttpHost( cfg.getProxyHost(), cfg.getProxyPort() ) );
+		}
+		CloseableHttpClient hc = hcb.build();
 		ExecutorService es = Executors.newFixedThreadPool( cfg.getBatch() );
-		while (!work( hc, es )) {
-			System.out.println( "[" + cfg.getSubTag() + "] 超速, 休息一下" );
-			try {
-				Thread.sleep( 2000 );
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+		try {
+			while (!work( hc, es )) {
+				System.out.println( "[" + cfg.getSubTag() + "] 超速, 休息一下" );
+				try {
+					Thread.sleep( 2000 );
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
+		} finally {
+			HttpClientUtils.closeQuietly( hc );
+			es.shutdown();
 		}
 	}
 
@@ -93,6 +104,7 @@ public class CommentWokerThread extends Thread {
 		final AtomicBoolean overspeed = new AtomicBoolean( false );
 		//final AtomicLong last = new AtomicLong( 0 );
 		final long tbeg = System.currentTimeMillis();
+		final long endAt = cfg.getEndAt().getTime();
 		for (int ii = 0; ii < cfg.getBatch(); ++ii) {
 			Future<?> f = es.submit( new Callable<Void>() {
 				public Void call() throws Exception {
@@ -101,6 +113,8 @@ public class CommentWokerThread extends Thread {
 							CloseableHttpResponse res = hc.execute( req );
 							res.getStatusLine().getStatusCode();
 							long end = System.currentTimeMillis();
+							if (end >= endAt)
+								stop.set( true );
 							long llast = last.getAndSet( end );
 							String content = EntityUtils.toString( res.getEntity() );
 							HttpClientUtils.closeQuietly( res );
