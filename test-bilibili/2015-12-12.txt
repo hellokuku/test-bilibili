@@ -1,11 +1,4 @@
-14.152.58.20
-61.164.47.167
-112.25.85.6
-
-http://space.bilibili.com/302812/#!/fav/1483819/0//1
-http://www.bilibili.com/video/av351513/
-
-
+比较没人的aid
 451514
 av451516
 av451520
@@ -35,6 +28,7 @@ av4569
 
 http://www.bilibili.com/video/av3367236/
 
+更新列表
 周一
 	温泉幼精箱根酱 00:05
 	魔鬼恋人 00:30
@@ -75,4 +69,177 @@ http://www.bilibili.com/video/av3367236/
 	小森同学拒绝不了 22:00
 	彗星路西法 22:30
 	超人幻想 22:30
+
+KOWABON 3374078 00:50
+请问您今天要来点兔子吗 3374085 01:00
+传颂之物 虚伪的假面 3374098 01:30
+终结的炽天使 3374107 02:00
+
+https://account.bilibili.com/answer/promotion
+https://account.bilibili.com/answer/cool/7163752
+https://account.bilibili.com/answer/base
+
+2015-12-12
+
+3374113	【10月】终物语 11【独家正版】
+3374107	【10月】终结的炽天使 22【bilibili正版】
+3374098	【10月】传颂之物 虚伪的假面 11【独家正版】
+3374085	【10月】请问您今天要来点兔子吗 第二季 10【独家正版】
+3374078	【10月】KOWABON 11【独家正版】
+3374073	【10月】落第骑士英雄谭 11【bilibili正版】
+3374064	【10月】学战都市Asterisk 11【独家正版】
+
+
+http://api.bilibili.com/search?main_ver=v3
+
+http://app.bilibili.com/bangumi/tid_recommend?page=1&pagesize=4&tid=33
+http://api.bilibili.com/bangumi/tid_recommend?page=1&pagesize=4&tid=33
+
+
+http://www.bilibili.com/index/ding/33.json?page=1&pagesize=100
+
+
+/feedback?ver=3
+http://app.bilibili.com/search?main_ver=v3
+
+
+ @POST("/feedback/post")
+ public abstract void send(@Query("aid") String paramString1, @Field("mid") String paramString2, @Field("msg") String paramString3, Callback<JSONObject> paramCallback);
+
+
+有主站的cookie还不够
+http://api.bilibili.com/feedback/post?aid=2347016&mid=19161363&msg=这么长...
+
+
+http://api.bilibili.com/login/get_key
+
+http://api.bilibili.com/login/v2?appkey=03fc8eb101b091fb&userid=8147532@qq.com&pwd=xzc@7086204511&platform=android&build=408005
+
+http://account.bilibili.com/api/login/v2?appkey=c1b107428d337928&userid=8147532@qq.com&pwd=xzc@7086204511&platform=android
+
+http://account.bilibili.com/api/login/v2?appkey=03fc8eb101b091fb&pwd=xzc%407086204511&userid=8147532%40qq.com&sign=84695faa539ff2cebdf86af8b2dbddb5
+
+有主站的cookie即可
+https://api.bilibili.com/myinfo
+
+access_key=8376371bad697b8bddb2e9aaa228a6fd
+access_key=8376371bad697b8bddb2e9aaa228a6fd
+appkey=c1b107428d337928
+appkey=c1b107428d337928
+build 408005
+platform=android
+sign=...
+
+https://account.bilibili.com/api/login/v2
+
+
+UserAgent BiLiBiLi WP Client/1.0.0 (orz@loli.my)
+
+
+http://www.bilibili.com/html/join.html?_device=android&access_key=8376371bad697b8bddb2e9aaa228a6fd&appkey=c1b107428d337928&build=408005&gourl=http%3A%2F%2Fwww.bilibili.com%2Fhtml%2Fjoin.html&platform=android&sign=5f7c338d3d84a31cdaac4662258f39ef
+
+
+http://api.bilibili.com/search_recommend?
+_device=android
+_hwid=3029927d46659793
+_ulv=5000
+access_key=76b5b9bdfe34bb8e2a809ba718ac5c6e
+appkey=c1b107428d337928
+main_ver=v2
+platform=android
+playtag=2634430
+recommend_type=related_post
+rindex=1
+sign=8ec7f03f380c8a0e289698cb4e75985f
+
+_device=android&_hwid=3029927d46659793&_ulv=5000&access_key=76b5b9bdfe34bb8e2a809ba718ac5c6e&appkey=c1b107428d337928&main_ver=v2&platform=android&playtag=2634430&recommend_type=related_post&rindex=1&sign=8ec7f03f380c8a0e289698cb4e75985f
+_device=android&_hwid=3029927d46659793&_ulv=5000&access_key=76b5b9bdfe34bb8e2a809ba718ac5c6e&appkey=c1b107428d337928&main_ver=v2&platform=android&playtag=2634430&recommend_type=related_post&rindex=1
+
+出来公钥c1b107428d337928私钥ea85624dfcf12d7cc7b2b3a94fac1f2c，这个有效期应该会很长~
+
+http://api.bilibili.cn/view
+
+String xx = "85eb6835b0a1034e"; 
+  String yy = "2ad42749773c441109bdc0191257a664"; 
+
+http://api.bilibili.cn/view
+
+
+_device=android&_hwid=3029927d46659793&_ulv=5000&access_key=76b5b9b
+
+dfe34bb8e2a809ba718ac5c6e&appkey=c1b107428d337928&main_ver=v2&platform=android&p
+
+laytag=2634430 AND SLEEP(5)&recommend_type=related_post&rindex=1&sign=8ec7f03f38
+
+8ec7f03f380c8a0e289698cb4e75985f
+8ec7f03f380c8a0e289698cb4e75985f
+8ec7f03f380c8a0e289698cb4e75985f
+
+http://api.bilibili.com/search_recommend?access_key=76b5b9bdfe34bb8e2a809ba718ac5c6e&appkey=c1b107428d337928&playtag=2634431&recommend_type=related_post
+http://api.bilibili.com/view?aid=3350694
+
+&sign=8ec7f03f380c8a0e289698cb4e75985f
+
+
+http://api.bilibili.com/view?appkey=03fc8eb101b091fb&id=3350694&page=1&type=json
+
+http://api.bilibili.com/login/get_key?appkey=03fc8eb101b091fb
+http://api.bilibili.com/login/v2?appkey=c1b107428d337928&userid=8147532@qq.com&pwd=xzc@7086204511&sign=1
+
+
+
+_device=android&_hwid=3029927d46659793&_ulv=5000&access_key=76b5b9bdfe34bb8e2a809ba718ac5c6e&appkey=c1b107428d337928&main_ver=v2&platform=android&playtag=2634430&recommend_type=related_post&rindex=1&sign=8ec7f03f380c8a0e289698cb4e75985f
+
+_device=android
+_hwid=3029927d46659793
+_ulv=5000
+access_key=76b5b9bdfe34bb8e2a809ba718ac5c6e
+appkey=c1b107428d337928
+main_ver=v2
+platform=android
+playtag=2634430
+recommend_type=related_post
+rindex=1
+sign=8ec7f03f380c8a0e289698cb4e75985f
+
+appkey=c1b107428d337928&pwd=xzc@7086204511&userid=8147532@qq.com
+http://account.bilibili.com/api/login/v2?appkey=c1b107428d337928&pwd=xzc%407086204511&userid=8147532%40qq.com&sign=11c564a00765d1e2613db6b075174165
+
+http://api.bilibili.com/login/v2?appkey=c1b107428d337928&pwd=xzc%407086204511&userid=8147532%40qq.com&sign=11c564a00765d1e2613db6b075174165
+{
+"code": 0,
+"mid": "19161363",
+"access_key": "339a4620ad6791660e8a49af49af3add",
+"expires": 1452524926
+}
+本页JSON数据由FeHelper进行自动格式化，若有任何问题，点击这里提交 意见反馈
+{
+"code": 0,
+"mid": "19161363",
+"access_key": "339a4620ad6791660e8a49af49af3add",
+"expires": 1452312007
+}
+{
+"code": 0,
+"mid": "19161363",
+"access_key": "339a4620ad6791660e8a49af49af3add",
+"expires": 1452322637
+}
+
+a(new String[] { "batch", "1", "check_area", "1", "id", String.valueOf(paramInt) });
+
+03fc8eb101b091fb
+c1b107428d337928
+
+batch=1&check_area=1&
+
+http://api.bilibili.com/view?appkey=03fc8eb101b091fb&id=3350694
+http://api.bilibili.com/view?appkey=c1b107428d337928&id=3356698&sign=fa82c0ac0755dfd35f80a9c2b5218e80
+appkey=c1b107428d337928&id=3356698&msg=%E6%B5%8B%E8%AF%95&sign=d759bc725a56240b98db91e06711cbb2
+
+http://api.bilibili.com/feedback
+
+http://api.bilibili.com/feedback/post?
+access_key=339a4620ad6791660e8a49af49af3add&aid=3356698&appkey=c1b107428d337928&mid=19161363&msg=yingzixiaojie
+
 

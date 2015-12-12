@@ -13,6 +13,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
@@ -30,6 +32,7 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.xzc.bilibili.Sign;
+import org.xzc.bilibili.Utils;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -48,7 +51,7 @@ public class CommentWokerThread extends Thread {
 		this.last = last;
 	}
 
-	private static HttpUriRequest makeCommentRequest(Config cfg) {
+	private static HttpUriRequest makeCommentRequest2(Config cfg) {
 		Map<String, String> params = new HashMap<String, String>();
 		params.put( "access_key", "339a4620ad6791660e8a49af49af3add" );
 		params.put( "appkey", "c1b107428d337928" );
@@ -68,6 +71,17 @@ public class CommentWokerThread extends Thread {
 			rb.addParameter( e.getKey(), e.getValue() );
 		}
 		return rb.build();
+	}
+
+	private static HttpUriRequest makeCommentRequest(Config cfg) {
+		return RequestBuilder.get( "http://interface.bilibili.com/feedback/post" )
+				//%2C
+				.addHeader( "Cookie", "DedeUserID=19480366; SESSDATA=f3e878e5,1450537949,61e7c5d1;" )
+				.addParameter( "callback", "abc" )
+				.addParameter( "aid", Integer.toString( cfg.getAid() ) ).addParameter( "msg", cfg.getMsg() )
+				.addParameter( "action", "send" )
+				.addHeader( "Referer", "http://www.bilibili.com/video/av" + cfg.getAid() )
+				.build();
 	}
 
 	public void run() {
@@ -98,6 +112,8 @@ public class CommentWokerThread extends Thread {
 		}
 	}
 
+	private static Pattern RESULT_PATTERN = Pattern.compile( "abc\\(\"(.+)\"\\)" );
+
 	private boolean work(final CloseableHttpClient hc, ExecutorService es) {
 		List<Future<?>> futureList = new ArrayList<Future<?>>();
 		final AtomicInteger tcount = new AtomicInteger( 0 );
@@ -111,20 +127,28 @@ public class CommentWokerThread extends Thread {
 					while (!stop.get() && !overspeed.get()) {
 						try {
 							CloseableHttpResponse res = hc.execute( req );
-							res.getStatusLine().getStatusCode();
 							long end = System.currentTimeMillis();
 							if (end >= endAt)
 								stop.set( true );
 							long llast = last.getAndSet( end );
-							String content = EntityUtils.toString( res.getEntity() );
-							//System.out.println( content );
-							HttpClientUtils.closeQuietly( res );
+							String content = EntityUtils.toString( res.getEntity() ).trim();
+							content = Utils.decodeUnicode( content );
+							System.out.println( content );
+							res.close();
 							int count = tcount.incrementAndGet();
 							if (count % 10 == 0) {
-								System.out.println( cfg.getTag() + " " + cfg.getSubTag() + " " + count + " 时间="
+								System.out.println( "[" + cfg.getTag() + "," + cfg.getSubTag() + "] " + count + " 时间="
 										+ ( end - tbeg ) / 1000 + "秒 间隔="
 										+ ( end - llast ) );
 							}
+							Matcher m = RESULT_PATTERN.matcher( content );
+							if (m.find()) {
+								String code = m.group( 1 );
+								if ("OK".equals( code )) {
+									stop.set( true );
+								}
+							}
+							/*
 							JSONObject json = JSON.parseObject( content );
 							int code = json.getIntValue( "code" );
 							//我们可以利用Feedback duplicate, 它的code也是0 这样可以防止重复
@@ -132,14 +156,14 @@ public class CommentWokerThread extends Thread {
 							//System.out.println( content );
 							if (code == 0) {//{"code":0,"msg":"Feedback duplicate"}
 								stop.set( true );
-
+							
 							}
 							if (code == -503) {
 								//{"code":-503,"result":[],"error":"overspeed"}
 								//超速
 								overspeed.set( true );
 								return null;
-							}
+							}*/
 						} catch (Exception ex) {
 							ex.printStackTrace();
 						}

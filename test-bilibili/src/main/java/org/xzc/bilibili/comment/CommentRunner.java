@@ -10,13 +10,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.http.HttpHost;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -60,15 +63,40 @@ public class CommentRunner {
 		s.addJob( commentJob, false );
 
 		List<Sender> senderList = new ArrayList<Sender>();
-		//senderList.add( new Sender( "cache.sjtu.edu.cn", 8080, 8, "sjtu" ) );
-		//senderList.add( new Sender( "202.120.17.158", 2076, 8, "158" ) );
-		//senderList.add( new Sender( "222.35.17.177", 2076, 8, "177" ) );
-		senderList.add( new Sender( null, 0, 16, "本机" ) );
-		Config cfg = new Config( "落第骑士英雄谭", 3374073, "深夜的一刀修罗!",
-				new DateTime( 2015, 12, 12, 20, 55 ).toDate(),
-				new DateTime( 2015, 12, 12, 21, 26 ).toDate() ).setSenderList( senderList );
+		//senderList.add( new Sender( "cache.sjtu.edu.cn", 8080,32, "sjtu" ) );
+		//senderList.add( new Sender( "202.120.17.158", 2076, 32, "158" ) );
+		//senderList.add( new Sender( "222.35.17.177", 2076, 16, "177" ) );
 
-		Trigger t1 = addJob( s, commentJob, cfg );
+		senderList.add( new Sender( "27.115.75.114", 8080, 16, "代理1" ) );//100
+		senderList.add( new Sender( "112.25.41.136", 80, 16, "代理2" ) );//100
+		//下面的延迟大概都是200
+		senderList.add( new Sender( "120.52.73.11", 8080, 8, "代理3" ) );
+		senderList.add( new Sender( "120.52.73.13", 8080, 8, "代理4" ) );
+		senderList.add( new Sender( "120.52.73.20", 8080, 8, "代理5" ) );
+		senderList.add( new Sender( "120.52.73.21", 80, 8, "代理6" ) );
+		senderList.add( new Sender( "120.52.73.24", 80, 8, "代理7" ) );
+		senderList.add( new Sender( "120.52.73.27", 80, 8, "代理8" ) );
+		senderList.add( new Sender( "120.52.73.29", 8080, 8, "代理9" ) );
+		senderList.add( new Sender( null, 0, 32, "本机" ) );
+
+		//addJob( s, commentJob, new Config( "落第骑士英雄谭", 3374073, "深夜的一刀修罗!",
+		//		new DateTime( 2015, 12, 12, 22, 00 ).toDate(),
+		//		new DateTime( 2015, 12, 12, 23, 10 ).toDate() ).setSenderList( senderList ) );
+		//45177
+		addJob( s, commentJob, new Config( "KOWABON", 3374078, "支持一下.",
+				//new DateTime( 2015, 12, 13, 0, 48 ).toDate(),
+				new DateTime( 2015, 12, 12, 0, 0 ).toDate(),
+				new DateTime( 2015, 12, 13, 1, 58 ).toDate() ).setSenderList( senderList ) );
+		addJob( s, commentJob, new Config( "请问您今天要来点兔子吗", 3374085, "请问您今天要来点兔子吗",
+				new DateTime( 2015, 12, 13, 0, 58 ).toDate(),
+				new DateTime( 2015, 12, 13, 1, 10 ).toDate() ).setSenderList( senderList ) );
+		addJob( s, commentJob, new Config( "传颂之物-虚伪的假面", 3374098, "传颂之物-虚伪的假面",
+				new DateTime( 2015, 12, 13, 1, 28 ).toDate(),
+				new DateTime( 2015, 12, 13, 1, 40 ).toDate() ).setSenderList( senderList ) );
+		addJob( s, commentJob, new Config( "终结的炽天使", 3374107, "终结的炽天使",
+				new DateTime( 2015, 12, 13, 1, 58 ).toDate(),
+				new DateTime( 2015, 12, 12, 2, 10 ).toDate() ).setSenderList( senderList ) );
+		
 	}
 
 	public void 强大的抢评论策略(long delay, int aid, String msg) throws Exception {
@@ -96,12 +124,6 @@ public class CommentRunner {
 					t2.join();
 				if (t3.isAlive())
 					t3.join();*/
-	}
-
-	private byte toByte(long a) {
-		if (a < 128)
-			return (byte) a;
-		return (byte) ( a - 256 );
 	}
 
 	private static InetAddress toInetAddress(long address) throws UnknownHostException {
@@ -200,14 +222,25 @@ public class CommentRunner {
 		HttpHost proxy1 = new HttpHost( "60.250.79.187", 110 );
 		HttpHost proxy2 = new HttpHost( "222.35.17.177", 2076 );
 		//HttpHost proxy3 = new HttpHost( "117.136.234.12", 80 );
-		HttpHost proxy3 = new HttpHost( "58.251.47.101", 8081 );
-		CloseableHttpClient hc = HttpClients.custom().setProxy( proxy3 ).build();
+		//HttpHost proxy3 = new HttpHost( "58.251.47.101", 8081 );
+		CloseableHttpClient hc = HttpClients.custom().setProxy( null ).build();
 		//CloseableHttpResponse res = hc.execute( RequestBuilder.get( "http://1111.ip138.com/ic.asp" ).build() );
 		long beg = System.currentTimeMillis();
-		CloseableHttpResponse res = hc.execute( RequestBuilder.get( "http://api.bilibili.com/view" ).build() );
-		String content = EntityUtils.toString( res.getEntity(), "gb2312" );
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+		params.add( new BasicNameValuePair( "access_key", "339a4620ad6791660e8a49af49af3add" ) );
+		params.add( new BasicNameValuePair( "aid", "3334538" ) );
+		UrlEncodedFormEntity e = new UrlEncodedFormEntity( params );
+		CloseableHttpResponse res = hc.execute(
+				RequestBuilder.post( "http://api.bilibili.com/feedback/post" )
+						.addParameter( "mid", "19161363" )
+						.addParameter( "type", "json" )
+						.addParameter( "access_key", "339a4620ad6791660e8a49af49af3add" )
+						.addParameter( "msg", "网络好卡啊, 怎么回事." )
+						.setEntity( e )
+						.build() );
+		String content = EntityUtils.toString( res.getEntity() );
 		long end = System.currentTimeMillis();
-		boolean ok = JSON.parseObject( content ).getIntValue( "code" ) == -1;
+		System.out.println( content );
 		System.out.println( "耗时" + ( end - beg ) );
 		res.close();
 		hc.close();
