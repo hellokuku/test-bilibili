@@ -63,11 +63,11 @@ public class CommentRunner {
 		s.addJob( commentJob, false );
 
 		List<Sender> senderList = new ArrayList<Sender>();
-		//senderList.add( new Sender( "cache.sjtu.edu.cn", 8080,32, "sjtu" ) );
-		//senderList.add( new Sender( "202.120.17.158", 2076, 32, "158" ) );
-		//senderList.add( new Sender( "222.35.17.177", 2076, 16, "177" ) );
+		senderList.add( new Sender( "cache.sjtu.edu.cn", 8080, 32, "sjtu" ) );
+		senderList.add( new Sender( "202.120.17.158", 2076, 32, "158" ) );
+		senderList.add( new Sender( "222.35.17.177", 2076, 16, "177" ) );
 
-		/*senderList.add( new Sender( "27.115.75.114", 8080, 16, "代理1" ) );//100
+		senderList.add( new Sender( "27.115.75.114", 8080, 16, "代理1" ) );//100
 		senderList.add( new Sender( "112.25.41.136", 80, 16, "代理2" ) );//100
 		//下面的延迟大概都是200
 		senderList.add( new Sender( "120.52.73.11", 8080, 8, "代理3" ) );
@@ -76,26 +76,26 @@ public class CommentRunner {
 		senderList.add( new Sender( "120.52.73.21", 80, 8, "代理6" ) );
 		senderList.add( new Sender( "120.52.73.24", 80, 8, "代理7" ) );
 		senderList.add( new Sender( "120.52.73.27", 80, 8, "代理8" ) );
-		senderList.add( new Sender( "120.52.73.29", 8080, 8, "代理9" ) );*/
+		senderList.add( new Sender( "120.52.73.29", 8080, 8, "代理9" ) );
 		senderList.add( new Sender( null, 0, 32, "本机" ) );
 
 		//addJob( s, commentJob, new Config( "落第骑士英雄谭", 3374073, "深夜的一刀修罗!",
 		//		new DateTime( 2015, 12, 12, 22, 00 ).toDate(),
 		//		new DateTime( 2015, 12, 12, 23, 10 ).toDate() ).setSenderList( senderList ) );
 		//45177
-		addJob( s, commentJob, new Config( "KOWABON", 3374078, "支持一下.",
+		addJob( s, commentJob, new Config( "KOWABON", 3374078, "这番看不懂啊! 智商捉急.",
 				new DateTime( 2015, 12, 13, 0, 48 ).toDate(),
 				new DateTime( 2015, 12, 13, 0, 58 ).toDate() ).setSenderList( senderList ) );
-		addJob( s, commentJob, new Config( "请问您今天要来点兔子吗", 3374085, "请问您今天要来点兔子吗",
+		addJob( s, commentJob, new Config( "请问您今天要来点兔子吗", 3374085, "今宵我要来点智乃.",
 				new DateTime( 2015, 12, 13, 0, 58 ).toDate(),
 				new DateTime( 2015, 12, 13, 1, 10 ).toDate() ).setSenderList( senderList ) );
-		addJob( s, commentJob, new Config( "传颂之物-虚伪的假面", 3374098, "传颂之物-虚伪的假面",
+		addJob( s, commentJob, new Config( "传颂之物-虚伪的假面", 3374098, "来听听OP先!",
 				new DateTime( 2015, 12, 13, 1, 28 ).toDate(),
 				new DateTime( 2015, 12, 13, 1, 40 ).toDate() ).setSenderList( senderList ) );
-		addJob( s, commentJob, new Config( "终结的炽天使", 3374107, "终结的炽天使",
+		addJob( s, commentJob, new Config( "终结的炽天使", 3374107, "上集看完之后整个人都不好了. 决定继续看下一集.",
 				new DateTime( 2015, 12, 13, 1, 58 ).toDate(),
 				new DateTime( 2015, 12, 12, 2, 10 ).toDate() ).setSenderList( senderList ) );
-		
+
 	}
 
 	public void 强大的抢评论策略(long delay, int aid, String msg) throws Exception {
