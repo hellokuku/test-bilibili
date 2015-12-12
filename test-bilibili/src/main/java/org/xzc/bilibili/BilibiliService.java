@@ -104,10 +104,11 @@ public class BilibiliService {
 	public synchronized void rebuildContext() {
 		boolean ok = false;
 		for (int i = 0; i < 10; ++i) {
+			try{
 			if (rebuildContextInternal()) {
 				ok = true;
 				break;
-			}
+			}}catch(Exception e){}
 		}
 		if (!ok)
 			throw new RuntimeException( "尽力了,但是initAccount失败." );

@@ -14,3 +14,30 @@ java.sql.SQLException: Batch tasks callable threw non-SQL exception
 java.sql.SQLException: Batch tasks callable threw non-SQL exception
 java.sql.SQLException: Batch tasks callable threw non-SQL exception
 java.sql.SQLException: Batch tasks callable threw non-SQL exception
+Sat Dec 12 17:31:20 CST 2015
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html>
+<head><title>504 Gateway Time-out</title></head>
+<body bgcolor="white">
+<h1>504 Gateway Time-out</h1>
+<p>The gateway did not receive a timely response from the upstream server or application. Sorry for the inconvenience.<br/>
+Please report this message and include the following information to us.<br/>
+Thank you very much!</p>
+<table>
+<tr>
+<td>URL:</td>
+<td>http://space.bilibili.com/ajax/fav/getList?mid=19216452&amp;fid=19453437&amp;pagesize=50&amp;order=ftime</td>
+</tr>
+<tr>
+<td>Server:</td>
+<td>cn-zj-cmcc8</td>
+</tr>
+<tr>
+<td>Date:</td>
+<td>2015/12/12 17:31:40</td>
+</tr>
+</table>
+<hr/>Powered by Tengine</body>
+</html>
+
+java.sql.SQLException: Batch tasks callable threw non-SQL exception
