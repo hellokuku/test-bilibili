@@ -1,4 +1,4 @@
-package org.xzc.bilibili;
+package org.xzc.bilibili.scan;
 
 import static org.junit.Assert.*;
 
@@ -21,10 +21,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.xzc.bilibili.dao.BilibiliDB;
+import org.xzc.bilibili.comment.CommentService;
 import org.xzc.bilibili.model.Bangumi;
+import org.xzc.bilibili.model.FavGetList;
 import org.xzc.bilibili.model.Video;
-import org.xzc.bilibili.model.json.FavGetList;
 import org.xzc.bilibili.task.CommentTask;
 
 import com.j256.ormlite.dao.CloseableIterator;

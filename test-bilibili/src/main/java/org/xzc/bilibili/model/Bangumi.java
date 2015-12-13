@@ -2,8 +2,8 @@ package org.xzc.bilibili.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
-import java.util.function.Consumer;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
@@ -26,12 +26,12 @@ public class Bangumi {
 		this.content = content;
 		this.document = Jsoup.parse( content );
 		this.name = document.select( ".info-title" ).text();
-		document.select( "#episode_list > ul > li" ).forEach( new Consumer<Element>() {
-			public void accept(Element t) {
-				String attr = t.select( "a:first-child" ).attr( "href" );
-				aids.add( StringUtils.substringBetween( attr, "av", "/" ) );
-			}
-		} );
+		Iterator<Element> iter = document.select( "#episode_list > ul > li" ).iterator();
+		while (iter.hasNext()) {
+			Element t = iter.next();
+			String attr = t.select( "a:first-child" ).attr( "href" );
+			aids.add( StringUtils.substringBetween( attr, "av", "/" ) );
+		}
 		Collections.reverse( aids );
 	}
 

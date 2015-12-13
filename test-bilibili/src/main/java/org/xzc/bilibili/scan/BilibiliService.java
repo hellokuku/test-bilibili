@@ -1,4 +1,4 @@
-package org.xzc.bilibili;
+package org.xzc.bilibili.scan;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,8 +28,10 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.xzc.bilibili.model.Account;
 import org.xzc.bilibili.model.Bangumi;
+import org.xzc.bilibili.model.FavGetList;
 import org.xzc.bilibili.model.Video;
-import org.xzc.bilibili.model.json.FavGetList;
+import org.xzc.bilibili.util.SafeRunner;
+import org.xzc.bilibili.util.Utils;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;

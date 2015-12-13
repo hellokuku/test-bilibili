@@ -2,8 +2,6 @@ package org.xzc.bilibili.reg;
 
 import java.util.List;
 
-import org.xzc.bilibili.Question;
-
 public class Data {
 	public long currentTime;
 	public long endTime;

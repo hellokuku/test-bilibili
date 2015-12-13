@@ -1,18 +1,12 @@
 package org.xzc.bilibili.model;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URIBuilder;
 import org.junit.Test;
-import org.xzc.bilibili.Sign;
+import org.xzc.bilibili.util.Sign;
 
 public class TestSign {
 	@Test

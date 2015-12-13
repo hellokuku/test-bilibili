@@ -1,8 +1,6 @@
-package org.xzc.bilibili.model.json;
+package org.xzc.bilibili.model;
 
 import java.util.List;
-
-import org.xzc.bilibili.model.Video;
 
 public class FavGetList {
 	public int mid;

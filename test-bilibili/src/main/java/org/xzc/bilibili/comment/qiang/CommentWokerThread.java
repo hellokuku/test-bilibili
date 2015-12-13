@@ -1,4 +1,4 @@
-package org.xzc.bilibili.comment;
+package org.xzc.bilibili.comment.qiang;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,8 +31,8 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.xzc.bilibili.Sign;
-import org.xzc.bilibili.Utils;
+import org.xzc.bilibili.util.Sign;
+import org.xzc.bilibili.util.Utils;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;

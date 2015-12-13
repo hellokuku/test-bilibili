@@ -1,4 +1,4 @@
-package org.xzc.bilibili;
+package org.xzc.bilibili.scan;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;

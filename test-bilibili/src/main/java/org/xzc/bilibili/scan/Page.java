@@ -1,4 +1,4 @@
-package org.xzc.bilibili.dao;
+package org.xzc.bilibili.scan;
 
 import java.util.List;
 

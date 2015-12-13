@@ -1,4 +1,4 @@
-package org.xzc.bilibili.comment;
+package org.xzc.bilibili.comment.qiang;
 
 public class Sender {
 	private String ip;

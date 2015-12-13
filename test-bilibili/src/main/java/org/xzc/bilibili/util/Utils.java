@@ -1,4 +1,4 @@
-package org.xzc.bilibili;
+package org.xzc.bilibili.util;
 
 public class Utils {
 	public static String decodeUnicode(String theString) {

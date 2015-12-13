@@ -1,4 +1,4 @@
-package org.xzc.bilibili.comment;
+package org.xzc.bilibili.comment.qiang;
 
 import java.util.ArrayList;
 import java.util.Date;

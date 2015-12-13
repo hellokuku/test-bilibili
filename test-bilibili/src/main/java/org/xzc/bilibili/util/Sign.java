@@ -1,4 +1,4 @@
-package org.xzc.bilibili;
+package org.xzc.bilibili.util;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;

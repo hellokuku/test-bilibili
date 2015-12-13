@@ -21,7 +21,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
-import org.xzc.bilibili.Question;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;

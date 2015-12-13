@@ -1,4 +1,4 @@
-package org.xzc.bilibili;
+package org.xzc.bilibili.comment;
 
 import java.util.Random;
 

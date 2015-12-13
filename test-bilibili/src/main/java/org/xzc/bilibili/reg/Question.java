@@ -1,4 +1,4 @@
-package org.xzc.bilibili;
+package org.xzc.bilibili.reg;
 
 public class Question {
 	public String qs_id;
