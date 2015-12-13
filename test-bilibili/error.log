@@ -63,3 +63,4 @@ java.sql.SQLException: Problems with column 2 parsing date-string '2015-12-13 20
 java.sql.SQLException: Problems with column 2 parsing date-string '2015-12-13 20:09:04' using 'yyyy-MM-dd HH:mm:ss.SSSSSS'
 java.sql.SQLException: Problems with column 2 parsing date-string '2015-12-13 20:00:00' using 'yyyy-MM-dd HH:mm:ss.SSSSSS'
 不合法的视频id=3381413
+org.apache.http.ConnectionClosedException: Premature end of chunk coded message body: closing chunk expected
