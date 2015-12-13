@@ -43,8 +43,8 @@ public class TestProxy {
 	public void run() throws Exception {
 		ps.directlyConnect();
 		//doUpdate( ps.getProxyList() );
-		doUpdate( ps.getProxyList() );
-		doUpdate( proxyDao.queryForEq( "success", false ) );
+		//doUpdate( ps.getProxyList() );
+		//doUpdate( proxyDao.queryForEq( "success", false ) );
 		doUpdate( proxyDao.queryForEq( "success", true ) );
 	}
 
