@@ -17,7 +17,7 @@ public class TestReg {
 			RegService rs = new RegService( ss[0], ss[1] );
 			boolean ok = rs.isOK();
 			while (!ok) {
-				System.out.println( "开始答题" );
+				System.out.println( ss[0] + " 开始答题" );
 				rs.answer1();
 				System.out.println( "通过阶段1" );
 				if (rs.answer2()) {

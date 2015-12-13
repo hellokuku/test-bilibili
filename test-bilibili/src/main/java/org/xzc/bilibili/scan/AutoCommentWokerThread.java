@@ -2,11 +2,16 @@ package org.xzc.bilibili.scan;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
 
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.xzc.bilibili.model.FavGetList;
 import org.xzc.bilibili.model.Video;
 import org.xzc.bilibili.task.CommentTask;
 
@@ -17,9 +22,10 @@ import org.xzc.bilibili.task.CommentTask;
  */
 @Component
 public class AutoCommentWokerThread extends Thread {
-	@Autowired
-	private BilibiliService simple;
-	@Autowired
+	@Resource(name = "commentHelperBilibiliService")
+	private BilibiliService commentHelper;
+
+	@Resource(name = "mainBilibiliService")
 	private BilibiliService main;
 	@Autowired
 	private CommentService commentService;
@@ -27,45 +33,88 @@ public class AutoCommentWokerThread extends Thread {
 	@Autowired
 	private BilibiliDB db;
 
-	private boolean doComment(Video v) {
-		//做评论
-		String msg = commentService.getComment( v );
-		String result = main.comment( v.aid, msg );
-		System.out.println( "尝试对aid=" + v.aid + " 评论 " + msg + ", 结果是" + result );
-		if (result.contains( "禁言" )) {
-			throw new RuntimeException( "竟然被禁言了, 目前没法解决." );
-		}
-		if (result.contains( "验证码" )) {
-			try {
-				System.out.println( "由于验证码错误， 睡觉60秒" );
-				Thread.sleep( 60000 );
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		//有的时候即使已经OK了, 但是实际上没有评论成功! 很可能是因为本次的msg和上次的msg完全一致
-		return "OK".equals( result );
-	}
+	private long lastCommentTime;//上一次的评论时间, 尽量不要太集中
 
 	@Override
 	public void run() {
+		lastCommentTime = System.currentTimeMillis();
+		System.out.println( "自动评论线程已经启动!" );
 		while (true) {
+			System.out.println( "开始执行评论任务" );
+			//迭代状态 0表示一切正常 1表示本次迭代出现了验证码的问题(必须要睡觉60秒) 2禁言 3其他问题
+			int iterationResult = 0;
 			try {
 				//获得待评论的任务
 				List<CommentTask> taskList = db.getCommentTaskList();
+				Map<Integer, CommentTask> ctMap = new HashMap<Integer, CommentTask>();
 				System.out.println( "开始执行自动评论任务, 任务数量=" + taskList.size() );
-				//全部尝试做评论
+				if (taskList.size() > 50) {
+					throw new IllegalArgumentException( "任务数量太大了!" );
+				}
+				//将他们全部加入commentHelper的收藏夹
 				for (CommentTask ct : taskList) {
-					if (!simple.isCommentListEmpty( ct.aid )) {
-						//评论已经不为空了
-						System.out.println( "评论已经不为空, 放弃. " + ct.aid );
-						db.markFailed( ct );
-					} else if (doComment( db.getVideo( ct.aid ) )) {
-						//判断一下第一是不是自己
-						db.markFinished( ct );
+					commentHelper.addFavotite( ct.aid );
+					ctMap.put( ct.aid, ct );
+				}
+				FavGetList list = commentHelper.consumeAllFavoriteListJSON();
+				db.updateBatch( list.vlist );
+				for (Video v : list.vlist) {
+					if (v.status == 0) {//现在已经允许评论了
+						CommentTask ct = ctMap.get( v.aid );//获得对应的ct
+						if (ct == null)//会么?
+							continue;
+						if (!commentHelper.isCommentListEmpty( v.aid )) {//评论已经不为空了, 放弃
+							System.out.println( "评论已经不为空, 放弃. " + v );
+							db.markFailed( new CommentTask( v.aid ) );
+						} else {//评论为空, 但是不要急着评论, 尽量延后一点点时间, 免得...
+							if (System.currentTimeMillis() - v.updateAt.getTime() <= 60000) {
+								//小于60秒就不评论
+								continue;
+							}
+							//比如根据Video的create时间还有ct的updateAt
+							System.out.println( "现在将要进行对 " + v.aid + " , " + v.title + "的评论" );
+							//System.out.println( v.create );create估计是投稿时间, 建议不要以它为参考
+
+							//这两个updateAt一般相差几秒, 任意一个都可以作为参考
+							//System.out.println( v.updateAt );//updateAt代表该视频的最近状态的更新时间
+							//System.out.println( ct.updateAt );//updateAt代表该任务的最近状态的更新时间
+
+							//开始评论
+							String msg = commentService.getComment( v );
+							if (msg == null) {//没有提供对该视频的评论, 那么就将它标记为放弃
+								System.out.println( "没有提供评论, 跳过 " + v );
+								//ct.status = 4;
+								//db.createOrUpdate( ct );
+								continue;
+							}
+							String result = main.comment( v.aid, msg );
+							System.out.println( "尝试对aid=" + v.aid + " 评论 " + msg + ", 结果是" + result );
+
+							if (result.contains( "禁言" )) {
+								iterationResult = 2;
+								db.createOrUpdate( ct );
+								break;//打破循环
+								//throw new RuntimeException( "竟然被禁言了, 目前没法解决." );
+							} else if (result.contains( "验证码" )) {
+								iterationResult = 1;
+								db.createOrUpdate( ct );
+								break;
+							} else if ("OK".equals( result )) {
+								//评论成功
+								db.markFinished( new CommentTask( v.aid ) );
+								System.out.println( "评论成功!" + v );
+							} else {
+								System.out.println( "评论时遇到未知的结果 " + result );
+								iterationResult = 3;//未知的结果
+								db.createOrUpdate( ct );
+							}
+						}
+					} else {//在这里评论的话是不安全的...
+
 					}
 				}
 			} catch (Exception e) {
+				e.printStackTrace();
 				try {
 					FileUtils.writeStringToFile( new File( "error.log" ), e.getMessage() + "\r\n", true );
 					Thread.sleep( 20000 );
@@ -76,7 +125,26 @@ public class AutoCommentWokerThread extends Thread {
 				}
 			}
 			try {
-				Thread.sleep( 10000 );//休息10秒
+				String text = null;
+				if (iterationResult == 0) {
+					text = "正常";
+				} else if (iterationResult == 1) {
+					text = "出现了验证码问题";
+				} else if (iterationResult == 2) {
+					text = "被禁言";
+				} else {
+					text = "未知的结果";
+				}
+				System.out.println( "评论任务执行完毕. 结果是 " + text );
+				if (iterationResult == 0) {
+					Thread.sleep( 30000 );
+				} else if (iterationResult == 1) {
+					Thread.sleep( 60000 );
+				} else if (iterationResult == 2) {
+					Thread.sleep( 30000 );
+				} else {
+					Thread.sleep( 30000 );
+				}
 			} catch (InterruptedException e) {
 			}
 		}

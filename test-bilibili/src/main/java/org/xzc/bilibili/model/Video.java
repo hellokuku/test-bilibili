@@ -2,6 +2,7 @@ package org.xzc.bilibili.model;
 
 import java.util.Date;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -13,8 +14,6 @@ public class Video {
 	@DatabaseField
 	public String title;
 	@DatabaseField
-	public int state = -1;
-	@DatabaseField
 	public int typeid = -1;
 	@DatabaseField(dataType = DataType.DATE_STRING)
 	public Date updateAt;
@@ -23,51 +22,14 @@ public class Video {
 	@DatabaseField
 	public int status = -1;
 
-	//暂时不考虑加入数据库
-	public String pic;
-	public String keywords;
-	public String description;
-
-	public boolean isOK() {
-		return state == 0;
-	}
-
-	public boolean isMQX() {
-		return state == 1;
-	}
-
-	public boolean isDeleted() {
-		return state == 2;
-	}
-
-	public boolean notExists() {
-		return state == 3;
-	}
-
-	public boolean isRedirect() {
-		return state == 4;
-	}
+	@JSONField(format = "yyyy-MM-dd HH:mm")
+	public Date create;//收藏夹里的格式是2015-12-05 21:20
 
 	@Override
 	public String toString() {
-		return "Video [aid=" + aid + ", title=" + title + ", state=" + state + ", typeid=" + typeid + ", updateAt="
-				+ updateAt + ", mid=" + mid + ", status=" + status + "]";
+		return "Video [aid=" + aid + ", title=" + title + ", typeid=" + typeid + ", updateAt=" + updateAt + ", mid="
+				+ mid + ", status=" + status + ", create=" + create + "]";
 	}
 
-	public String getStateText() {
-		switch (state) {
-		case 0:
-			return "正常";
-		case 1:
-			return "无权限";
-		case 2:
-			return "已删除";
-		case 3:
-			return "视频不存在";
-		case 4:
-			return "重定向";
-		default:
-			return "未知";
-		}
-	}
+
 }

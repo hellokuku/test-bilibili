@@ -3,7 +3,6 @@ package org.xzc.bilibili.scan;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -11,7 +10,6 @@ import java.util.Random;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import javax.annotation.Resource;
 
@@ -200,10 +198,14 @@ public class TestApp {
 				CommentTask ct = new CommentTask();
 				ct.aid = v.aid;
 				ct.status = 0;
-				db.addOrUpdateCommentTask( ct );
+				db.createOrUpdate( ct );
+				System.out.println( "添加任务" + v );
 			}
 		}
 	};
+
+	@Autowired
+	private AutoCommentWokerThread acwt;
 
 	/**
 	 * 用一个线程 不断使用getVideo1方法探测视频
@@ -211,25 +213,23 @@ public class TestApp {
 	 */
 	@Test
 	public void 持续跟进最新的视频() throws Exception {
+		acwt.start();
 		int batch = 50;//每次检测50个aid
-		boolean reachBoundary = false;//是否达到边界
 		int aid = db.getMaxAid( 3349048 ) + 1;//aid起点
-		List<Integer> successAidList = new ArrayList<Integer>();
 		while (true) {
 			try {
+				boolean reachBoundary = false;//是否达到边界
 				int count = 0;
 				while (count < batch) {
 					++count;
-					System.out.println("现在要处理aid="+aid);
 					int code = simpleBilibiliService.addFavotite( aid );//直接加入收藏夹
 					if (code == 0 || code == 11007) {//成功
-						successAidList.add( aid );
+						//不做事
 					} else if (code == -1111) {//不存在可能是遇到了边界 或者 是假的, 可能再往后几个aid又可以用了! 真是的...
 						for (int i = 0; i < 16; ++i) {
 							code = simpleBilibiliService.addFavotite( aid + i );
 							if (code == 0 || code == 11007) {//找到一个!
 								aid = aid + i;
-								successAidList.add( aid );
 								break;
 							}
 						}
@@ -237,35 +237,21 @@ public class TestApp {
 							reachBoundary = true;
 							break;
 						}
-					} else if (code == -101) {
-						//{"code":-101,"message":"Account is not logined.","ts":1449589626}
-						//simpleBilibiliService.rebuildContext();
-						//mainBilibiliService.rebuildContext();
-						System.out.println( "出问题了code=-101, 睡觉20秒" );
-						Thread.sleep( 20000 );
-						continue;
 					} else {
-						//String content = simpleBilibiliService.getLastFavoriteContent();
-						//FileUtils.writeStringToFile( new File( "error.log" ), content + "\r\n", true );
-						//simpleBilibiliService.rebuildContext();
-						//mainBilibiliService.rebuildContext();
-						System.out.println( "出问题了, 睡觉20秒" );
+						FileUtils.writeStringToFile( new File( "error.log" ), "", true );
+						System.out.println( "出问题了, code=" + code + ", 睡觉20秒" );
 						Thread.sleep( 20000 );
 						continue;
 					}
 					++aid;
 				}
-				//消耗收藏夹( parsedCallback );
-				消耗收藏夹();//由于不需要批量发评论了 因此回调为null
+				消耗收藏夹( parsedCallback );
 				if (reachBoundary) {
-					reachBoundary = false;
-					System.out.println( "真的达到边界了, 休息10秒,再继续" );
-					Thread.sleep( 10000 );
+					System.out.println( "真的达到边界了, 休息30秒,再继续" );
+					Thread.sleep( 30000 );
 				}
 			} catch (Exception ex) {
 				FileUtils.writeStringToFile( new File( "error.log" ), ex.getMessage() + "\r\n", true );
-				//simpleBilibiliService.rebuildContext();
-				//mainBilibiliService.rebuildContext();
 				System.out.println( "出问题了, 睡觉20秒" );
 				Thread.sleep( 20000 );
 				continue;
@@ -295,7 +281,6 @@ public class TestApp {
 				public Void call() throws Exception {
 					for (Video v : favoriteList.vlist) {
 						db.createOrUpdate( v );
-						System.out.println("添加"+v);
 					}
 					return null;
 				}
@@ -311,7 +296,6 @@ public class TestApp {
 		}
 		return total;
 	}
-
 
 	private Random random = new Random();
 
@@ -352,6 +336,7 @@ public class TestApp {
 		System.out.println( "ok" );
 	}
 
+	/*
 	public void 抢评论() throws Exception {
 		ExecutorService es = Executors.newFixedThreadPool( 3 );//4个线程
 		List<Future<?>> list = new ArrayList<Future<?>>();
@@ -391,7 +376,7 @@ public class TestApp {
 		}
 		es.shutdown();
 	}
-
+	*/
 	public void 获取所有番剧信息() {
 		List<Bangumi> list = simpleBilibiliService.getBangumiList();
 		for (Bangumi b : list) {

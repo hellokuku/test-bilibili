@@ -26,33 +26,32 @@ public class BilibiliDB {
 	RuntimeExceptionDao<Video, Integer> videoDao;
 	RuntimeExceptionDao<CommentTask, Integer> commentTaskDao;
 
-	@PostConstruct
-	public void init() throws SQLException {
-		TableUtils.createTableIfNotExists( cs, Video.class );
-		TableUtils.createTableIfNotExists( cs, CommentTask.class );
-		videoDao = new RuntimeExceptionDao( DaoManager.createDao( cs, Video.class ) );
-		commentTaskDao = new RuntimeExceptionDao( DaoManager.createDao( cs, CommentTask.class ) );
+	public void add(Video v) {
+		videoDao.create( v );
 	}
 
-	public void addOrUpdateCommentTask(CommentTask ct) {
+	public void createOrUpdate(CommentTask ct) {
+		ct.updateAt = new Date();
 		commentTaskDao.createOrUpdate( ct );
+	}
+
+	public void createOrUpdate(Video v) {
+		v.updateAt = new Date();
+		videoDao.createOrUpdate( v );
 	}
 
 	public List<CommentTask> getCommentTaskList() {
 		return commentTaskDao.queryForEq( "status", 0 );
 	}
 
-	public void markFinished(CommentTask ct) {
-		ct.status = 1;
-		commentTaskDao.update( ct );
-	}
-
-	public void add(Video v) {
-		videoDao.create( v );
-	}
-
-	public Video getVideo(int aid) {
-		return videoDao.queryForId( aid );
+	public int getMaxAid(int defaultValue) {
+		//获得最大的aix
+		try {
+			String str = videoDao.queryBuilder().selectRaw( "max(aid)" ).queryRawFirst()[0];
+			return str == null ? defaultValue : Integer.parseInt( str );
+		} catch (Exception e) {
+			throw new RuntimeException( e );
+		}
 	}
 
 	public List<Video> getMQXList(int maxResults) {
@@ -68,30 +67,13 @@ public class BilibiliDB {
 		}
 	}
 
-	public void createOrUpdate(Video v) {
-		v.updateAt = new Date();
-		videoDao.createOrUpdate( v );
+	public Video getVideo(int aid) {
+		return videoDao.queryForId( aid );
 	}
 
-	public void update(Video v) {
-		v.updateAt = new Date();
-		videoDao.update( v );
-	}
-
-	public int getMaxAid(int defaultValue) {
-		//获得最大的aix
+	public List<Video> getVideoByState(int state) {
 		try {
-			String str = videoDao.queryBuilder().selectRaw( "max(aid)" ).queryRawFirst()[0];
-			return str == null ? defaultValue : Integer.parseInt( str );
-		} catch (Exception e) {
-			throw new RuntimeException( e );
-		}
-	}
-
-	public List<Video> getVideoByStateAndTypeID(int state, int typeid, int maxResults) {
-		try {
-			return videoDao.queryBuilder().limit( maxResults ).where().eq( "state", state ).and().eq( "typeid", typeid )
-					.query();
+			return videoDao.queryBuilder().where().eq( "state", state ).query();
 		} catch (SQLException e) {
 			throw new RuntimeException( e );
 		}
@@ -119,9 +101,10 @@ public class BilibiliDB {
 		}
 	}
 
-	public List<Video> getVideoByState(int state) {
+	public List<Video> getVideoByStateAndTypeID(int state, int typeid, int maxResults) {
 		try {
-			return videoDao.queryBuilder().where().eq( "state", state ).query();
+			return videoDao.queryBuilder().limit( maxResults ).where().eq( "state", state ).and().eq( "typeid", typeid )
+					.query();
 		} catch (SQLException e) {
 			throw new RuntimeException( e );
 		}
@@ -131,12 +114,51 @@ public class BilibiliDB {
 		return videoDao;
 	}
 
-	public void fixCommentTask() {
+	@PostConstruct
+	public void init() throws SQLException {
+		TableUtils.createTableIfNotExists( cs, Video.class );
+		TableUtils.createTableIfNotExists( cs, CommentTask.class );
+		videoDao = new RuntimeExceptionDao( DaoManager.createDao( cs, Video.class ) );
+		commentTaskDao = new RuntimeExceptionDao( DaoManager.createDao( cs, CommentTask.class ) );
 	}
 
 	public void markFailed(CommentTask ct) {
-		ct.status = 3;
+		ct.status = 2;
+		ct.updateAt = new Date();
 		commentTaskDao.update( ct );
 	}
-	
+
+	public void markFinished(CommentTask ct) {
+		ct.status = 1;
+		ct.updateAt = new Date();
+		commentTaskDao.update( ct );
+	}
+
+	public void update(Video v) {
+		v.updateAt = new Date();
+		videoDao.update( v );
+	}
+
+	//TODO 名字得改一下
+	public void updateBatch(final List<Video> vlist) {
+		videoDao.callBatchTasks( new Callable<Void>() {
+			public Void call() throws Exception {
+				Date now = new Date();
+				for (Video v : vlist) {
+					Video v0 = videoDao.queryForId( v.aid );
+					if (v0 == null) {
+						v.updateAt = now;
+						videoDao.create( v );
+					} else if (v0.status == 0) {
+						v.updateAt = v0.updateAt;
+					} else {
+						v.updateAt = now;
+						videoDao.update( v );
+					}
+				}
+				return null;
+			}
+		} );
+	}
+
 }

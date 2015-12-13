@@ -23,8 +23,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.protocol.HttpContext;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.xzc.bilibili.model.Account;
 import org.xzc.bilibili.model.Bangumi;
 import org.xzc.bilibili.model.FavGetList;
@@ -227,9 +225,13 @@ public class BilibiliService {
 				String content = hc.asString( req );
 				try {
 					JSONObject data = JSON.parseObject( content ).getJSONObject( "data" );
-					FavGetList json = JSON.toJavaObject( data, FavGetList.class );
-					json.pagesize = pagesize;
-					return json;
+					JSONArray ja = data.getJSONArray( "vlist" );
+					for (int i = 0; i < ja.size(); ++i) {
+						JSONObject jo = ja.getJSONObject( i );
+						jo.put( "create", jo.getString( "create" ) + ":00" );
+					}
+					FavGetList fgl = JSON.toJavaObject( data, FavGetList.class );
+					return fgl;
 				} catch (Exception e) {
 					log( content );
 					throw new RuntimeException( e );
@@ -251,18 +253,16 @@ public class BilibiliService {
 				JSONObject json = hc.getAsJSON( url );
 				Video v = new Video();
 				v.aid = aid;
-				v.description = json.getString( "description" );
-				v.keywords = "";//这里没有keywords
 				v.typeid = json.getIntValue( "tid" );//这里叫做tid
 				v.title = json.getString( "title" );
 				v.mid = json.getIntValue( "mid" );
-				v.pic = json.getString( "pic" );
 				v.status = 0;
 				return v;
 			}
 		} );
 	}
 
+	/*
 	public Video getVideo1(final int aid) {
 		return safeRun( new SafeRunner<Video>() {
 			public Video run() throws Exception {
@@ -289,7 +289,7 @@ public class BilibiliService {
 				return v;
 			}
 		} );
-	}
+	}*/
 
 	@Deprecated
 	public Video getVideo2(int aid) {
@@ -415,5 +415,25 @@ public class BilibiliService {
 	@PreDestroy
 	public void close() {
 		hc.close();
+	}
+
+	/**
+	 * 消耗掉默认收藏夹的所有内容
+	 * @return
+	 */
+	public FavGetList consumeAllFavoriteListJSON() {
+		FavGetList ret = new FavGetList();
+		List<Video> vlist = new ArrayList<Video>();
+		while (true) {
+			FavGetList fgl = getFavoriteListJSON( 50 );
+			deleteFavoriteJSON( fgl );
+			ret.count += fgl.count;
+			vlist.addAll( fgl.vlist );
+			if (fgl.count == fgl.vlist.size())
+				break;
+		}
+		ret.pages = 1;
+		ret.vlist = vlist;
+		return ret;
 	}
 }

@@ -1,18 +1,21 @@
 # 视频 #
 最小化登陆
-""
+https://account.bilibili.com/ajax/miniLogin/minilogin
 可以不需要验证码!
 
 添加到收藏夹
 http://api.bilibili.com/favourite/add?id=3335348
 
+获取用户信息
+http://api.bilibili.com/userinfo?user=xzchaooDRF8
+
 获取用户的收藏夹
 这个似乎没有做权限认证, 所以可以获取其他人的收藏夹?
-http://space.bilibili.com/ajax/fav/getBoxList?mid=
+http://space.bilibili.com/ajax/fav/getBoxList?mid=19557513
 和[获取收藏的视频]搭配使用可以获取别人的收藏信息!
 
-收藏列表
-http://space.bilibili.com/ajax/fav/getList?mid=19161363&pagesize=30&fid=19407652
+收藏列表 xzchaooDRF8
+http://space.bilibili.com/ajax/fav/getList?mid=19557513&pagesize=30&fid=19764585
 pagesize最大在70左右
 
 获得评论列表
@@ -55,6 +58,7 @@ aids:3296072
 137 娱乐圈
 138 搞笑					** 山下**
 152 官方眼神
+153 好像是国产吧?
 154 三次元舞蹈
 
 # 用户 #
