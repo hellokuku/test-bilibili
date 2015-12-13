@@ -27,15 +27,14 @@ public class AppConfig {
 	@Bean(name = "simpleAccount")
 	public Account simpleAccount() {
 		Account a = new Account( 19216452, "704fe3e6,1450055207,1cc44621" );
-		// 704fe3e6,1450078325,1d03124f
 		return a;
 	}
 
 	@Bean(name = "mainAccount")
 	public Account mainAccount() {
-//		f2a2b0f4,1450448416,a2f6ccc2
+		//		f2a2b0f4,1450448416,a2f6ccc2
 		Account a = new Account( 19161363, "b365258b,1450454249,025a276e" );
-//		Account a = new Account( 1655915, "137419f3,1449971802,b48e796e" );
+		//		Account a = new Account( 1655915, "137419f3,1449971802,b48e796e" );
 		return a;
 	}
 

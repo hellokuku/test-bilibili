@@ -23,6 +23,12 @@ import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 
+/**
+ * 各种代理的区别
+ * http://blog.csdn.net/a19860903/article/details/47146715
+ * @author xzchaoo
+ *
+ */
 @Configuration
 @ComponentScan
 public class TestProxy {
@@ -35,25 +41,11 @@ public class TestProxy {
 	private ProxyService ps;
 
 	public void run() throws Exception {
-		//System.out.println( ps.canConnect( new ProxyPair( "218.97.194.198", 80 ) ) );
-		//列出所有代理();
 		ps.directlyConnect();
-		Proxy p = new Proxy();
-		//p.setIp( "120.52.73.29" );
-		//p.setPort( 8080 );
-		p.setIp( "27.115.75.114" );
-		p.setPort( 8080 );
-		ps.tryProxy( p );
-		System.out.println( p );
-		//更新所有成功的代理();
-	}
-	public void 更新所有失败() throws InterruptedException, ExecutionException{
-		List<Proxy> list = proxyDao.queryForEq( "success", false );
-		doUpdate( list );
-	}
-	public void 更新所有成功的代理() throws InterruptedException, ExecutionException {
-		List<Proxy> list = proxyDao.queryForEq( "success", true );
-		doUpdate( list );
+		//doUpdate( ps.getProxyList() );
+		doUpdate( ps.getProxyList() );
+		doUpdate( proxyDao.queryForEq( "success", false ) );
+		doUpdate( proxyDao.queryForEq( "success", true ) );
 	}
 
 	@Bean(destroyMethod = "close")
@@ -78,7 +70,7 @@ public class TestProxy {
 	private RuntimeExceptionDao<Proxy, String> proxyDao;
 
 	private void doUpdate(final List<Proxy> list) throws InterruptedException, ExecutionException {
-		ExecutorService es = Executors.newFixedThreadPool( 16 );
+		ExecutorService es = Executors.newFixedThreadPool( ps.getBatch() );
 		List<Future<?>> futureList = new ArrayList<Future<?>>();
 		System.out.println( "共有" + list.size() + "个" );
 		int i = 0;
@@ -101,7 +93,7 @@ public class TestProxy {
 		proxyDao.callBatchTasks( new Callable<Void>() {
 			public Void call() throws Exception {
 				for (Proxy p : list) {
-					proxyDao.update( p );
+					proxyDao.createOrUpdate( p );
 				}
 				return null;
 			}
