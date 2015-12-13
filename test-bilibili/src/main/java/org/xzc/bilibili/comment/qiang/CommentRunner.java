@@ -37,13 +37,9 @@ import com.alibaba.fastjson.JSON;
 public class CommentRunner {
 	private static final SimpleDateFormat SDF = new SimpleDateFormat( "MM月dd日HH时mm分ss秒" );
 
-	private static Trigger addJob(Scheduler s, JobDetail job, Config cfg)
-			throws SchedulerException {
-		Trigger t = TriggerBuilder.newTrigger()
-				.startAt( cfg.getStartAt() )
-				.forJob( job )
-				.usingJobData( CommentJob.ARG_CONFIG, JSON.toJSONString( cfg ) )
-				.build();
+	private static Trigger addJob(Scheduler s, JobDetail job, Config cfg) throws SchedulerException {
+		Trigger t = TriggerBuilder.newTrigger().startAt( cfg.getStartAt() ).forJob( job )
+				.usingJobData( CommentJob.ARG_CONFIG, JSON.toJSONString( cfg ) ).build();
 		s.scheduleJob( t );
 		System.out.println( "[" + cfg.getTag() + "] 将会于" + SDF.format( cfg.getStartAt() ) + "开始, 于"
 				+ SDF.format( cfg.getEndAt() ) + "结束." );
@@ -55,38 +51,37 @@ public class CommentRunner {
 		Scheduler s = f.getScheduler();
 		s.start();
 
-		JobDetail commentJob = JobBuilder.newJob( CommentJob.class )
-				.withIdentity( "comment" )
-				.storeDurably()
-				.build();
+		JobDetail commentJob = JobBuilder.newJob( CommentJob.class ).withIdentity( "comment" ).storeDurably().build();
 
 		s.addJob( commentJob, false );
 
 		List<Sender> senderList = new ArrayList<Sender>();
-		//		senderList.add( new Sender( "cache.sjtu.edu.cn", 8080, 32, "sjtu" ) );
-		//		senderList.add( new Sender( "202.120.17.158", 2076, 32, "158" ) );
+		//senderList.add( new Sender( "cache.sjtu.edu.cn", 8080, 32, "sjtu" ) );
+		//senderList.add( new Sender( "202.120.17.158", 2076, 32, "158" ) );
 		//		senderList.add( new Sender( "222.35.17.177", 2076, 16, "177" ) );
 
-		//		senderList.add( new Sender( "27.115.75.114", 8080, 1, "代理1" ) );//100
-		//		senderList.add( new Sender( "112.25.41.136", 80, 1, "代理2" ) );//100
+		//senderList.add( new Sender( "27.115.75.114", 8080, 16, "代理1" ) );//100
+		//senderList.add( new Sender( "112.25.41.136", 80, 16, "代理2" ) );//100
 		//下面的延迟大概都是200
-		//		senderList.add( new Sender( "120.52.73.11", 8080, 1, "代理3" ) );
+		//senderList.add( new Sender( "120.52.73.11", 8080, 16, "代理3" ) );
 		//以下延迟300
-		//		senderList.add( new Sender( "120.52.73.13", 8080, 1, "代理4" ) );
+		//senderList.add( new Sender( "120.52.73.13", 8080, 16, "代理4" ) );
 		senderList.add( new Sender( "120.52.73.20", 8080, 16, "代理5" ) );
 		senderList.add( new Sender( "120.52.73.21", 80, 16, "代理6" ) );
 		senderList.add( new Sender( "120.52.73.24", 80, 16, "代理7" ) );
 		senderList.add( new Sender( "120.52.73.27", 80, 16, "代理8" ) );
 		senderList.add( new Sender( "120.52.73.29", 8080,16, "代理9" ) );
-		//senderList.add( new Sender( "116.246.6.52", 80,1, "代理10" ) );
-		//senderList.add( new Sender( "122.72.33.139", 80,1, "代理11" ) );
-		//senderList.add( new Sender( "112.25.41.136", 801,1, "代理12" ) );
+		senderList.add( new Sender( "116.246.6.52", 80, 16, "代理10" ) );
+		senderList.add( new Sender( "122.72.33.139", 80, 16, "代理11" ) );
+		//senderList.add( new Sender( "112.25.41.136", 80, 16, "代理12" ) );
 		senderList.add( new Sender( null, 0, 32, "本机" ) );
 
-		addJob( s, commentJob, new Config( "超人幻想", 3381898, "恭喜第二季制作决定!",
-				new DateTime( 2015, 12, 13, 22, 28 ).toDate(),
-				new DateTime( 2015, 12, 13, 22, 40 ).toDate() ).setSenderList( senderList ) );
-
+		addJob( s, commentJob, new Config( "温泉幼精箱根酱", 3381920, "这周的出水量不知道怎么样.",
+				new DateTime( 2015, 12, 14, 0, 3 ).toDate(),
+				new DateTime( 2015, 12, 14, 0, 15 ).toDate() ).setSenderList( senderList ) );
+		addJob( s, commentJob, new Config( "魔鬼恋人", 3382145, "不要黑女主, 要和谐和谐.",
+				new DateTime( 2015, 12, 14, 0, 28 ).toDate(),
+				new DateTime( 2015, 12, 14, 0, 40 ).toDate() ).setSenderList( senderList ) );
 	}
 
 	public void 强大的抢评论策略(long delay, int aid, String msg) throws Exception {
@@ -187,11 +182,12 @@ public class CommentRunner {
 		HttpHost proxy = new HttpHost( address, port );
 		CloseableHttpResponse res = null;
 		try {
-			res = hc.execute(
-					RequestBuilder.get( "http://api.bilibili.com/view" )
-							.setConfig( RequestConfig.custom().setSocketTimeout( 2000 ).setConnectTimeout( 2000 )
+			res = hc.execute( RequestBuilder
+					.get( "http://api.bilibili.com/view" )
+					.setConfig(
+							RequestConfig.custom().setSocketTimeout( 2000 ).setConnectTimeout( 2000 )
 									.setConnectionRequestTimeout( 2000 ).setProxy( proxy ).build() )
-							.build() );
+					.build() );
 			String content = EntityUtils.toString( res.getEntity() );
 			res.close();
 			return JSON.parseObject( content ).getInteger( "code" ) == -1;
@@ -220,14 +216,10 @@ public class CommentRunner {
 		params.add( new BasicNameValuePair( "access_key", "339a4620ad6791660e8a49af49af3add" ) );
 		params.add( new BasicNameValuePair( "aid", "3334538" ) );
 		UrlEncodedFormEntity e = new UrlEncodedFormEntity( params );
-		CloseableHttpResponse res = hc.execute(
-				RequestBuilder.post( "http://api.bilibili.com/feedback/post" )
-						.addParameter( "mid", "19161363" )
-						.addParameter( "type", "json" )
-						.addParameter( "access_key", "339a4620ad6791660e8a49af49af3add" )
-						.addParameter( "msg", "网络好卡啊, 怎么回事." )
-						.setEntity( e )
-						.build() );
+		CloseableHttpResponse res = hc.execute( RequestBuilder.post( "http://api.bilibili.com/feedback/post" )
+				.addParameter( "mid", "19161363" ).addParameter( "type", "json" )
+				.addParameter( "access_key", "339a4620ad6791660e8a49af49af3add" ).addParameter( "msg", "网络好卡啊, 怎么回事." )
+				.setEntity( e ).build() );
 		String content = EntityUtils.toString( res.getEntity() );
 		long end = System.currentTimeMillis();
 		System.out.println( content );

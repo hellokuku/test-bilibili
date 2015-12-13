@@ -72,7 +72,6 @@ public class AutoCommentWokerThread extends Thread {
 								continue;
 							}
 							//比如根据Video的create时间还有ct的updateAt
-							System.out.println( "现在将要进行对 " + v.aid + " , " + v.title + "的评论" );
 							//System.out.println( v.create );create估计是投稿时间, 建议不要以它为参考
 
 							//这两个updateAt一般相差几秒, 任意一个都可以作为参考
@@ -90,23 +89,23 @@ public class AutoCommentWokerThread extends Thread {
 							String result = main.comment( v.aid, msg );
 							System.out.println( "尝试对aid=" + v.aid + " 评论 " + msg + ", 结果是" + result );
 
-							if (result.contains( "禁言" )) {
-								iterationResult = 2;
+							if (result.contains( "验证码" )) {
+								iterationResult = 1;
 								db.createOrUpdate( ct );
 								break;//打破循环
-								//throw new RuntimeException( "竟然被禁言了, 目前没法解决." );
-							} else if (result.contains( "验证码" )) {
-								iterationResult = 1;
+							} else if (result.contains( "禁言" )) {
+								iterationResult = 2;
 								db.createOrUpdate( ct );
 								break;
 							} else if ("OK".equals( result )) {
 								//评论成功
 								db.markFinished( new CommentTask( v.aid ) );
-								System.out.println( "评论成功!" + v );
+								System.out.println( "评论成功! " + v );
 							} else {
 								System.out.println( "评论时遇到未知的结果 " + result );
 								iterationResult = 3;//未知的结果
 								db.createOrUpdate( ct );
+								break;
 							}
 						}
 					} else {//在这里评论的话是不安全的...
@@ -136,16 +135,15 @@ public class AutoCommentWokerThread extends Thread {
 					text = "未知的结果";
 				}
 				System.out.println( "评论任务执行完毕. 结果是 " + text );
-				if (iterationResult == 0) {
-					Thread.sleep( 30000 );
-				} else if (iterationResult == 1) {
+				if (iterationResult == 1) {
+					System.out.println( "评论线程睡觉30秒" );
 					Thread.sleep( 60000 );
-				} else if (iterationResult == 2) {
-					Thread.sleep( 30000 );
 				} else {
+					System.out.println( "评论线程睡觉30秒" );
 					Thread.sleep( 30000 );
 				}
 			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 		}
 	}
