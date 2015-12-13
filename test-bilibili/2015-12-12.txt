@@ -79,6 +79,10 @@ https://account.bilibili.com/answer/promotion
 https://account.bilibili.com/answer/cool/7163752
 https://account.bilibili.com/answer/base
 
+DedeUserID 19480366
+SESSDATA f3e878e5,1450537949,61e7c5d1
+
+
 2015-12-12
 
 3374113	【10月】终物语 11【独家正版】

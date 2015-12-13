@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -19,15 +18,10 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
-import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.client.utils.HttpClientUtils;
-import org.apache.http.cookie.Cookie;
-import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.impl.cookie.BasicClientCookie;
-import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
@@ -59,24 +53,6 @@ public class BilibiliService {
 	}
 
 	/**
-	 * 制作一个cookie
-	 * @param name
-	 * @param value
-	 * @return
-	 */
-	private static Cookie makeCookie(String name, String value) {
-		BasicClientCookie c = new BasicClientCookie( name, value );
-		Calendar calendar = Calendar.getInstance();
-		calendar.set( Calendar.YEAR, 2020 );
-		c.setDomain( ".bilibili.com" );
-		c.setPath( "/" );
-		c.setExpiryDate( calendar.getTime() );
-		c.setSecure( false );
-		c.setVersion( 1 );
-		return c;
-	}
-
-	/**
 	 * 绑定的hc
 	 */
 	private CloseableHttpClient hc;
@@ -86,13 +62,6 @@ public class BilibiliService {
 	 */
 	private Account a;
 
-	private BasicCookieStore makeCookieStore() {
-		BasicCookieStore bcs = new BasicCookieStore();
-		bcs.addCookie( makeCookie( "DedeUserID", Integer.toString( a.id ) ) );
-		bcs.addCookie( makeCookie( "SESSDATA", a.SESSIDATA ) );
-		return bcs;
-	}
-
 	public BilibiliService(final Account a) {
 		this.a = a;
 		//控制连接并发量
@@ -100,49 +69,15 @@ public class BilibiliService {
 		m.setDefaultMaxPerRoute( 4 );
 		m.setMaxTotal( 20 );
 
-		hc = HttpClients.custom().addInterceptorFirst( new HttpRequestInterceptor() {
-			public void process(HttpRequest req, HttpContext arg1) throws HttpException, IOException {
-				req.addHeader( "Cookie", "DedeUserID=" + a.id + "; SESSDATA=" + a.SESSIDATA + ";" );
+		RequestConfig rc = RequestConfig.custom().setCookieSpec( CookieSpecs.IGNORE_COOKIES ).build();
+
+		hc = HttpClients.custom().setDefaultRequestConfig( rc ).addInterceptorFirst( new HttpRequestInterceptor() {
+			public void process(HttpRequest request, HttpContext context) throws HttpException, IOException {
+				request.addHeader( "Cookie", "DedeUserID=" + a.id + "; SESSDATA=" + a.SESSIDATA + ";" );
 			}
 		} ).setConnectionManager( m ).build();
-		rebuildContextInternal();
-		//rebuildContext();
-	}
 
-	public synchronized void rebuildContext() {
-		if (true)
-			return;
-		boolean ok = false;
-		for (int i = 0; i < 10; ++i) {
-			try {
-				if (rebuildContextInternal()) {
-					ok = true;
-					break;
-				}
-			} catch (Exception e) {
-			}
-		}
-		if (!ok)
-			throw new RuntimeException( "尽力了,但是initAccount失败." );
-	}
-
-	private boolean rebuildContextInternal() {
-//		BasicCookieStore bcs = makeCookieStore();
-		RequestConfig rc = RequestConfig.custom().setCookieSpec( CookieSpecs.IGNORE_COOKIES).build();
-		HttpClientContext ctx2 = new HttpClientContext();
-//		ctx2.setCookieStore( bcs );
-		ctx2.setRequestConfig( rc );
-		ctx = new BasicHttpContext( ctx2 );
-
-		return initAccount();
-	}
-
-	private BasicHttpContext ctx;
-
-	private String lastFavoriteContent;
-
-	public String getLastFavoriteContent() {
-		return lastFavoriteContent;
+		initAccount();
 	}
 
 	/**
@@ -156,7 +91,6 @@ public class BilibiliService {
 			public Integer run() throws Exception {
 				String url = "http://api.bilibili.com/favourite/add?id=" + aid;
 				String content = asString( url );
-				lastFavoriteContent = content;
 				return JSON.parseObject( content ).getIntValue( "code" );
 			}
 		} );
@@ -170,7 +104,6 @@ public class BilibiliService {
 	public String comment(final int aid, final String msg) {
 		HttpUriRequest req = makeCommentRequest( aid, msg );
 		String content = asString( req );
-		//return content;
 		Matcher matcher = RESULT_PATTERN.matcher( content );
 		matcher.find();
 		return Utils.decodeUnicode( matcher.group( 1 ) );
@@ -413,7 +346,7 @@ public class BilibiliService {
 	private String asString(final HttpUriRequest req) {
 		return safeRun( new SafeRunner<String>() {
 			public String run() throws Exception {
-				CloseableHttpResponse res = hc.execute( req, ctx );
+				CloseableHttpResponse res = hc.execute( req );
 				try {
 					return EntityUtils.toString( res.getEntity(), UTF8 );
 				} finally {
