@@ -11,6 +11,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.http.HttpException;
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -25,6 +28,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -89,36 +93,44 @@ public class BilibiliService {
 		return bcs;
 	}
 
-	public BilibiliService(Account a) {
+	public BilibiliService(final Account a) {
 		this.a = a;
 		//控制连接并发量
 		PoolingHttpClientConnectionManager m = new PoolingHttpClientConnectionManager();
 		m.setDefaultMaxPerRoute( 4 );
 		m.setMaxTotal( 20 );
 
-		hc = HttpClients.custom().setConnectionManager( m ).build();
-		
-		rebuildContext();
+		hc = HttpClients.custom().addInterceptorFirst( new HttpRequestInterceptor() {
+			public void process(HttpRequest req, HttpContext arg1) throws HttpException, IOException {
+				req.addHeader( "Cookie", "DedeUserID=" + a.id + "; SESSDATA=" + a.SESSIDATA + ";" );
+			}
+		} ).setConnectionManager( m ).build();
+		rebuildContextInternal();
+		//rebuildContext();
 	}
 
 	public synchronized void rebuildContext() {
+		if (true)
+			return;
 		boolean ok = false;
 		for (int i = 0; i < 10; ++i) {
-			try{
-			if (rebuildContextInternal()) {
-				ok = true;
-				break;
-			}}catch(Exception e){}
+			try {
+				if (rebuildContextInternal()) {
+					ok = true;
+					break;
+				}
+			} catch (Exception e) {
+			}
 		}
 		if (!ok)
 			throw new RuntimeException( "尽力了,但是initAccount失败." );
 	}
 
 	private boolean rebuildContextInternal() {
-		BasicCookieStore bcs = makeCookieStore();
-		RequestConfig rc = RequestConfig.custom().setCookieSpec( CookieSpecs.NETSCAPE ).build();
+//		BasicCookieStore bcs = makeCookieStore();
+		RequestConfig rc = RequestConfig.custom().setCookieSpec( CookieSpecs.IGNORE_COOKIES).build();
 		HttpClientContext ctx2 = new HttpClientContext();
-		ctx2.setCookieStore( bcs );
+//		ctx2.setCookieStore( bcs );
 		ctx2.setRequestConfig( rc );
 		ctx = new BasicHttpContext( ctx2 );
 

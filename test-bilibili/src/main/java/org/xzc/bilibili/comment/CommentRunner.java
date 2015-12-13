@@ -63,15 +63,15 @@ public class CommentRunner {
 		s.addJob( commentJob, false );
 
 		List<Sender> senderList = new ArrayList<Sender>();
-		senderList.add( new Sender( "cache.sjtu.edu.cn", 8080, 32, "sjtu" ) );
-		senderList.add( new Sender( "202.120.17.158", 2076, 32, "158" ) );
-		senderList.add( new Sender( "222.35.17.177", 2076, 16, "177" ) );
+//		senderList.add( new Sender( "cache.sjtu.edu.cn", 8080, 32, "sjtu" ) );
+//		senderList.add( new Sender( "202.120.17.158", 2076, 32, "158" ) );
+//		senderList.add( new Sender( "222.35.17.177", 2076, 16, "177" ) );
 
-		senderList.add( new Sender( "27.115.75.114", 8080, 16, "代理1" ) );//100
-		senderList.add( new Sender( "112.25.41.136", 80, 16, "代理2" ) );//100
+//		senderList.add( new Sender( "27.115.75.114", 8080, 16, "代理1" ) );//100
+//		senderList.add( new Sender( "112.25.41.136", 80, 16, "代理2" ) );//100
 		//下面的延迟大概都是200
-		senderList.add( new Sender( "120.52.73.11", 8080, 8, "代理3" ) );
-		senderList.add( new Sender( "120.52.73.13", 8080, 8, "代理4" ) );
+//		senderList.add( new Sender( "120.52.73.11", 8080, 8, "代理3" ) );
+//		senderList.add( new Sender( "120.52.73.13", 8080, 8, "代理4" ) );
 		senderList.add( new Sender( "120.52.73.20", 8080, 8, "代理5" ) );
 		senderList.add( new Sender( "120.52.73.21", 80, 8, "代理6" ) );
 		senderList.add( new Sender( "120.52.73.24", 80, 8, "代理7" ) );
@@ -94,7 +94,7 @@ public class CommentRunner {
 				new DateTime( 2015, 12, 13, 1, 40 ).toDate() ).setSenderList( senderList ) );
 		addJob( s, commentJob, new Config( "终结的炽天使", 3374107, "上集看完之后整个人都不好了. 决定继续看下一集.",
 				new DateTime( 2015, 12, 13, 1, 58 ).toDate(),
-				new DateTime( 2015, 12, 12, 2, 10 ).toDate() ).setSenderList( senderList ) );
+				new DateTime( 2015, 12, 13, 2, 10 ).toDate() ).setSenderList( senderList ) );
 
 	}
 

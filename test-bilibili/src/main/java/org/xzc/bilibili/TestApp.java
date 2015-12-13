@@ -373,7 +373,7 @@ public class TestApp {
 					} else if (code == -101) {
 						//{"code":-101,"message":"Account is not logined.","ts":1449589626}
 						simpleBilibiliService.rebuildContext();
-						mainBilibiliService.rebuildContext();
+						//mainBilibiliService.rebuildContext();
 						System.out.println( "出问题了code=-101, 睡觉20秒" );
 						Thread.sleep( 20000 );
 						continue;
@@ -381,7 +381,7 @@ public class TestApp {
 						String content = simpleBilibiliService.getLastFavoriteContent();
 						FileUtils.writeStringToFile( new File( "error.log" ), content + "\r\n", true );
 						simpleBilibiliService.rebuildContext();
-						mainBilibiliService.rebuildContext();
+						//mainBilibiliService.rebuildContext();
 						System.out.println( "出问题了, 睡觉20秒" );
 						Thread.sleep( 20000 );
 						continue;
@@ -396,8 +396,8 @@ public class TestApp {
 				}
 			} catch (Exception ex) {
 				FileUtils.writeStringToFile( new File( "error.log" ), ex.getMessage() + "\r\n", true );
-				simpleBilibiliService.rebuildContext();
-				mainBilibiliService.rebuildContext();
+				//simpleBilibiliService.rebuildContext();
+				//mainBilibiliService.rebuildContext();
 				System.out.println( "出问题了, 睡觉20秒" );
 				Thread.sleep( 20000 );
 				continue;
