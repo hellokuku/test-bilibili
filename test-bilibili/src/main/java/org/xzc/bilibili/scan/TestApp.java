@@ -344,7 +344,7 @@ public class TestApp {
 		};
 		//thread.start();
 		 */
-		int batch = 10;//每次检测50个aid
+		int batch = 50;//每次检测50个aid
 		boolean reachBoundary = false;//是否达到边界
 		int aid = db.getMaxAid( 3349048 ) + 1;//aid起点
 		List<Integer> successAidList = new ArrayList<Integer>();
@@ -353,6 +353,7 @@ public class TestApp {
 				int count = 0;
 				while (count < batch) {
 					++count;
+					System.out.println("现在要处理aid="+aid);
 					int code = simpleBilibiliService.addFavotite( aid );//直接加入收藏夹
 					if (code == 0 || code == 11007) {//成功
 						successAidList.add( aid );
@@ -420,12 +421,14 @@ public class TestApp {
 				int batch = 50;
 				int total = 0;
 				FavGetList favoriteList = simpleBilibiliService.getFavoriteListJSON( batch );
+				System.out.println(favoriteList);
 				while (true) {
 					total += favoriteList.vlist.size();
 					for (Video v : favoriteList.vlist) {
 						if (cb != null)
 							cb.onParsed( v );
 						db.createOrUpdate( v );
+						System.out.println("添加"+v);
 					}
 					simpleBilibiliService.deleteFavoriteJSON( favoriteList );
 					if (favoriteList.count > favoriteList.vlist.size())
