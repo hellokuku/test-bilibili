@@ -37,13 +37,9 @@ import com.alibaba.fastjson.JSON;
 public class CommentRunner {
 	private static final SimpleDateFormat SDF = new SimpleDateFormat( "MM月dd日HH时mm分ss秒" );
 
-	private static Trigger addJob(Scheduler s, JobDetail job, Config cfg)
-			throws SchedulerException {
-		Trigger t = TriggerBuilder.newTrigger()
-				.startAt( cfg.getStartAt() )
-				.forJob( job )
-				.usingJobData( CommentJob.ARG_CONFIG, JSON.toJSONString( cfg ) )
-				.build();
+	private static Trigger addJob(Scheduler s, JobDetail job, Config cfg) throws SchedulerException {
+		Trigger t = TriggerBuilder.newTrigger().startAt( cfg.getStartAt() ).forJob( job )
+				.usingJobData( CommentJob.ARG_CONFIG, JSON.toJSONString( cfg ) ).build();
 		s.scheduleJob( t );
 		System.out.println( "[" + cfg.getTag() + "] 将会于" + SDF.format( cfg.getStartAt() ) + "开始, 于"
 				+ SDF.format( cfg.getEndAt() ) + "结束." );
@@ -55,46 +51,34 @@ public class CommentRunner {
 		Scheduler s = f.getScheduler();
 		s.start();
 
-		JobDetail commentJob = JobBuilder.newJob( CommentJob.class )
-				.withIdentity( "comment" )
-				.storeDurably()
-				.build();
+		JobDetail commentJob = JobBuilder.newJob( CommentJob.class ).withIdentity( "comment" ).storeDurably().build();
 
 		s.addJob( commentJob, false );
 
 		List<Sender> senderList = new ArrayList<Sender>();
-//		senderList.add( new Sender( "cache.sjtu.edu.cn", 8080, 32, "sjtu" ) );
-//		senderList.add( new Sender( "202.120.17.158", 2076, 32, "158" ) );
-//		senderList.add( new Sender( "222.35.17.177", 2076, 16, "177" ) );
+				senderList.add( new Sender( "cache.sjtu.edu.cn", 8080, 32, "sjtu" ) );
+				senderList.add( new Sender( "202.120.17.158", 2076, 32, "158" ) );
+		//		senderList.add( new Sender( "222.35.17.177", 2076, 16, "177" ) );
 
-//		senderList.add( new Sender( "27.115.75.114", 8080, 16, "代理1" ) );//100
-//		senderList.add( new Sender( "112.25.41.136", 80, 16, "代理2" ) );//100
+				senderList.add( new Sender( "27.115.75.114", 8080, 16, "代理1" ) );//100
+				senderList.add( new Sender( "112.25.41.136", 80, 16, "代理2" ) );//100
 		//下面的延迟大概都是200
-//		senderList.add( new Sender( "120.52.73.11", 8080, 8, "代理3" ) );
-//		senderList.add( new Sender( "120.52.73.13", 8080, 8, "代理4" ) );
-		senderList.add( new Sender( "120.52.73.20", 8080, 8, "代理5" ) );
-		senderList.add( new Sender( "120.52.73.21", 80, 8, "代理6" ) );
-		senderList.add( new Sender( "120.52.73.24", 80, 8, "代理7" ) );
-		senderList.add( new Sender( "120.52.73.27", 80, 8, "代理8" ) );
-		senderList.add( new Sender( "120.52.73.29", 8080, 8, "代理9" ) );
+				senderList.add( new Sender( "120.52.73.11", 8080, 16, "代理3" ) );
+		//以下延迟300
+				senderList.add( new Sender( "120.52.73.13", 8080, 16, "代理4" ) );
+		//senderList.add( new Sender( "120.52.73.20", 8080, 1, "代理5" ) );
+		//senderList.add( new Sender( "120.52.73.21", 80, 1, "代理6" ) );
+		//senderList.add( new Sender( "120.52.73.24", 80, 1, "代理7" ) );
+		//senderList.add( new Sender( "120.52.73.27", 80, 1, "代理8" ) );
+		//senderList.add( new Sender( "120.52.73.29", 8080,1, "代理9" ) );
+		//senderList.add( new Sender( "116.246.6.52", 80,1, "代理10" ) );
+		//senderList.add( new Sender( "122.72.33.139", 80,1, "代理11" ) );
+		//senderList.add( new Sender( "112.25.41.136", 801,1, "代理12" ) );
 		senderList.add( new Sender( null, 0, 32, "本机" ) );
 
-		//addJob( s, commentJob, new Config( "落第骑士英雄谭", 3374073, "深夜的一刀修罗!",
-		//		new DateTime( 2015, 12, 12, 22, 00 ).toDate(),
-		//		new DateTime( 2015, 12, 12, 23, 10 ).toDate() ).setSenderList( senderList ) );
-		//45177
-		addJob( s, commentJob, new Config( "KOWABON", 3374078, "这番看不懂啊! 智商捉急.",
-				new DateTime( 2015, 12, 12, 0, 48 ).toDate(),
-				new DateTime( 2015, 12, 13, 0, 58 ).toDate() ).setSenderList( senderList ) );
-		addJob( s, commentJob, new Config( "请问您今天要来点兔子吗", 3374085, "今宵我要来点智乃.",
-				new DateTime( 2015, 12, 13, 0, 58 ).toDate(),
-				new DateTime( 2015, 12, 13, 1, 10 ).toDate() ).setSenderList( senderList ) );
-		addJob( s, commentJob, new Config( "传颂之物-虚伪的假面", 3374098, "来听听OP先!",
-				new DateTime( 2015, 12, 13, 1, 28 ).toDate(),
-				new DateTime( 2015, 12, 13, 1, 40 ).toDate() ).setSenderList( senderList ) );
-		addJob( s, commentJob, new Config( "终结的炽天使", 3374107, "上集看完之后整个人都不好了. 决定继续看下一集.",
-				new DateTime( 2015, 12, 13, 1, 58 ).toDate(),
-				new DateTime( 2015, 12, 13, 2, 10 ).toDate() ).setSenderList( senderList ) );
+		addJob( s, commentJob, new Config( "超人幻想", 3381898, "恭喜第二季制作决定!",
+				new DateTime( 2015, 12, 13, 22, 28 ).toDate(),
+				new DateTime( 2015, 12, 13, 22, 40 ).toDate() ).setSenderList( senderList ) );
 
 	}
 
@@ -196,11 +180,11 @@ public class CommentRunner {
 		HttpHost proxy = new HttpHost( address, port );
 		CloseableHttpResponse res = null;
 		try {
-			res = hc.execute(
-					RequestBuilder.get( "http://api.bilibili.com/view" )
-							.setConfig( RequestConfig.custom().setSocketTimeout( 2000 ).setConnectTimeout( 2000 )
-									.setConnectionRequestTimeout( 2000 ).setProxy( proxy ).build() )
-							.build() );
+			res = hc.execute( RequestBuilder
+					.get( "http://api.bilibili.com/view" )
+					.setConfig(
+							RequestConfig.custom().setSocketTimeout( 2000 ).setConnectTimeout( 2000 )
+									.setConnectionRequestTimeout( 2000 ).setProxy( proxy ).build() ).build() );
 			String content = EntityUtils.toString( res.getEntity() );
 			res.close();
 			return JSON.parseObject( content ).getInteger( "code" ) == -1;
@@ -229,14 +213,10 @@ public class CommentRunner {
 		params.add( new BasicNameValuePair( "access_key", "339a4620ad6791660e8a49af49af3add" ) );
 		params.add( new BasicNameValuePair( "aid", "3334538" ) );
 		UrlEncodedFormEntity e = new UrlEncodedFormEntity( params );
-		CloseableHttpResponse res = hc.execute(
-				RequestBuilder.post( "http://api.bilibili.com/feedback/post" )
-						.addParameter( "mid", "19161363" )
-						.addParameter( "type", "json" )
-						.addParameter( "access_key", "339a4620ad6791660e8a49af49af3add" )
-						.addParameter( "msg", "网络好卡啊, 怎么回事." )
-						.setEntity( e )
-						.build() );
+		CloseableHttpResponse res = hc.execute( RequestBuilder.post( "http://api.bilibili.com/feedback/post" )
+				.addParameter( "mid", "19161363" ).addParameter( "type", "json" )
+				.addParameter( "access_key", "339a4620ad6791660e8a49af49af3add" ).addParameter( "msg", "网络好卡啊, 怎么回事." )
+				.setEntity( e ).build() );
 		String content = EntityUtils.toString( res.getEntity() );
 		long end = System.currentTimeMillis();
 		System.out.println( content );
