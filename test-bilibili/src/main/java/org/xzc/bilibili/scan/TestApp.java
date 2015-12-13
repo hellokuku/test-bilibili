@@ -387,7 +387,8 @@ public class TestApp {
 					}
 					++aid;
 				}
-				消耗收藏夹( parsedCallback );
+				//消耗收藏夹( parsedCallback );
+				消耗收藏夹();//由于不需要批量发评论了 因此回调为null
 				if (reachBoundary) {
 					reachBoundary = false;
 					System.out.println( "真的达到边界了, 休息10秒,再继续" );
