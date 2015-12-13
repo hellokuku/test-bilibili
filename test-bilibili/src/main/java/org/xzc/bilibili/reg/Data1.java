@@ -2,7 +2,7 @@ package org.xzc.bilibili.reg;
 
 import java.util.List;
 
-public class Data {
+public class Data1 {
 	public long currentTime;
 	public long endTime;
 	public List<Question> questionList;

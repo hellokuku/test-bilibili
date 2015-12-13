@@ -1,7 +1,7 @@
 package org.xzc.bilibili.reg;
 
-public class Base {
-	public Data data;
+public class Base1 {
+	public Data1 data;
 	public boolean status;
 	@Override
 	public String toString() {

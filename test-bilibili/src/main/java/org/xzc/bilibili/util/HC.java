@@ -41,7 +41,7 @@ public class HC {
 				CloseableHttpResponse res = null;
 				try {
 					res = hc.execute( req );
-					String content = EntityUtils.toString( res.getEntity() );
+					String content = EntityUtils.toString( res.getEntity(), "utf-8" );
 					return content;
 				} finally {
 					HttpClientUtils.closeQuietly( res );

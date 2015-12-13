@@ -1,6 +1,6 @@
 # 视频 #
 最小化登陆
-https://account.bilibili.com/ajax/miniLogin/minilogin
+""
 可以不需要验证码!
 
 添加到收藏夹

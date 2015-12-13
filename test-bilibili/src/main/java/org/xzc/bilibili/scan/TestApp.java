@@ -1,9 +1,8 @@
 package org.xzc.bilibili.scan;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -14,11 +13,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.xzc.bilibili.model.Bangumi;
@@ -32,12 +32,11 @@ import com.j256.ormlite.dao.RuntimeExceptionDao;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { AppConfig.class })
 public class TestApp {
-	@Autowired
-	@Qualifier("simpleBilibiliService")
+
+	@Resource(name = "simpleBilibiliService")
 	private BilibiliService simpleBilibiliService;
 
-	//@Autowired
-	//@Qualifier("mainBilibiliService")
+	@Resource(name = "mainBilibiliService")
 	private BilibiliService mainBilibiliService;
 
 	//测试是否登陆
@@ -47,53 +46,9 @@ public class TestApp {
 		assertTrue( mainBilibiliService.isLogin() );
 	}
 
-	@Test
-	public void 获取视频信息0() {
-		int aid = 3334306;
-		Video v = simpleBilibiliService.getVideo0( aid );
-		System.out.println( v );
-	}
-
-	@Test
-	public void 获取视频信息1() {
-		int aid = 3334603;
-		Video v = simpleBilibiliService.getVideo1( aid );
-		System.out.println( v );
-	}
-
-	@Test
-	public void 获得收藏夹内容_JSON() {
-		FavGetList json = simpleBilibiliService.getFavoriteListJSON( 10 );
-		System.out.println( json.count );
-	}
-
-	@Test
-	public void 删除收藏夹内容_JSON() {
-		FavGetList json = simpleBilibiliService.getFavoriteListJSON( 10 );
-		System.out.println( json.count );
-		simpleBilibiliService.deleteFavoriteJSON( json );
-		json = simpleBilibiliService.getFavoriteListJSON( 10 );
-		System.out.println( json.count );
-	}
-
-	@Autowired
+	@Resource
 	private BilibiliDB db;
 
-	@Test
-	public void 测试评论间隔() throws Exception {
-		int aid = 2007730;
-		while (true) {
-			String result = simpleBilibiliService.comment( aid, "路过路过路过..." + randomChar() );
-			System.out.println( result );
-			for (int i = 0; i < 60; ++i) {
-				System.out.print( i + " " );
-				Thread.sleep( 1000 );
-			}
-			System.out.println();
-		}
-	}
-
-	@Test
 	public void 批量占据评论() throws Exception {
 		int from = 2007730;
 		int to = from + 800;
@@ -121,30 +76,8 @@ public class TestApp {
 		}
 	}
 
-	@Test
 	public void 测试弹幕() {
 		simpleBilibiliService.danmu();
-	}
-
-	private Video 处理伪边界(int aid) {
-		for (int i = 0; i < 16; ++i) {
-			Video v = simpleBilibiliService.getVideo1( aid + i );
-			if (!v.notExists()) {
-				return v;
-			}
-		}
-		return null;
-	}
-
-	private void 更新视频状态(int aid) {
-		Video v = simpleBilibiliService.getVideo1( aid );
-		if (!v.notExists()) {
-			db.createOrUpdate( v );
-			if (v.isMQX()) {
-				simpleBilibiliService.addFavotite( aid );//加入收藏夹
-			}
-		}
-		System.out.println( "添加" + v );
 	}
 
 	/**
@@ -154,7 +87,6 @@ public class TestApp {
 	 *由于开了4个线程 1秒大概搞12个
 	 * @throws Exception
 	 */
-	@Test
 	public void 批量获取视频状态_新策略3() throws Exception {
 		int from = db.getMaxAid( 3347430 ) + 1;//aid起点
 		final boolean[] stop = new boolean[] { false };
@@ -210,7 +142,6 @@ public class TestApp {
 	 * 大概一秒可以搞定3个视频
 	 * @throws Exception
 	 */
-	@Test
 	public void 批量获取视频状态_新策略2() throws Exception {
 		int batch = 50;//每次检测50个aid
 		int aid = db.getMaxAid( 0 ) + 1;//aid起点
@@ -261,26 +192,6 @@ public class TestApp {
 	@Autowired
 	private CommentService commentService;
 
-	private boolean doComment(Video v) {
-		//做评论
-		String msg = commentService.getComment( v );
-		String result = mainBilibiliService.comment( v.aid, msg );
-		System.out.println( "0尝试对aid=" + v.aid + " 评论 " + msg + ", 结果是" + result );
-		if (result.contains( "禁言" )) {
-			throw new RuntimeException( "竟然被禁言了, 目前没法解决." );
-		}
-		if (result.contains( "验证码" )) {//验证码 睡觉18秒
-			try {
-				System.out.println( "由于验证码错误， 睡觉20秒" );
-				Thread.sleep( 20000 );
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		//有的时候即使已经OK了, 但是实际上没有评论成功!
-		return "OK".equals( result );
-	}
-
 	private ParsedCallback parsedCallback = new ParsedCallback() {
 		public void onParsed(Video v) {
 			//System.out.println( "开始评估视频" + v );
@@ -300,50 +211,6 @@ public class TestApp {
 	 */
 	@Test
 	public void 持续跟进最新的视频() throws Exception {
-		//启动一个线程不断扫描任务
-		/*db.fixCommentTask();
-		Thread thread = new Thread() {
-			public void run() {
-				while (true) {
-					try {
-						List<CommentTask> taskList = db.getCommentTaskList();
-						System.out.println( "开始执行自动评论任务, 任务数量=" + taskList.size() );
-						//评论!
-						for (CommentTask ct : taskList) {
-							if (!simpleBilibiliService.isCommentListEmpty( ct.aid )) {
-								//评论已经不为空了
-								System.out.println( "评论已经不为空, 放弃. " + ct.aid );
-								db.markFailed( ct );
-							} else if (doComment( db.getVideo( ct.aid ) )) {
-								//判断一下第一是不是自己
-								db.markFinished( ct );
-							}
-						}
-					} catch (Exception e) {
-						//simpleBilibiliService.rebuildContext();
-						//mainBilibiliService.rebuildContext();
-						try {
-							FileUtils.writeStringToFile( new File( "error.log" ), e.getMessage() + "\r\n", true );
-						} catch (IOException e1) {
-							e1.printStackTrace();
-						}
-						try {
-							Thread.sleep( 20000 );
-						} catch (InterruptedException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-					}
-					try {
-						Thread.sleep( 5000 );//休息5秒
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		};
-		//thread.start();
-		 */
 		int batch = 10;//每次检测50个aid
 		boolean reachBoundary = false;//是否达到边界
 		int aid = db.getMaxAid( 3349048 ) + 1;//aid起点
@@ -405,87 +272,44 @@ public class TestApp {
 		}
 	}
 
-	private interface ParsedCallback {
-		public void onParsed(Video v);
-	}
-
+	/**
+	 * 消耗掉收藏夹 返回消耗的视频的个数
+	 * @return
+	 */
 	private int 消耗收藏夹() {
 		return 消耗收藏夹( null );
 	}
 
 	private int 消耗收藏夹(final ParsedCallback cb) {
-		return db.getVideoDao().callBatchTasks( new Callable<Integer>() {
-			public Integer call() throws Exception {
-				System.out.println( "消耗收藏夹" );
-				int batch = 50;
-				int total = 0;
-				FavGetList favoriteList = simpleBilibiliService.getFavoriteListJSON( batch );
-				while (true) {
-					total += favoriteList.vlist.size();
+		System.out.println( "消耗收藏夹" );
+		int batch = 50;
+		int total = 0;
+		while (true) {
+			//获取收藏夹
+			final FavGetList favoriteList = simpleBilibiliService.getFavoriteListJSON( batch );
+			//统计
+			total += favoriteList.vlist.size();
+			//插入数据库
+			db.getVideoDao().callBatchTasks( new Callable<Void>() {
+				public Void call() throws Exception {
 					for (Video v : favoriteList.vlist) {
-						if (cb != null)
-							cb.onParsed( v );
 						db.createOrUpdate( v );
 					}
-					simpleBilibiliService.deleteFavoriteJSON( favoriteList );
-					if (favoriteList.count > favoriteList.vlist.size())
-						favoriteList = simpleBilibiliService.getFavoriteListJSON( batch );
-					else
-						break;
+					return null;
 				}
-				return total;
-			}
-		} );
+			} );
+			//回调
+			if (cb != null)
+				for (Video v : favoriteList.vlist)
+					cb.onParsed( v );
+			//删除
+			simpleBilibiliService.deleteFavoriteJSON( favoriteList );
+			if (favoriteList.count == favoriteList.vlist.size())
+				break;
+		}
+		return total;
 	}
 
-	@Test
-	public void 更新所有状态1() {
-		List<Video> list = db.getVideoByStateAndTypeID( 1, -1, 50 );
-		while (list.size() > 0) {
-			for (Video v : list) {
-				simpleBilibiliService.addFavotite( v.aid );
-			}
-			消耗收藏夹();
-			list = db.getVideoByStateAndTypeID( 1, -1, 50 );
-		}
-	}
-
-	@Test
-	public void 更新状态() {
-		List<Video> list = db.getVideoByState( 1 );
-		System.out.println( "totalsize=" + list.size() );
-		int count = 0;
-		for (Video v : list) {
-			Video v2 = simpleBilibiliService.getVideo1( v.aid );
-			if (v.state != v2.state) {
-				System.out.println( "更新 " + v2 );
-				db.update( v2 );
-				if (v2.isMQX()) {
-					simpleBilibiliService.addFavotite( v2.aid );
-					++count;
-					if (count > 50) {
-						消耗收藏夹();
-						count = 0;
-					}
-				}
-			}
-		}
-		消耗收藏夹();
-	}
-
-	@Test
-	public void 更新所有还没有获取标题的视频() {
-		int batch = 50;
-		List<Video> list = db.getMQXList( batch );
-		while (list.size() > 0) {
-			//加入收藏夹
-			for (Video v : list) {
-				simpleBilibiliService.addFavotite( v.aid );
-			}
-			消耗收藏夹();
-			list = db.getMQXList( batch );
-		}
-	}
 
 	private Random random = new Random();
 
@@ -521,13 +345,11 @@ public class TestApp {
 		}
 	}
 
-	@Test
 	public void 测试阻塞时间() {
 		阻塞直到( makeDate( 12, 9, 23, 18 ) );
 		System.out.println( "ok" );
 	}
 
-	@Test
 	public void 抢评论() throws Exception {
 		ExecutorService es = Executors.newFixedThreadPool( 3 );//4个线程
 		List<Future<?>> list = new ArrayList<Future<?>>();
@@ -568,7 +390,6 @@ public class TestApp {
 		es.shutdown();
 	}
 
-	@Test
 	public void 获取所有番剧信息() {
 		List<Bangumi> list = simpleBilibiliService.getBangumiList();
 		for (Bangumi b : list) {
@@ -580,7 +401,6 @@ public class TestApp {
 		}
 	}
 
-	@Test
 	public void 获取番剧每集的aid() {
 		String bid = "2744";
 		Bangumi b = simpleBilibiliService.getBangumi( bid );
@@ -590,7 +410,6 @@ public class TestApp {
 		}
 	}
 
-	@Test
 	public void 更新全部() {
 		final RuntimeExceptionDao<Video, Integer> dao = db.getVideoDao();
 		dao.callBatchTasks( new Callable<Void>() {

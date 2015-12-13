@@ -1,6 +1,5 @@
 package org.xzc.bilibili.scan;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -24,30 +23,17 @@ public class AppConfig {
 		}
 	}
 
-	@Bean(name = "simpleAccount")
-	public Account simpleAccount() {
-		Account a = new Account( 19216452, "704fe3e6,1450055207,1cc44621" );
-		return a;
-	}
-
-	@Bean(name = "mainAccount")
-	public Account mainAccount() {
-		//		f2a2b0f4,1450448416,a2f6ccc2
-		Account a = new Account( 19161363, "b365258b,1450454249,025a276e" );
-		//		Account a = new Account( 1655915, "137419f3,1449971802,b48e796e" );
-		return a;
-	}
-
 	@Bean(name = "simpleBilibiliService")
-	public BilibiliService simpleBilibiliService(@Qualifier("simpleAccount") Account a) {
+	public BilibiliService simpleBilibiliService() {
+		Account a = new Account( 19216452, "704fe3e6,1450055207,1cc44621" );
 		BilibiliService bs = new BilibiliService( a );
 		return bs;
 	}
 
-	//@Bean(name = "mainBilibiliService")
-	public BilibiliService mainBilibiliService(@Qualifier("mainAccount") Account a) {
+	@Bean(name = "mainBilibiliService")
+	public BilibiliService mainBilibiliService() {
+		Account a = new Account( 19216452, "704fe3e6,1450055207,1cc44621" );
 		BilibiliService bs = new BilibiliService( a );
 		return bs;
-
 	}
 }

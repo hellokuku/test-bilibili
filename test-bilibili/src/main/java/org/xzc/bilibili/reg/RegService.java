@@ -46,9 +46,9 @@ public class RegService {
 		}
 	}
 
-	public Base getBase1() {
+	public Base1 getBase1() {
 		String s = hc.getAsString( "https://account.bilibili.com/answer/base" );
-		return JSON.toJavaObject( hc.getAsJSON( "https://account.bilibili.com/answer/getBaseQ" ), Base.class );
+		return JSON.toJavaObject( hc.getAsJSON( "https://account.bilibili.com/answer/getBaseQ" ), Base1.class );
 	}
 
 	public String submitBase1(String url, List<Question> list) {
@@ -110,7 +110,7 @@ public class RegService {
 	}
 
 	public boolean answer1() {
-		Base b1 = getBase1();
+		Base1 b1 = getBase1();
 		while (setToNextAns( b1.data.questionList )) {
 			String result = submitBase1( "https://account.bilibili.com/answer/goPromotion", b1.data.questionList );
 			if (result.contains( "false" )) {
