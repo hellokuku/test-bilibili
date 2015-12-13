@@ -21,6 +21,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
+import org.xzc.bilibili.util.HC;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -28,19 +29,21 @@ import com.alibaba.fastjson.JSONObject;
 
 public class RegService {
 	private HC hc;
+	private String mainHtml;
 
 	public RegService(final String DedeUserID, final String SESSDATA) {
 		RequestConfig rc = RequestConfig.custom().setCookieSpec( CookieSpecs.IGNORE_COOKIES ).build();
 		CloseableHttpClient hc0 = HttpClients.custom().setDefaultRequestConfig( rc )
 				.addInterceptorFirst( new HttpRequestInterceptor() {
 					public void process(HttpRequest request, HttpContext context) throws HttpException, IOException {
-						//xzchaooDRF1request.addHeader( "Cookie", "DedeUserID=19533545;SESSDATA=f0ee7f17,1481508926,1406d614;" );
-						//f0ee7f17,1450578153,e9d8a416
-						//xzchaooDRF2
 						request.addHeader( "Cookie", "DedeUserID=" + DedeUserID + ";SESSDATA=" + SESSDATA + ";" );
 					}
 				} ).build();
 		hc = new HC( hc0 );
+		mainHtml = hc.getAsString( "http://member.bilibili.com/main.html" );
+		if (!mainHtml.contains( DedeUserID )) {
+			throw new IllegalArgumentException( "该账号还没有登陆." );
+		}
 	}
 
 	public Base getBase1() {
@@ -162,6 +165,10 @@ public class RegService {
 				.build();
 		String content = hc.asString( req );
 		return JSON.toJavaObject( hc.asJSON( req ), Base2.class );
+	}
+
+	public boolean isOK() {
+		return !mainHtml.contains( "我要回答问题激活" );
 	}
 
 }

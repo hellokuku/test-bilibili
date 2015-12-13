@@ -28,25 +28,32 @@ import com.alibaba.fastjson.JSON;
 @Component
 public class ProxyService {
 	private CloseableHttpClient hc;
+	private int batch = 16;
 
 	@PostConstruct
 	public void postConstruct() {
 		PoolingHttpClientConnectionManager p = new PoolingHttpClientConnectionManager();
-		p.setMaxTotal( 32 );
-		p.setDefaultMaxPerRoute( 16 );
-		hc = HttpClients.custom().setRetryHandler( new StandardHttpRequestRetryHandler(10,false) ).setConnectionManager( p ).build();
+		p.setMaxTotal( batch * 4 );
+		p.setDefaultMaxPerRoute( batch );
+		hc = HttpClients.custom().setRetryHandler( new StandardHttpRequestRetryHandler( 10, false ) )
+				.setConnectionManager( p ).build();
+	}
+
+	public int getBatch() {
+		return batch;
 	}
 
 	private String url = "http://api.bilibili.com/view?abc";
 
 	public void tryProxy(Proxy p) {
 		try {
+			int timeout = 5000;
 			long beg = System.currentTimeMillis();
 			String content = asString( RequestBuilder.get( url ).setConfig(
 					RequestConfig.custom()
-							.setSocketTimeout( 2000 )
-							.setConnectTimeout( 2000 )
-							.setConnectionRequestTimeout( 2000 )
+							.setSocketTimeout( timeout )
+							.setConnectTimeout( timeout )
+							.setConnectionRequestTimeout( timeout )
 							.setProxy( new HttpHost( p.getIp(), p.getPort() ) )
 							.setCookieSpec( CookieSpecs.IGNORE_COOKIES )
 							.build() )
@@ -59,6 +66,7 @@ public class ProxyService {
 	}
 
 	public List<Proxy> getProxyList() {
+		//目前主要是从http://www.xicidaili.com这个网站拉取数据
 		List<Proxy> list = new ArrayList<Proxy>();
 		for (int page = 1; page <= 10; ++page) {
 			String url = "http://www.xicidaili.com/nn/" + page;

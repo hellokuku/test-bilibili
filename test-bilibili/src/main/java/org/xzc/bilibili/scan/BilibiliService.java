@@ -75,7 +75,7 @@ public class BilibiliService {
 
 		hc = HttpClients.custom().setDefaultRequestConfig( rc ).addInterceptorFirst( new HttpRequestInterceptor() {
 			public void process(HttpRequest request, HttpContext context) throws HttpException, IOException {
-				request.addHeader( "Cookie", "DedeUserID=" + a.id + "; SESSDATA=" + a.SESSIDATA + ";" );
+				request.addHeader( "Cookie", "DedeUserID=" + a.getId() + "; SESSDATA=" + a.getSESSIDATA() + ";" );
 			}
 		} ).setConnectionManager( m ).build();
 
@@ -162,7 +162,7 @@ public class BilibiliService {
 
 	public String deleteFavorite2(String aids) {
 		HttpUriRequest req = RequestBuilder.post( "http://space.bilibili.com/ajax/fav/mdel" )
-				.addParameter( "fid", Integer.toString( a.fid ) ).addParameter( "aids", aids )
+				.addParameter( "fid", Integer.toString( a.getFid() ) ).addParameter( "aids", aids )
 				.addHeader( "Referer", "http://space.bilibili.com/" ).build();
 		String content = asString( req );
 		return content;
@@ -297,7 +297,7 @@ public class BilibiliService {
 		for (Video v : list.vlist) {
 			if (aid == v.aid) {
 				//删除它
-				deleteFavorite( a.fid, aid );
+				deleteFavorite( a.getFid(), aid );
 				return v;
 			}
 		}
@@ -332,7 +332,7 @@ public class BilibiliService {
 			public Boolean run() throws Exception {
 				String url = "http://member.bilibili.com/main.html";
 				String content = asString( url );
-				return content.contains( Integer.toString( a.id ) );
+				return content.contains( Integer.toString( a.getId() ) );
 			}
 		} );
 	}
@@ -363,11 +363,24 @@ public class BilibiliService {
 	}
 
 	private boolean initAccount() {
-		if (!isLogin())
+		String url = "http://member.bilibili.com/main.html";
+		String content = asString( url );
+		if (!content.contains( Integer.toString( a.getId() ) ))//账号还没有登陆
 			return false;
-		String url = FAV_GET_BOX_LIST_URL + a.id;
-		JSONObject jo = asJSON( url );
-		a.fid = jo.getJSONObject( "data" ).getJSONArray( "list" ).getJSONObject( 0 ).getIntValue( "fav_box" );
+		String jsonStr = asString( "http://api.bilibili.com/userinfo?mid=" + a.getId() );
+
+		Account aa = JSON.parseObject( jsonStr, Account.class );
+		aa.setSESSIDATA( a.getSESSIDATA() );
+		aa.setId( a.getId() );
+		a = aa;
+
+		a.setActive( !content.contains( "我要回答问题激活" ) );
+
+		//获得默认的收藏夹
+		JSONObject jo = asJSON( FAV_GET_BOX_LIST_URL + a.getId() );
+		a.setFid( jo.getJSONObject( "data" ).getJSONArray( "list" ).getJSONObject( 0 ).getIntValue( "fav_box" ) );
+
+		System.out.println( "初始化账号成功" + a );
 		return true;
 	}
 
@@ -391,7 +404,7 @@ public class BilibiliService {
 	 */
 	private HttpUriRequest makeDeleteFavoriteRequest(String aids) {
 		return RequestBuilder.post( "http://space.bilibili.com/ajax/fav/mdel" )
-				.addParameter( "fid", Integer.toString( a.fid ) ).addParameter( "aids", aids )
+				.addParameter( "fid", Integer.toString( a.getFid() ) ).addParameter( "aids", aids )
 				.addHeader( "Referer", "http://space.bilibili.com/" ).build();
 	}
 
@@ -402,7 +415,8 @@ public class BilibiliService {
 	 */
 	private HttpUriRequest makeGetFavoriteListRequest(int pagesize) {
 		return RequestBuilder.get( "http://space.bilibili.com/ajax/fav/getList" )
-				.addParameter( "mid", Integer.toString( a.id ) ).addParameter( "fid", Integer.toString( a.fid ) )
+				.addParameter( "mid", Integer.toString( a.getId() ) )
+				.addParameter( "fid", Integer.toString( a.getFid() ) )
 				.addParameter( "pagesize", Integer.toString( pagesize ) ).addParameter( "order", "ftime" ).build();
 	}
 
