@@ -56,24 +56,24 @@ public class CommentRunner {
 		s.addJob( commentJob, false );
 
 		List<Sender> senderList = new ArrayList<Sender>();
-		//senderList.add( new Sender( "cache.sjtu.edu.cn", 8080, 32, "sjtu" ) );
-		//senderList.add( new Sender( "202.120.17.158", 2076, 32, "158" ) );
+		senderList.add( new Sender( "cache.sjtu.edu.cn", 8080, 32, "sjtu" ) );
+		senderList.add( new Sender( "202.120.17.158", 2076, 32, "158" ) );
 		//		senderList.add( new Sender( "222.35.17.177", 2076, 16, "177" ) );
 
-		//senderList.add( new Sender( "27.115.75.114", 8080, 16, "代理1" ) );//100
-		//senderList.add( new Sender( "112.25.41.136", 80, 16, "代理2" ) );//100
+		senderList.add( new Sender( "27.115.75.114", 8080, 16, "代理1" ) );//100
+		senderList.add( new Sender( "112.25.41.136", 80, 16, "代理2" ) );//100
 		//下面的延迟大概都是200
-		//senderList.add( new Sender( "120.52.73.11", 8080, 16, "代理3" ) );
+		senderList.add( new Sender( "120.52.73.11", 8080, 16, "代理3" ) );
 		//以下延迟300
-		//senderList.add( new Sender( "120.52.73.13", 8080, 16, "代理4" ) );
-		senderList.add( new Sender( "120.52.73.20", 8080, 16, "代理5" ) );
-		senderList.add( new Sender( "120.52.73.21", 80, 16, "代理6" ) );
-		senderList.add( new Sender( "120.52.73.24", 80, 16, "代理7" ) );
-		senderList.add( new Sender( "120.52.73.27", 80, 16, "代理8" ) );
-		senderList.add( new Sender( "120.52.73.29", 8080,16, "代理9" ) );
-		senderList.add( new Sender( "116.246.6.52", 80, 16, "代理10" ) );
-		senderList.add( new Sender( "122.72.33.139", 80, 16, "代理11" ) );
-		//senderList.add( new Sender( "112.25.41.136", 80, 16, "代理12" ) );
+		senderList.add( new Sender( "120.52.73.13", 8080, 16, "代理4" ) );
+		//senderList.add( new Sender( "120.52.73.20", 8080, 16, "代理5" ) );
+		//senderList.add( new Sender( "120.52.73.21", 80, 16, "代理6" ) );
+		//senderList.add( new Sender( "120.52.73.24", 80, 16, "代理7" ) );
+		//senderList.add( new Sender( "120.52.73.27", 80, 16, "代理8" ) );
+		//senderList.add( new Sender( "120.52.73.29", 8080,16, "代理9" ) );
+		//senderList.add( new Sender( "116.246.6.52", 80, 16, "代理10" ) );
+		//senderList.add( new Sender( "122.72.33.139", 80, 16, "代理11" ) );
+		senderList.add( new Sender( "112.25.41.136", 80, 16, "代理12" ) );
 		senderList.add( new Sender( null, 0, 32, "本机" ) );
 
 		addJob( s, commentJob, new Config( "温泉幼精箱根酱", 3381920, "这周的出水量不知道怎么样.",
