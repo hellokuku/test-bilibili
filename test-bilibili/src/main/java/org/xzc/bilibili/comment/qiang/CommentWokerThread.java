@@ -115,6 +115,21 @@ public class CommentWokerThread extends Thread {
 	private static Pattern RESULT_PATTERN = Pattern.compile( "abc\\(\"(.+)\"\\)" );
 
 	private boolean work(final CloseableHttpClient hc, ExecutorService es) {
+		CloseableHttpResponse res = null;
+		try {
+			res = hc.execute( RequestBuilder.get( "http://api.bilibili.com/view" ).build() );
+			String content = EntityUtils.toString( res.getEntity() );
+			if (!content.contains( "code" )) {
+				System.out.println( "该代理服务器无法运行" );
+				return true;
+			}
+		} catch (Exception e) {
+			System.out.println( "该代理服务器无法运行" );
+			e.printStackTrace();
+			return true;
+		} finally {
+			HttpClientUtils.closeQuietly( res );
+		}
 		List<Future<?>> futureList = new ArrayList<Future<?>>();
 		final AtomicInteger tcount = new AtomicInteger( 0 );
 		final AtomicBoolean overspeed = new AtomicBoolean( false );
