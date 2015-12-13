@@ -84,7 +84,7 @@ public class CommentRunner {
 		//		new DateTime( 2015, 12, 12, 23, 10 ).toDate() ).setSenderList( senderList ) );
 		//45177
 		addJob( s, commentJob, new Config( "KOWABON", 3374078, "这番看不懂啊! 智商捉急.",
-				new DateTime( 2015, 12, 13, 0, 48 ).toDate(),
+				new DateTime( 2015, 12, 12, 0, 48 ).toDate(),
 				new DateTime( 2015, 12, 13, 0, 58 ).toDate() ).setSenderList( senderList ) );
 		addJob( s, commentJob, new Config( "请问您今天要来点兔子吗", 3374085, "今宵我要来点智乃.",
 				new DateTime( 2015, 12, 13, 0, 58 ).toDate(),
@@ -94,7 +94,7 @@ public class CommentRunner {
 				new DateTime( 2015, 12, 13, 1, 40 ).toDate() ).setSenderList( senderList ) );
 		addJob( s, commentJob, new Config( "终结的炽天使", 3374107, "上集看完之后整个人都不好了. 决定继续看下一集.",
 				new DateTime( 2015, 12, 13, 1, 58 ).toDate(),
-				new DateTime( 2015, 12, 12, 2, 10 ).toDate() ).setSenderList( senderList ) );
+				new DateTime( 2015, 12, 13, 2, 10 ).toDate() ).setSenderList( senderList ) );
 
 	}
 

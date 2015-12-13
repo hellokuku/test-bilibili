@@ -268,7 +268,7 @@ public class TestApp {
 		String result = mainBilibiliService.comment( v.aid, msg );
 		System.out.println( "0尝试对aid=" + v.aid + " 评论 " + msg + ", 结果是" + result );
 		if (result.contains( "禁言" )) {
-			mainBilibiliService.rebuildContext();
+			throw new RuntimeException( "竟然被禁言了, 目前没法解决." );
 		}
 		if (result.contains( "验证码" )) {//验证码 睡觉18秒
 			try {
@@ -302,7 +302,7 @@ public class TestApp {
 	@Test
 	public void 持续跟进最新的视频() throws Exception {
 		//启动一个线程不断扫描任务
-		db.fixCommentTask();
+		/*db.fixCommentTask();
 		Thread thread = new Thread() {
 			public void run() {
 				while (true) {
@@ -321,8 +321,8 @@ public class TestApp {
 							}
 						}
 					} catch (Exception e) {
-						simpleBilibiliService.rebuildContext();
-						mainBilibiliService.rebuildContext();
+						//simpleBilibiliService.rebuildContext();
+						//mainBilibiliService.rebuildContext();
 						try {
 							FileUtils.writeStringToFile( new File( "error.log" ), e.getMessage() + "\r\n", true );
 						} catch (IOException e1) {
@@ -344,7 +344,7 @@ public class TestApp {
 			}
 		};
 		//thread.start();
-
+		 */
 		int batch = 10;//每次检测50个aid
 		boolean reachBoundary = false;//是否达到边界
 		int aid = db.getMaxAid( 3349048 ) + 1;//aid起点
@@ -372,16 +372,16 @@ public class TestApp {
 						}
 					} else if (code == -101) {
 						//{"code":-101,"message":"Account is not logined.","ts":1449589626}
-						simpleBilibiliService.rebuildContext();
-						mainBilibiliService.rebuildContext();
+						//simpleBilibiliService.rebuildContext();
+						//mainBilibiliService.rebuildContext();
 						System.out.println( "出问题了code=-101, 睡觉20秒" );
 						Thread.sleep( 20000 );
 						continue;
 					} else {
-						String content = simpleBilibiliService.getLastFavoriteContent();
-						FileUtils.writeStringToFile( new File( "error.log" ), content + "\r\n", true );
-						simpleBilibiliService.rebuildContext();
-						mainBilibiliService.rebuildContext();
+						//String content = simpleBilibiliService.getLastFavoriteContent();
+						//FileUtils.writeStringToFile( new File( "error.log" ), content + "\r\n", true );
+						//simpleBilibiliService.rebuildContext();
+						//mainBilibiliService.rebuildContext();
 						System.out.println( "出问题了, 睡觉20秒" );
 						Thread.sleep( 20000 );
 						continue;
@@ -396,8 +396,8 @@ public class TestApp {
 				}
 			} catch (Exception ex) {
 				FileUtils.writeStringToFile( new File( "error.log" ), ex.getMessage() + "\r\n", true );
-				simpleBilibiliService.rebuildContext();
-				mainBilibiliService.rebuildContext();
+				//simpleBilibiliService.rebuildContext();
+				//mainBilibiliService.rebuildContext();
 				System.out.println( "出问题了, 睡觉20秒" );
 				Thread.sleep( 20000 );
 				continue;

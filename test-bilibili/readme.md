@@ -195,19 +195,58 @@ playTime:628.993
 fontsize:25
 
 
-
-
 注册成功
 http://www.bilibili.com/account/register_success
 
 礼仪答题
 https://account.bilibili.com/answer/base
+https://account.bilibili.com/answer/getBaseQ 获得问题
 
-答题2
+提交
+https://account.bilibili.com/answer/goPromotion post方式
+ans_hash_43659	811260173aa28331ecf6e2ed3985c86c
+ans_hash_43667	15a9ca748fcbc9296df4d4819a5897a4
+ans_hash_43675	ce7204c4030211a43da491e8fed414e8
+ans_hash_43679	b785d82ab875d9d07673603222cb2bbc
+ans_hash_43681	c77ad558ccc94f0b626063d2ae2c0c51
+ans_hash_43689	8781f494c0adfece9cca3794530c34b6
+ans_hash_43690	e8cd59e337f78df1933e1101db888152
+ans_hash_43694	6932d955078d0ce7a0d230b5f474c8f1
+ans_hash_43699	643dcddd966a846968d964d0206f637c
+ans_hash_43705	e05a023a65f003ec6ad75c1280446915
+ans_hash_43706	5fc84e0f587563325331cd96339c2689
+ans_hash_43714	b6fd6fe74e2c9df9ebd8e5a30d3b42a1
+ans_hash_43716	c6e4ca38b2785f4ecb16fb3bd9b6ef02
+ans_hash_43721	4d4c2977a88e9f4240a844c0849ba22e
+ans_hash_43724	1a4fd6e537dd6ae2a3254fc189b2042e
+ans_hash_43736	87eaafc646e3b4fee6445b1316672651
+ans_hash_43737	33f023302c9d8a35afea6d4996cca940
+ans_hash_43738	5361fe0001ad7468953bdadb91d5b3d1
+ans_hash_43742	f3b64e9e7cb096cb42f0bdbe6c2302b4
+ans_hash_43752	1394256e4ba27a6407245443d90ad629
+qs_ids	43659,43667,43675,43679,43681,43689,43690,43694,43699,43705,43706,43714,43716,43721,43724,43736,43737,43738,43742,43752
+
+qs_ids=43659%2C43667%2C43675%2C43679%2C43681%2C43689%2C43690%2C43694%2C43699%2C43705%2C43706%2C43714%2C43716%2C43721%2C43724%2C43736%2C43737%2C43738%2C43742%2C43752&ans_hash_43659=811260173aa28331ecf6e2ed3985c86c&ans_hash_43667=15a9ca748fcbc9296df4d4819a5897a4&ans_hash_43675=ce7204c4030211a43da491e8fed414e8&ans_hash_43679=b785d82ab875d9d07673603222cb2bbc&ans_hash_43681=c77ad558ccc94f0b626063d2ae2c0c51&ans_hash_43689=8781f494c0adfece9cca3794530c34b6&ans_hash_43690=e8cd59e337f78df1933e1101db888152&ans_hash_43694=6932d955078d0ce7a0d230b5f474c8f1&ans_hash_43699=643dcddd966a846968d964d0206f637c&ans_hash_43705=e05a023a65f003ec6ad75c1280446915&ans_hash_43706=5fc84e0f587563325331cd96339c2689&ans_hash_43714=b6fd6fe74e2c9df9ebd8e5a30d3b42a1&ans_hash_43716=c6e4ca38b2785f4ecb16fb3bd9b6ef02&ans_hash_43721=4d4c2977a88e9f4240a844c0849ba22e&ans_hash_43724=1a4fd6e537dd6ae2a3254fc189b2042e&ans_hash_43736=87eaafc646e3b4fee6445b1316672651&ans_hash_43737=33f023302c9d8a35afea6d4996cca940&ans_hash_43738=5361fe0001ad7468953bdadb91d5b3d1&ans_hash_43742=f3b64e9e7cb096cb42f0bdbe6c2302b4&ans_hash_43752=1394256e4ba27a6407245443d90ad629
+
+
+答题2 这个可以回答多次
 https://account.bilibili.com/answer/promotion
 获得要答的类型
 https://account.bilibili.com/answer/getProType
 
+选择3个类型 进行提交
+https://account.bilibili.com/answer/getQstByType
+post数据 type_ids 11,12,13
+返回一个json, 里面是一堆问题, 格式和答题1完全一致
+提交答案
+https://account.bilibili.com/answer/checkPAns
+格式和答题1完全一致
+{
+"status": true,
+"data": "/answer/cool/7211548"
+}
+然后到https://account.bilibili.com/answer/cool/7211548去看结果
+https://account.bilibili.com/answer/cool/7212202
 
 提交答题1
 https://account.bilibili.com/answer/goPromotion
@@ -233,3 +272,6 @@ ans_hash_43738:01f0e66b37ad0d62a752aa131cb93355
 ans_hash_43743:432a9076fe40a11a00d92585215b8181
 ans_hash_43751:186e389f768c8043a20a47627f01e35c
 ans_hash_43752:18bf7fb552c45f63541518b8d7c984cb
+
+
+
