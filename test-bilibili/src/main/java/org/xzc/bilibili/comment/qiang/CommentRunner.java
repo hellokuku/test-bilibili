@@ -56,33 +56,30 @@ public class CommentRunner {
 		s.addJob( commentJob, false );
 
 		List<Sender> senderList = new ArrayList<Sender>();
-				senderList.add( new Sender( "cache.sjtu.edu.cn", 8080, 32, "sjtu" ) );
-				senderList.add( new Sender( "202.120.17.158", 2076, 32, "158" ) );
+		senderList.add( new Sender( "cache.sjtu.edu.cn", 8080, 32, "sjtu" ) );
+		senderList.add( new Sender( "202.120.17.158", 2076, 32, "158" ) );
 		//		senderList.add( new Sender( "222.35.17.177", 2076, 16, "177" ) );
 
-				senderList.add( new Sender( "27.115.75.114", 8080, 16, "代理1" ) );//100
-				senderList.add( new Sender( "112.25.41.136", 80, 16, "代理2" ) );//100
+		senderList.add( new Sender( "27.115.75.114", 8080, 16, "代理1" ) );//100
+		senderList.add( new Sender( "112.25.41.136", 80, 16, "代理2" ) );//100
 		//下面的延迟大概都是200
-				senderList.add( new Sender( "120.52.73.11", 8080, 16, "代理3" ) );
+		senderList.add( new Sender( "120.52.73.11", 8080, 16, "代理3" ) );
 		//以下延迟300
-				senderList.add( new Sender( "120.52.73.13", 8080, 16, "代理4" ) );
+		senderList.add( new Sender( "120.52.73.13", 8080, 16, "代理4" ) );
 		//senderList.add( new Sender( "120.52.73.20", 8080, 1, "代理5" ) );
 		//senderList.add( new Sender( "120.52.73.21", 80, 1, "代理6" ) );
 		//senderList.add( new Sender( "120.52.73.24", 80, 1, "代理7" ) );
 		//senderList.add( new Sender( "120.52.73.27", 80, 1, "代理8" ) );
 		//senderList.add( new Sender( "120.52.73.29", 8080,1, "代理9" ) );
-		senderList.add( new Sender( "116.246.6.52", 80, 32, "代理10" ) );
-		senderList.add( new Sender( "122.72.33.139", 80, 32, "代理11" ) );
-		senderList.add( new Sender( "112.25.41.136", 80, 32, "代理12" ) );
+		senderList.add( new Sender( "116.246.6.52", 80, 16, "代理10" ) );
+		senderList.add( new Sender( "122.72.33.139", 80, 16, "代理11" ) );
+		senderList.add( new Sender( "112.25.41.136", 80, 16, "代理12" ) );
 		senderList.add( new Sender( null, 0, 32, "本机" ) );
 
-		addJob( s, commentJob, new Config( "雨色可可", 3381912, "雨色可可, 能第一吗?",
-				new DateTime( 2015, 12, 12, 23, 13 ).toDate(),
-				new DateTime( 2015, 12, 13, 23, 25 ).toDate() ).setSenderList( senderList ) );
-		addJob( s, commentJob, new Config( "温泉幼精箱根酱", 3381920, "温泉幼精箱根酱",
+		addJob( s, commentJob, new Config( "温泉幼精箱根酱", 3381920, "这周的出水量不知道怎么样.",
 				new DateTime( 2015, 12, 14, 0, 3 ).toDate(),
 				new DateTime( 2015, 12, 14, 0, 15 ).toDate() ).setSenderList( senderList ) );
-		addJob( s, commentJob, new Config( "魔鬼恋人", 3382145, "魔鬼恋人",
+		addJob( s, commentJob, new Config( "魔鬼恋人", 3382145, "不要黑女主, 要和谐和谐.",
 				new DateTime( 2015, 12, 14, 0, 28 ).toDate(),
 				new DateTime( 2015, 12, 14, 0, 40 ).toDate() ).setSenderList( senderList ) );
 	}
@@ -189,7 +186,8 @@ public class CommentRunner {
 					.get( "http://api.bilibili.com/view" )
 					.setConfig(
 							RequestConfig.custom().setSocketTimeout( 2000 ).setConnectTimeout( 2000 )
-									.setConnectionRequestTimeout( 2000 ).setProxy( proxy ).build() ).build() );
+									.setConnectionRequestTimeout( 2000 ).setProxy( proxy ).build() )
+					.build() );
 			String content = EntityUtils.toString( res.getEntity() );
 			res.close();
 			return JSON.parseObject( content ).getInteger( "code" ) == -1;
