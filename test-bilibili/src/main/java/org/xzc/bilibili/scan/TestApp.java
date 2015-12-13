@@ -14,6 +14,10 @@ import java.util.concurrent.Executors;
 import javax.annotation.Resource;
 
 import org.apache.commons.io.FileUtils;
+import org.joda.time.DateTime;
+import org.joda.time.Period;
+import org.joda.time.format.PeriodFormatter;
+import org.joda.time.format.PeriodFormatterBuilder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -213,6 +217,22 @@ public class TestApp {
 	 */
 	@Test
 	public void 持续跟进最新的视频() throws Exception {
+		DateTime startAt = new DateTime( 2015, 12, 14, 0, 40 );
+		PeriodFormatter pf = new PeriodFormatterBuilder().printZeroAlways().appendHours().appendLiteral( "小时" )
+				.appendMinutes()
+				.appendLiteral( "分" ).appendSeconds().appendLiteral( "秒" ).toFormatter();
+		while (true) {
+			DateTime now = DateTime.now();
+			Period p = new Period( now, startAt );
+			if (now.isAfter( startAt )) {
+				System.out.println( "时间到了, 启动!" );
+				break;
+			} else {
+				System.out.println( "距离开始还有 " + p.toString( pf ) );
+			}
+			Thread.sleep( 1000 );
+		}
+		System.out.println( "执行..." );
 		acwt.start();
 		int batch = 50;//每次检测50个aid
 		int aid = db.getMaxAid( 3349048 ) + 1;//aid起点

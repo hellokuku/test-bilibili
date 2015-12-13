@@ -78,12 +78,12 @@ public class CommentRunner {
 		//senderList.add( new Sender( "120.52.73.24", 80, 1, "代理7" ) );
 		//senderList.add( new Sender( "120.52.73.27", 80, 1, "代理8" ) );
 		//senderList.add( new Sender( "120.52.73.29", 8080,1, "代理9" ) );
-		senderList.add( new Sender( "116.246.6.52", 801, 32, "代理10" ) );
-		senderList.add( new Sender( "122.72.33.139", 801, 32, "代理11" ) );
-		senderList.add( new Sender( "112.25.41.136", 801, 32, "代理12" ) );
-		//senderList.add( new Sender( null, 0, 32, "本机" ) );
+		senderList.add( new Sender( "116.246.6.52", 80, 32, "代理10" ) );
+		senderList.add( new Sender( "122.72.33.139", 80, 32, "代理11" ) );
+		senderList.add( new Sender( "112.25.41.136", 80, 32, "代理12" ) );
+		senderList.add( new Sender( null, 0, 32, "本机" ) );
 
-		addJob( s, commentJob, new Config( "雨色可可", 3381912, "雨色可可",
+		addJob( s, commentJob, new Config( "雨色可可", 3381912, "雨色可可, 能第一吗?",
 				new DateTime( 2015, 12, 12, 23, 13 ).toDate(),
 				new DateTime( 2015, 12, 13, 23, 25 ).toDate() ).setSenderList( senderList ) );
 		addJob( s, commentJob, new Config( "温泉幼精箱根酱", 3381920, "温泉幼精箱根酱",

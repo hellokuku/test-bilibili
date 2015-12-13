@@ -159,26 +159,10 @@ public class CommentWokerThread extends Thread {
 							Matcher m = RESULT_PATTERN.matcher( content );
 							if (m.find()) {
 								String code = m.group( 1 );
-								if ("OK".equals( code )) {
+								if ("OK".equals( code ) || code.contains( "验证码" )) {
 									stop.set( true );
 								}
 							}
-							/*
-							JSONObject json = JSON.parseObject( content );
-							int code = json.getIntValue( "code" );
-							//我们可以利用Feedback duplicate, 它的code也是0 这样可以防止重复
-							//然后由可以利用多线程的并发 简直流弊
-							//System.out.println( content );
-							if (code == 0) {//{"code":0,"msg":"Feedback duplicate"}
-								stop.set( true );
-							
-							}
-							if (code == -503) {
-								//{"code":-503,"result":[],"error":"overspeed"}
-								//超速
-								overspeed.set( true );
-								return null;
-							}*/
 						} catch (Exception ex) {
 							ex.printStackTrace();
 						}

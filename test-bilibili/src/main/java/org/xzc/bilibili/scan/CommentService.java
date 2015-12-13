@@ -30,7 +30,7 @@ public class CommentService {
 	public String getComment(Video v) {
 		if (v.mid == 1643718) {
 			// return "喂, 110, 这里有大绅(变)士(态), 请速速前来!";
-			return "前些天尝试举报山下君，竟然被大家讨厌了， 连号都封了， 丧心病狂啊这。。。";
+			return "前些天大胆尝试举报山下君，竟然被大家讨厌了， 连号都封了， 丧心病狂啊这。。。";
 		}
 		if (( v.typeid == 71 || v.typeid == 138 ) && v.mid == 883968) {// 暴走漫画
 			if (v.title.contains( "暴走大事件第四季" ))
