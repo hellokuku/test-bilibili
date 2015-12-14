@@ -25,11 +25,17 @@ public class Video {
 	@JSONField(format = "yyyy-MM-dd HH:mm")
 	public Date create;//收藏夹里的格式是2015-12-05 21:20
 
+	public Video() {
+	}
+
+	public Video(int aid) {
+		this.aid = aid;
+	}
+
 	@Override
 	public String toString() {
 		return "Video [aid=" + aid + ", title=" + title + ", typeid=" + typeid + ", updateAt=" + updateAt + ", mid="
 				+ mid + ", status=" + status + ", create=" + create + "]";
 	}
-
 
 }

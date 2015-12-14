@@ -1,6 +1,33 @@
 package org.xzc.bilibili.util;
 
+import org.joda.time.DateTime;
+import org.joda.time.Period;
+import org.joda.time.format.PeriodFormatter;
+import org.joda.time.format.PeriodFormatterBuilder;
+
 public class Utils {
+	public static void blockUntil(DateTime startAt, long sleepTime) {
+		PeriodFormatter pf = new PeriodFormatterBuilder().printZeroAlways().appendHours().appendLiteral( "小时" )
+				.appendMinutes()
+				.appendLiteral( "分" ).appendSeconds().appendLiteral( "秒" ).toFormatter();
+		while (true) {
+			DateTime now = DateTime.now();
+			Period p = new Period( now, startAt );
+			if (now.isAfter( startAt )) {
+				System.out.println( "时间到了, 启动!" );
+				break;
+			} else {
+				System.out.println( "距离开始还有 " + p.toString( pf ) );
+			}
+			try {
+				Thread.sleep( sleepTime );
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		System.out.println( "执行..." );
+	}
+
 	public static String decodeUnicode(String theString) {
 		char aChar;
 		int len = theString.length();

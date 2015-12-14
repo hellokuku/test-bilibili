@@ -176,6 +176,9 @@ public class BilibiliService {
 	}
 
 	public Result deleteFavoriteJSON(FavGetList fgl) {
+		if (fgl.vlist.size() == 0) {
+			return new Result( true, "要删除的视频id为空, 不发请求." );
+		}
 		String aids = getDeleteAids( fgl );
 		HttpUriRequest req = makeDeleteFavoriteRequest( aids );
 		String result = hc.asString( req );

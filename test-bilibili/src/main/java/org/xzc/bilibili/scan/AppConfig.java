@@ -44,4 +44,12 @@ public class AppConfig {
 		BilibiliService bs = new BilibiliService( a );
 		return bs;
 	}
+
+	@Bean(name = "testBilibiliService")
+	public BilibiliService testBilibiliService() {
+		// duruofeixh3@163.com
+		Account a = new Account( 19539141, "5609edf4,1450665642,f2c0edc0" );
+		BilibiliService bs = new BilibiliService( a );
+		return bs;
+	}
 }

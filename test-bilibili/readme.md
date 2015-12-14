@@ -1,3 +1,6 @@
+测试用账号 duruofeixh3@163.com
+aid = 19539141 fid = 19796220
+
 # 视频 #
 最小化登陆
 https://account.bilibili.com/ajax/miniLogin/minilogin
@@ -7,15 +10,15 @@ https://account.bilibili.com/ajax/miniLogin/minilogin
 http://api.bilibili.com/favourite/add?id=3335348
 
 获取用户信息
-http://api.bilibili.com/userinfo?user=xzchaooDRF8
+http://api.bilibili.com/userinfo?user=xzchaooDRF3
 
 获取用户的收藏夹
 这个似乎没有做权限认证, 所以可以获取其他人的收藏夹?
-http://space.bilibili.com/ajax/fav/getBoxList?mid=19557513
+http://space.bilibili.com/ajax/fav/getBoxList?mid=19539141
 和[获取收藏的视频]搭配使用可以获取别人的收藏信息!
 
-收藏列表 xzchaooDRF8
-http://space.bilibili.com/ajax/fav/getList?mid=19557513&pagesize=30&fid=19764585
+收藏列表 xzchaooDRF3
+http://space.bilibili.com/ajax/fav/getList?mid=19539141&pagesize=30&fid=19796220
 pagesize最大在70左右
 
 获得评论列表

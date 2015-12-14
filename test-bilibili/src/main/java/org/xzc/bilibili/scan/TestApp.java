@@ -3,6 +3,7 @@ package org.xzc.bilibili.scan;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -205,13 +206,21 @@ public class TestApp {
 		}
 	};
 
-	//@Test
+	@Resource(name = "testBilibiliService")
+	private BilibiliService testBilibiliService;
+
+	@Test
 	public void 测试删除() {
-		FavGetList fgl = simpleBilibiliService.getFavoriteListJSON( 50 );
+		FavGetList fgl = testBilibiliService.getFavoriteListJSON( 50 );
+		System.out.println( fgl );
+		//fgl.vlist.add( new Video( 3373841 ) );
+		//fgl.vlist.add( new Video( 3373842 ) );
 		System.out.println( fgl.count );
 		System.out.println( fgl.vlist.size() );
-		Result r = simpleBilibiliService.deleteFavoriteJSON( fgl );
+		Result r = testBilibiliService.deleteFavoriteJSON( fgl );
 		System.out.println( r );
+		fgl = testBilibiliService.getFavoriteListJSON( 50 );
+		System.out.println( fgl );
 	}
 
 	@Autowired
@@ -223,22 +232,6 @@ public class TestApp {
 	 */
 	@Test
 	public void 持续跟进最新的视频() throws Exception {
-		/*DateTime startAt = new DateTime( 2015, 12, 14, 0, 40 );
-		PeriodFormatter pf = new PeriodFormatterBuilder().printZeroAlways().appendHours().appendLiteral( "小时" )
-				.appendMinutes()
-				.appendLiteral( "分" ).appendSeconds().appendLiteral( "秒" ).toFormatter();
-		while (true) {
-			DateTime now = DateTime.now();
-			Period p = new Period( now, startAt );
-			if (now.isAfter( startAt )) {
-				System.out.println( "时间到了, 启动!" );
-				break;
-			} else {
-				System.out.println( "距离开始还有 " + p.toString( pf ) );
-			}
-			Thread.sleep( 1000 );
-		}
-		System.out.println( "执行..." );*/
 		acwt.start();
 		int batch = 50;//每次检测50个aid
 		int aid = db.getMaxAid( 3349048 ) + 1;//aid起点
@@ -318,7 +311,7 @@ public class TestApp {
 			//删除
 			Result r = simpleBilibiliService.deleteFavoriteJSON( favoriteList );
 			if (!r.success) {
-				throw new RuntimeException( simpleBilibiliService.getAccount()+" 删除收藏夹失败, 请检查账号cookie." + r );
+				throw new RuntimeException( simpleBilibiliService.getAccount() + " 删除收藏夹失败, 请检查账号cookie." + r );
 			}
 			if (favoriteList.count == favoriteList.vlist.size())
 				break;
