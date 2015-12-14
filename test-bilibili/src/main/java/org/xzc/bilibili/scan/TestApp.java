@@ -14,10 +14,6 @@ import java.util.concurrent.Executors;
 import javax.annotation.Resource;
 
 import org.apache.commons.io.FileUtils;
-import org.joda.time.DateTime;
-import org.joda.time.Period;
-import org.joda.time.format.PeriodFormatter;
-import org.joda.time.format.PeriodFormatterBuilder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -208,6 +204,15 @@ public class TestApp {
 		}
 	};
 
+	//@Test
+	public void 测试删除() {
+		FavGetList fgl = simpleBilibiliService.getFavoriteListJSON( 50 );
+		System.out.println( fgl.count );
+		System.out.println( fgl.vlist.size() );
+		boolean result = simpleBilibiliService.deleteFavoriteJSON( fgl );
+		System.out.println( result );
+	}
+
 	@Autowired
 	private AutoCommentWokerThread acwt;
 
@@ -217,7 +222,7 @@ public class TestApp {
 	 */
 	@Test
 	public void 持续跟进最新的视频() throws Exception {
-		DateTime startAt = new DateTime( 2015, 12, 14, 0, 40 );
+		/*DateTime startAt = new DateTime( 2015, 12, 14, 0, 40 );
 		PeriodFormatter pf = new PeriodFormatterBuilder().printZeroAlways().appendHours().appendLiteral( "小时" )
 				.appendMinutes()
 				.appendLiteral( "分" ).appendSeconds().appendLiteral( "秒" ).toFormatter();
@@ -232,7 +237,7 @@ public class TestApp {
 			}
 			Thread.sleep( 1000 );
 		}
-		System.out.println( "执行..." );
+		System.out.println( "执行..." );*/
 		acwt.start();
 		int batch = 50;//每次检测50个aid
 		int aid = db.getMaxAid( 3349048 ) + 1;//aid起点
@@ -310,7 +315,9 @@ public class TestApp {
 				for (Video v : favoriteList.vlist)
 					cb.onParsed( v );
 			//删除
-			simpleBilibiliService.deleteFavoriteJSON( favoriteList );
+			if (!simpleBilibiliService.deleteFavoriteJSON( favoriteList )) {
+				throw new RuntimeException( "删除收藏夹失败, 请检查账号cookie." );
+			}
 			if (favoriteList.count == favoriteList.vlist.size())
 				break;
 		}

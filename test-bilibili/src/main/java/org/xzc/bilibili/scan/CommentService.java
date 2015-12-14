@@ -16,9 +16,9 @@ public class CommentService {
 			return true;
 		//if (v.title.contains( "一拳" ) || v.title.contains( "一击" ))
 		//	return false;
-		//return v.typeid == 33 || v.typeid == 32;
+		return v.typeid == 33 || v.typeid == 32 || v.typeid == 31;
 		//return v.typeid == 32;
-		return false;
+		//return false;
 	}
 
 	private Random random = new Random();
@@ -41,10 +41,11 @@ public class CommentService {
 		if (v.typeid == 15 && v.title.contains( "监狱学园" )) {
 			return "每一集都做得很好啊, 剧情做得还是满紧凑的, 终于要到结尾了!!!";
 		}
+		return "第一第一, 来支持一下视频.";
 		//if (v.typeid == 32) {//完结动画
 		//return "没有人评论吗? 新番还没看完, 旧的又有得看了.";
 		//	return "这, 好古老的番啊.";
 		//}
-		return null;
+		//return null;
 	}
 }

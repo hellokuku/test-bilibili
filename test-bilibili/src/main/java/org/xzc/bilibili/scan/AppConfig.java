@@ -25,7 +25,8 @@ public class AppConfig {
 
 	@Bean(name = "simpleBilibiliService")
 	public BilibiliService simpleBilibiliService() {
-		Account a = new Account( 19216452, "704fe3e6,1450055207,1cc44621" );
+		//2015-12-14 10:08
+		Account a = new Account( 19216452, "704fe3e6,1450663497,f2f2cdd9" );
 		BilibiliService bs = new BilibiliService( a );
 		return bs;
 	}

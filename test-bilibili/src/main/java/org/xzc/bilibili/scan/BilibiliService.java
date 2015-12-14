@@ -176,7 +176,8 @@ public class BilibiliService {
 	public boolean deleteFavoriteJSON(FavGetList json) {
 		String aids = getDeleteAids( json );
 		HttpUriRequest req = makeDeleteFavoriteRequest( aids );
-		return hc.asJSON( req ).getBooleanValue( "status" );
+		String result = hc.asString( req );
+		return JSON.parseObject( result ).getBooleanValue( "status" );
 	}
 
 	public Bangumi getBangumi(final String bid) {
@@ -386,7 +387,12 @@ public class BilibiliService {
 	 */
 	private HttpUriRequest makeDeleteFavoriteRequest(String aids) {
 		return RequestBuilder.post( "http://space.bilibili.com/ajax/fav/mdel" )
-				.addParameter( "fid", Integer.toString( a.getFid() ) ).addParameter( "aids", aids )
+				.addHeader( "Origin", "http://space.bilibili.com" )
+				.addHeader( "X-Requested-With", "XMLHttpRequest" )
+				.addHeader( "User-Agent",
+						"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.87 Safari/537.36 QQBrowser/9.2.5584.400" )
+				.setEntity( HC.makeFormEntity( "fid", a.getFid(), "aids", aids ) )
+				//.addParameter( "fid", Integer.toString( a.getFid() ) ).addParameter( "aids", aids )
 				.addHeader( "Referer", "http://space.bilibili.com/" ).build();
 	}
 
@@ -426,7 +432,9 @@ public class BilibiliService {
 		List<Video> vlist = new ArrayList<Video>();
 		while (true) {
 			FavGetList fgl = getFavoriteListJSON( 50 );
-			deleteFavoriteJSON( fgl );
+			if (!deleteFavoriteJSON( fgl )) {
+				throw new RuntimeException( "删除收藏夹失败, 请检查cookie! id=" + a.getId() + " fid=" + a.getFid() );
+			}
 			ret.count += fgl.count;
 			vlist.addAll( fgl.vlist );
 			if (fgl.count == fgl.vlist.size())

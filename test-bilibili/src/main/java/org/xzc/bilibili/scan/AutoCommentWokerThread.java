@@ -116,7 +116,7 @@ public class AutoCommentWokerThread extends Thread {
 				e.printStackTrace();
 				try {
 					FileUtils.writeStringToFile( new File( "error.log" ), e.getMessage() + "\r\n", true );
-					Thread.sleep( 20000 );
+					Thread.sleep( 60000 );
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				} catch (IOException e1) {
