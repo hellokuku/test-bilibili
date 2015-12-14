@@ -68,7 +68,7 @@ public class AutoCommentWokerThread extends Thread {
 							System.out.println( "评论已经不为空, 放弃. " + v );
 							db.markFailed( new CommentTask( v.aid ) );
 						} else {//评论为空, 但是不要急着评论, 尽量延后一点点时间, 免得...
-							if (System.currentTimeMillis() - v.updateAt.getTime() <= 60000) {
+							if (System.currentTimeMillis() - v.updateAt.getTime() <= 10000) {
 								//小于60秒就不评论
 								continue;
 							}
