@@ -318,7 +318,7 @@ public class TestApp {
 			//删除
 			Result r = simpleBilibiliService.deleteFavoriteJSON( favoriteList );
 			if (!r.success) {
-				throw new RuntimeException( "删除收藏夹失败, 请检查账号cookie." );
+				throw new RuntimeException( simpleBilibiliService.getAccount()+" 删除收藏夹失败, 请检查账号cookie." + r );
 			}
 			if (favoriteList.count == favoriteList.vlist.size())
 				break;

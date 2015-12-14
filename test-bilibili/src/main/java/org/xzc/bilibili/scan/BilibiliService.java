@@ -437,8 +437,7 @@ public class BilibiliService {
 			FavGetList fgl = getFavoriteListJSON( 50 );
 			Result r = deleteFavoriteJSON( fgl );
 			if (!r.success) {
-				throw new RuntimeException(
-						"删除收藏夹失败, 请检查cookie! id=" + a.getId() + " fid=" + a.getFid() + " msg=" + r.msg );
+				throw new RuntimeException( a + " 删除收藏夹失败, 请检查cookie! " + r );
 			}
 			ret.count += fgl.count;
 			vlist.addAll( fgl.vlist );
@@ -448,5 +447,9 @@ public class BilibiliService {
 		ret.pages = 1;
 		ret.vlist = vlist;
 		return ret;
+	}
+
+	public Account getAccount() {
+		return a;
 	}
 }
