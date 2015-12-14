@@ -27,6 +27,14 @@ public class CommentService {
 		return (char) ( 'A' + random.nextInt( 26 ) );
 	}
 
+	private String 重复(char c) {
+		int r = random.nextInt( 3 ) + 1;
+		String s = "";
+		for (int i = 0; i < r; ++i)
+			s += c;
+		return s;
+	}
+
 	public String getComment(Video v) {
 		if (v.mid == 1643718) {
 			// return "喂, 110, 这里有大绅(变)士(态), 请速速前来!";
@@ -41,7 +49,7 @@ public class CommentService {
 		if (v.typeid == 15 && v.title.contains( "监狱学园" )) {
 			return "每一集都做得很好啊, 剧情做得还是满紧凑的, 终于要到结尾了!!!";
 		}
-		return "第一第一, 来支持一下视频.";
+		return "第一第一" + 重复( '!' ) + " 来支持一下视频" + 重复( '.' );
 		//if (v.typeid == 32) {//完结动画
 		//return "没有人评论吗? 新番还没看完, 旧的又有得看了.";
 		//	return "这, 好古老的番啊.";
