@@ -1,5 +1,7 @@
 package org.xzc.bilibili.json;
 
+import static org.junit.Assert.*;
+
 import java.text.SimpleDateFormat;
 
 import org.apache.http.impl.client.HttpClients;
@@ -12,6 +14,12 @@ import com.alibaba.fastjson.JSONObject;
 
 public class TestFastJSON {
 	@Test
+	public void testName2() throws Exception {
+		JSONObject jo = JSON.parseObject( "{\"status\":false,\"data\":\"av\u53f7\u9519\u8bef\"}");
+		String string = jo.getString( "data" );
+		System.out.println( string );
+	}
+
 	public void testName() throws Exception {
 		System.out.println( new SimpleDateFormat( "yyyy-MM-dd HH:mm" ).parse( "2015-12-05 21:20" ) );
 		HC hc = new HC( HttpClients.custom().build() );

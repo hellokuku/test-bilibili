@@ -21,6 +21,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.xzc.bilibili.model.Bangumi;
 import org.xzc.bilibili.model.FavGetList;
+import org.xzc.bilibili.model.Result;
 import org.xzc.bilibili.model.Video;
 import org.xzc.bilibili.task.CommentTask;
 
@@ -57,15 +58,15 @@ public class TestApp {
 			//boolean empty = simpleBilibiliService.isCommentListEmpty( aid );
 			boolean empty = true;
 			if (empty) {
-				String result = simpleBilibiliService.comment( aid, "路过路过路过..." + randomChar() );
-				System.out.println( aid + " " + result );
-				if ("OK".equals( result )) {
+				Result r = simpleBilibiliService.comment( aid, "路过路过路过..." + randomChar() );
+				System.out.println( aid + " " + r );
+				if (r.success) {
 					++aid;
-				} else if (result.contains( "验证码" )) {
+				} else if (r.msg.contains( "验证码" )) {
 					System.out.println( "睡觉60秒" );
 					Thread.sleep( 60000 );
 				} else {
-					System.out.println( "意外情况 " + result );
+					System.out.println( "意外情况 " + r );
 					//break;
 				}
 			} else {
@@ -209,8 +210,8 @@ public class TestApp {
 		FavGetList fgl = simpleBilibiliService.getFavoriteListJSON( 50 );
 		System.out.println( fgl.count );
 		System.out.println( fgl.vlist.size() );
-		boolean result = simpleBilibiliService.deleteFavoriteJSON( fgl );
-		System.out.println( result );
+		Result r = simpleBilibiliService.deleteFavoriteJSON( fgl );
+		System.out.println( r );
 	}
 
 	@Autowired
@@ -315,7 +316,8 @@ public class TestApp {
 				for (Video v : favoriteList.vlist)
 					cb.onParsed( v );
 			//删除
-			if (!simpleBilibiliService.deleteFavoriteJSON( favoriteList )) {
+			Result r = simpleBilibiliService.deleteFavoriteJSON( favoriteList );
+			if (!r.success) {
 				throw new RuntimeException( "删除收藏夹失败, 请检查账号cookie." );
 			}
 			if (favoriteList.count == favoriteList.vlist.size())

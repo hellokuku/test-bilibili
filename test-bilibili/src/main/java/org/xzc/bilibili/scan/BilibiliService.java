@@ -26,6 +26,7 @@ import org.apache.http.protocol.HttpContext;
 import org.xzc.bilibili.model.Account;
 import org.xzc.bilibili.model.Bangumi;
 import org.xzc.bilibili.model.FavGetList;
+import org.xzc.bilibili.model.Result;
 import org.xzc.bilibili.model.Video;
 import org.xzc.bilibili.util.HC;
 import org.xzc.bilibili.util.SafeRunner;
@@ -108,12 +109,13 @@ public class BilibiliService {
 	 * @param aid
 	 * @param msg
 	 */
-	public String comment(final int aid, final String msg) {
+	public Result comment(final int aid, final String msg) {
 		HttpUriRequest req = makeCommentRequest( aid, msg );
 		String content = hc.asString( req );
 		Matcher matcher = RESULT_PATTERN.matcher( content );
 		matcher.find();
-		return Utils.decodeUnicode( matcher.group( 1 ) );
+		String s = Utils.decodeUnicode( matcher.group( 1 ) );
+		return new Result( "OK".equals( s ), s );
 	}
 
 	public void danmu() {
@@ -173,11 +175,12 @@ public class BilibiliService {
 		return content;
 	}
 
-	public boolean deleteFavoriteJSON(FavGetList json) {
-		String aids = getDeleteAids( json );
+	public Result deleteFavoriteJSON(FavGetList fgl) {
+		String aids = getDeleteAids( fgl );
 		HttpUriRequest req = makeDeleteFavoriteRequest( aids );
 		String result = hc.asString( req );
-		return JSON.parseObject( result ).getBooleanValue( "status" );
+		JSONObject json = JSON.parseObject( result );
+		return new Result( json.getBooleanValue( "status" ), json.getString( "data" ) );
 	}
 
 	public Bangumi getBangumi(final String bid) {
@@ -432,8 +435,10 @@ public class BilibiliService {
 		List<Video> vlist = new ArrayList<Video>();
 		while (true) {
 			FavGetList fgl = getFavoriteListJSON( 50 );
-			if (!deleteFavoriteJSON( fgl )) {
-				throw new RuntimeException( "删除收藏夹失败, 请检查cookie! id=" + a.getId() + " fid=" + a.getFid() );
+			Result r = deleteFavoriteJSON( fgl );
+			if (!r.success) {
+				throw new RuntimeException(
+						"删除收藏夹失败, 请检查cookie! id=" + a.getId() + " fid=" + a.getFid() + " msg=" + r.msg );
 			}
 			ret.count += fgl.count;
 			vlist.addAll( fgl.vlist );

@@ -12,6 +12,7 @@ import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.xzc.bilibili.model.FavGetList;
+import org.xzc.bilibili.model.Result;
 import org.xzc.bilibili.model.Video;
 import org.xzc.bilibili.task.CommentTask;
 
@@ -86,26 +87,22 @@ public class AutoCommentWokerThread extends Thread {
 								//db.createOrUpdate( ct );
 								continue;
 							}
-							String result = main.comment( v.aid, msg );
-							System.out.println( "尝试对aid=" + v.aid + " 评论 " + msg + ", 结果是" + result );
-
-							if (result.contains( "验证码" )) {
-								iterationResult = 1;
-								db.createOrUpdate( ct );
-								break;//打破循环
-							} else if (result.contains( "禁言" )) {
-								iterationResult = 2;
+							Result r = main.comment( v.aid, msg );
+							System.out.println( "尝试对aid=" + v.aid + " 评论 " + msg + ", 结果是" + r );
+							if (!r.success) {
+								if (r.msg.contains( "验证码" )) {
+									iterationResult = 1;
+								} else if (r.msg.contains( "禁言" )) {
+									iterationResult = 2;
+								} else {
+									iterationResult = 3;//未知的结果
+								}
 								db.createOrUpdate( ct );
 								break;
-							} else if ("OK".equals( result )) {
+							} else {
 								//评论成功
 								db.markFinished( new CommentTask( v.aid ) );
 								System.out.println( "评论成功! " + v );
-							} else {
-								System.out.println( "评论时遇到未知的结果 " + result );
-								iterationResult = 3;//未知的结果
-								db.createOrUpdate( ct );
-								break;
 							}
 						}
 					} else {//在这里评论的话是不安全的...
