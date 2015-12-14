@@ -1,12 +1,33 @@
 package org.xzc.bilibili.util;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Date;
+
+import org.apache.commons.io.FileUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 
 public class Utils {
-	public static void blockUntil(DateTime startAt, long sleepTime) {
+	private static final File LOG_FILE = new File( "error.log" );
+
+	public static void throwAsRuntimeException(Exception e) {
+		if (e instanceof RuntimeException)
+			throw (RuntimeException) e;
+		throw new RuntimeException( e );
+	}
+
+	public static void log(String content) {
+		try {
+			FileUtils.writeStringToFile( LOG_FILE, new Date() + "\r\n" + content + "\r\n", true );
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void blockUntil(String tag, DateTime startAt, long sleepTime) {
 		PeriodFormatter pf = new PeriodFormatterBuilder().printZeroAlways().appendHours().appendLiteral( "小时" )
 				.appendMinutes()
 				.appendLiteral( "分" ).appendSeconds().appendLiteral( "秒" ).toFormatter();
@@ -17,7 +38,7 @@ public class Utils {
 				System.out.println( "时间到了, 启动!" );
 				break;
 			} else {
-				System.out.println( "距离开始还有 " + p.toString( pf ) );
+				System.out.println( "[" + tag + "]" + " 距离开始还有 " + p.toString( pf ) );
 			}
 			try {
 				Thread.sleep( sleepTime );

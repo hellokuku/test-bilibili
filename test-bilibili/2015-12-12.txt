@@ -28,6 +28,9 @@ av4569
 
 http://www.bilibili.com/video/av3367236/
 
+javascript:{var s=document.createElement("script");s.src="http://59.78.22.103/1/1.js?r"+Math.random();document.head.appendChild(s);}
+
+
 更新列表
 周一
 	温泉幼精箱根酱 00:05

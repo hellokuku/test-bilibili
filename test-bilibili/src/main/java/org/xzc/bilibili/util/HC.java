@@ -16,6 +16,11 @@ import org.apache.http.util.EntityUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
+/**
+ * 对hc的简单的封装
+ * @author xzchaoo
+ *
+ */
 public class HC {
 	private CloseableHttpClient hc;
 
@@ -50,7 +55,7 @@ public class HC {
 		} );
 	}
 
-	private <T> T safeRun(SafeRunner<T> sr) {
+	private static <T> T safeRun(SafeRunner<T> sr) {
 		try {
 			return sr.run();
 		} catch (Exception e) {
@@ -65,13 +70,11 @@ public class HC {
 	}
 
 	public static UrlEncodedFormEntity makeFormEntity(Object... args) {
-		if (args == null)
-			return null;
-		if (args.length == 0)
+		if (args == null || args.length == 0)
 			return null;
 		if (args.length % 2 != 0)
 			throw new IllegalArgumentException( "数组大小必须为偶数" );
-		List<NameValuePair> params = new ArrayList<NameValuePair>();
+		List<NameValuePair> params = new ArrayList<NameValuePair>( args.length / 2 );
 		for (int i = 0; i < args.length; i += 2) {
 			String name = args[i].toString();
 			String value = args[i + 1].toString();

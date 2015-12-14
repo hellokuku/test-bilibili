@@ -1,4 +1,23 @@
-测试用账号 duruofeixh3@163.com
+会有延迟
+http://api.bilibili.com/userinfo?user=xzchaooDR4
+
+先登陆再访问 就可以签到了!
+http://api.bilibili.com/myinfo?access_key=9770211f472fe224b3eeb7769797d8b5
+
+
+5be9b8caed10c4cfe1e34bed8b3d247c
+
+
+duruofeixh5@163.com 5be9b8caed10c4cfe1e34bed8b3d247c
+duruofeixh6@163.com access_key=c33da748da58b980a3089d8001f2ff2c
+duruofeixh7@163.com d89fa82e6dec663949f89abdf56d8ad1
+
+
+http://space.bilibili.com/ajax/member/GetInfo?mid=1643718
+http://api.bilibili.cn/userinfo?user=xuzhichaoxh1
+
+
+测试用账号 duruofeixh8@163.com
 aid = 19539141 fid = 19796220
 
 # 视频 #
@@ -10,7 +29,7 @@ https://account.bilibili.com/ajax/miniLogin/minilogin
 http://api.bilibili.com/favourite/add?id=3335348
 
 获取用户信息
-http://api.bilibili.com/userinfo?user=xzchaooDRF3
+http://api.bilibili.com/userinfo?user=xzchaooDRF8
 
 获取用户的收藏夹
 这个似乎没有做权限认证, 所以可以获取其他人的收藏夹?

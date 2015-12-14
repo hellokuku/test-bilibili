@@ -15,6 +15,7 @@ import java.util.concurrent.Executors;
 import javax.annotation.Resource;
 
 import org.apache.commons.io.FileUtils;
+import org.joda.time.DateTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import org.xzc.bilibili.model.FavGetList;
 import org.xzc.bilibili.model.Result;
 import org.xzc.bilibili.model.Video;
 import org.xzc.bilibili.task.CommentTask;
+import org.xzc.bilibili.util.Utils;
 
 import com.j256.ormlite.dao.CloseableIterator;
 import com.j256.ormlite.dao.RuntimeExceptionDao;
@@ -232,6 +234,7 @@ public class TestApp {
 	 */
 	@Test
 	public void 持续跟进最新的视频() throws Exception {
+		Utils.blockUntil( "持续跟进最新的视频", new DateTime( 2015, 12, 15, 1, 40 ), 60000 );
 		acwt.start();
 		int batch = 50;//每次检测50个aid
 		int aid = db.getMaxAid( 3349048 ) + 1;//aid起点

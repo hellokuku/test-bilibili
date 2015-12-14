@@ -23,13 +23,14 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.protocol.HttpContext;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.xzc.bilibili.model.Account;
 import org.xzc.bilibili.model.Bangumi;
 import org.xzc.bilibili.model.FavGetList;
 import org.xzc.bilibili.model.Result;
 import org.xzc.bilibili.model.Video;
 import org.xzc.bilibili.util.HC;
-import org.xzc.bilibili.util.SafeRunner;
 import org.xzc.bilibili.util.Utils;
 
 import com.alibaba.fastjson.JSON;
@@ -95,13 +96,9 @@ public class BilibiliService {
 	 * @return
 	 */
 	public int addFavotite(final int aid) {
-		return safeRun( new SafeRunner<Integer>() {
-			public Integer run() throws Exception {
-				String url = "http://api.bilibili.com/favourite/add?id=" + aid;
-				String content = hc.getAsString( url );
-				return JSON.parseObject( content ).getIntValue( "code" );
-			}
-		} );
+		String url = "http://api.bilibili.com/favourite/add?id=" + aid;
+		String content = hc.getAsString( url );
+		return JSON.parseObject( content ).getIntValue( "code" );
 	}
 
 	/**
@@ -187,64 +184,45 @@ public class BilibiliService {
 	}
 
 	public Bangumi getBangumi(final String bid) {
-		return safeRun( new SafeRunner<Bangumi>() {
-			public Bangumi run() throws Exception {
-				String url = "http://www.bilibili.com/bangumi/i/" + bid;
-				String content = hc.getAsString( url );
-				Bangumi b = new Bangumi( bid, content );
-				return b;
-			}
-		} );
+		String url = "http://www.bilibili.com/bangumi/i/" + bid;
+		String content = hc.getAsString( url );
+		Bangumi b = new Bangumi( bid, content );
+		return b;
 	}
 
 	public List<Bangumi> getBangumiList() {
-		return safeRun( new SafeRunner<List<Bangumi>>() {
-			public List<Bangumi> run() throws Exception {
-				String url = "http://www.bilibili.com/index/index-bangumi-timeline.json";
-				String content = hc.getAsString( url );
-				//Bangumi b = new Bangumi( bid, content );
-				JSONObject jo = JSON.parseObject( content );
-				JSONArray ja = jo.getJSONObject( "bangumi" ).getJSONArray( "list" );
-				List<Bangumi> list = new ArrayList<Bangumi>();
-				for (int i = 0; i < ja.size(); ++i) {
-					JSONObject jo2 = ja.getJSONObject( i );
-					String bid = Integer.toString( jo2.getInteger( "season_id" ) );
-					Bangumi b = getBangumi( bid );
-					list.add( b );
-				}
-				return list;
-			}
-		} );
-	}
-
-	private void log(String content) {
-		try {
-			FileUtils.writeStringToFile( new File( "error.log" ), new Date() + "\r\n" + content + "\r\n", true );
-		} catch (IOException e) {
-			e.printStackTrace();
+		String url = "http://www.bilibili.com/index/index-bangumi-timeline.json";
+		String content = hc.getAsString( url );
+		//Bangumi b = new Bangumi( bid, content );
+		JSONObject jo = JSON.parseObject( content );
+		JSONArray ja = jo.getJSONObject( "bangumi" ).getJSONArray( "list" );
+		List<Bangumi> list = new ArrayList<Bangumi>();
+		for (int i = 0; i < ja.size(); ++i) {
+			JSONObject jo2 = ja.getJSONObject( i );
+			String bid = Integer.toString( jo2.getInteger( "season_id" ) );
+			Bangumi b = getBangumi( bid );
+			list.add( b );
 		}
+		return list;
 	}
 
 	public FavGetList getFavoriteListJSON(final int pagesize) {
-		return safeRun( new SafeRunner<FavGetList>() {
-			public FavGetList run() throws Exception {
-				HttpUriRequest req = makeGetFavoriteListRequest( pagesize );
-				String content = hc.asString( req );
-				try {
-					JSONObject data = JSON.parseObject( content ).getJSONObject( "data" );
-					JSONArray ja = data.getJSONArray( "vlist" );
-					for (int i = 0; i < ja.size(); ++i) {
-						JSONObject jo = ja.getJSONObject( i );
-						jo.put( "create", jo.getString( "create" ) + ":00" );
-					}
-					FavGetList fgl = JSON.toJavaObject( data, FavGetList.class );
-					return fgl;
-				} catch (Exception e) {
-					log( content );
-					throw new RuntimeException( e );
-				}
+		HttpUriRequest req = makeGetFavoriteListRequest( pagesize );
+		String content = hc.asString( req );
+		try {
+			JSONObject data = JSON.parseObject( content ).getJSONObject( "data" );
+			JSONArray ja = data.getJSONArray( "vlist" );
+			//这里修正一下时间的格式
+			for (int i = 0; i < ja.size(); ++i) {
+				JSONObject jo = ja.getJSONObject( i );
+				jo.put( "create", jo.getString( "create" ) + ":00" );
 			}
-		} );
+			FavGetList fgl = JSON.toJavaObject( data, FavGetList.class );
+			return fgl;
+		} catch (Exception e) {
+			Utils.log( e.getMessage() );
+			throw new RuntimeException( e );
+		}
 	}
 
 	/**
@@ -254,52 +232,36 @@ public class BilibiliService {
 	 * @return
 	 */
 	public Video getVideo0(final int aid) {
-		return safeRun( new SafeRunner<Video>() {
-			public Video run() throws Exception {
-				String url = "http://api.bilibili.cn/view?appkey=03fc8eb101b091fb&id=" + aid;
-				JSONObject json = hc.getAsJSON( url );
-				Video v = new Video();
-				v.aid = aid;
-				v.typeid = json.getIntValue( "tid" );//这里叫做tid
-				v.title = json.getString( "title" );
-				v.mid = json.getIntValue( "mid" );
-				v.status = 0;
-				return v;
-			}
-		} );
+		String url = "http://api.bilibili.cn/view?appkey=03fc8eb101b091fb&id=" + aid;
+		JSONObject json = hc.getAsJSON( url );
+		Video v = new Video();
+		v.aid = aid;
+		v.typeid = json.getIntValue( "tid" );//这里叫做tid
+		v.title = json.getString( "title" );
+		v.mid = json.getIntValue( "mid" );
+		v.status = 0;
+		return v;
 	}
 
-	/*
+	@Deprecated
 	public Video getVideo1(final int aid) {
-		return safeRun( new SafeRunner<Video>() {
-			public Video run() throws Exception {
-				String url = "http://www.bilibili.com/video/av" + aid;
-				String content = hc.getAsString( url );
-				Video v = new Video();
-				v.aid = aid;
-				Document d = Jsoup.parse( content );
-				v.title = d.select( ".v-title" ).text();
-				if (!v.title.isEmpty()) {
-					v.state = 0;
-				} else if (content.contains( "你没有权限浏览" ))
-					v.state = 1;
-				else if (content.contains( "此视频不存在或被删除." ))
-					v.state = 2;
-				else if (content.contains( "你输入的参数有误" ))
-					v.state = 3;
-				else if (content.contains( "本视频已撞车或被版权所有者申述" ))
-					v.state = 4;
-				else {
-					System.out.println( content );
-					throw new RuntimeException( "未知的状态! aid=" + aid );
-				}
-				return v;
-			}
-		} );
-	}*/
+		String url = "http://www.bilibili.com/video/av" + aid;
+		String content = hc.getAsString( url );
+		Video v = new Video();
+		v.aid = aid;
+		Document d = Jsoup.parse( content );
+		v.title = d.select( ".v-title" ).text();
+		if (!v.title.isEmpty())
+			v.status = 0;
+		else
+			v.status = -1;
+		return v;
+	}
 
 	@Deprecated
 	public Video getVideo2(int aid) {
+		if (true)
+			throw new UnsupportedOperationException( "不要使用这个方法" );
 		//这个方法有可能会出错
 		//先收藏它
 		addFavotite( aid );
@@ -342,13 +304,9 @@ public class BilibiliService {
 	}
 
 	public boolean isLogin() {
-		return safeRun( new SafeRunner<Boolean>() {
-			public Boolean run() throws Exception {
-				String url = "http://member.bilibili.com/main.html";
-				String content = hc.getAsString( url );
-				return content.contains( Integer.toString( a.getId() ) );
-			}
-		} );
+		String url = "http://member.bilibili.com/main.html";
+		String content = hc.getAsString( url );
+		return content.contains( Integer.toString( a.getId() ) );
 	}
 
 	private boolean initAccount() {
@@ -363,7 +321,7 @@ public class BilibiliService {
 		aa.setId( a.getId() );
 		a = aa;
 
-		a.setActive( !content.contains( "我要回答问题激活" ) );
+		a.setActive( !content.contains( "我要回答问题激活" ) );//要不要顺便去激活一下?
 
 		//获得默认的收藏夹
 		JSONObject jo = hc.getAsJSON( FAV_GET_BOX_LIST_URL + a.getId() );
@@ -380,9 +338,12 @@ public class BilibiliService {
 	 * @return
 	 */
 	private HttpUriRequest makeCommentRequest(int aid, String msg) {
-		return RequestBuilder.get( "http://interface.bilibili.com/feedback/post" ).addParameter( "callback", "abc" )
-				.addParameter( "aid", Integer.toString( aid ) ).addParameter( "msg", msg )
-				.addParameter( "action", "send" ).addHeader( "Referer", "http://www.bilibili.com/video/av" + aid )
+		return RequestBuilder.get( "http://interface.bilibili.com/feedback/post" )
+				.addParameter( "callback", "abc" )
+				.addParameter( "aid", Integer.toString( aid ) )
+				.addParameter( "msg", msg )
+				.addParameter( "action", "send" )
+				.addHeader( "Referer", "http://www.bilibili.com/video/av" + aid )
 				.build();
 	}
 
@@ -397,8 +358,8 @@ public class BilibiliService {
 				.addHeader( "X-Requested-With", "XMLHttpRequest" )
 				.addHeader( "User-Agent",
 						"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.87 Safari/537.36 QQBrowser/9.2.5584.400" )
-				.setEntity( HC.makeFormEntity( "fid", a.getFid(), "aids", aids ) )
-				//.addParameter( "fid", Integer.toString( a.getFid() ) ).addParameter( "aids", aids )
+				//.setEntity( HC.makeFormEntity( "fid", a.getFid(), "aids", aids ) )
+				.addParameter( "fid", Integer.toString( a.getFid() ) ).addParameter( "aids", aids )
 				.addHeader( "Referer", "http://space.bilibili.com/" ).build();
 	}
 
@@ -412,16 +373,6 @@ public class BilibiliService {
 				.addParameter( "mid", Integer.toString( a.getId() ) )
 				.addParameter( "fid", Integer.toString( a.getFid() ) )
 				.addParameter( "pagesize", Integer.toString( pagesize ) ).addParameter( "order", "ftime" ).build();
-	}
-
-	private <T> T safeRun(SafeRunner<T> sr) {
-		try {
-			return sr.run();
-		} catch (Exception e) {
-			if (e instanceof RuntimeException)
-				throw (RuntimeException) e;
-			throw new RuntimeException( e );
-		}
 	}
 
 	@PreDestroy

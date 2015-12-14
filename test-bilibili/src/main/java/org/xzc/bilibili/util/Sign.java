@@ -9,14 +9,22 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URIBuilder;
 
 public class Sign {
 	private String appkey = "c1b107428d337928";
 	private String se = "ea85624dfcf12d7cc7b2b3a94fac1f2c";
 
 	public Sign() {
+	}
+
+	public Sign(Object... args) {
+		Map<String, String> params = new HashMap<String, String>();
+		for (int i = 0; i < args.length; i += 2) {
+			String name = args[i].toString();
+			String value = args[i + 1].toString();
+			params.put( name, value );
+		}
+		parse( params );
 	}
 
 	public String getAppkey() {
