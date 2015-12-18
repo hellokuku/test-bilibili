@@ -372,7 +372,7 @@ public class BilibiliService {
 	 * @return
 	 */
 	private HttpUriRequest makeDeleteFavoriteRequest(String aids) {
-		return RequestBuilder.post( SPACE_HOST + "/ajax/fav/mdel" )
+		return RequestBuilder.post( SPACE_URL+ "/ajax/fav/mdel" )
 				.addHeader( "Host", SPACE_HOST )
 				.addHeader( "Origin", "http://space.bilibili.com" )
 				.addHeader( "X-Requested-With", "XMLHttpRequest" )
