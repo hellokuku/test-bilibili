@@ -27,7 +27,7 @@ public class AppConfig {
 	public BilibiliService simpleBilibiliService() {
 		//2015-12-14 10:08 xuzhichaoxh1@163.com
 		Account a = new Account( 19216452, "704fe3e6,1450788690,9bc262e4" );
-		BilibiliService bs = new BilibiliService( a );
+		BilibiliService bs = new BilibiliService( a, "27.115.75.114", 8080 );
 		return bs;
 	}
 

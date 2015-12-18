@@ -10,6 +10,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.apache.http.HttpException;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.client.config.CookieSpecs;
@@ -20,6 +21,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.protocol.HttpContext;
+import org.ibex.nestedvm.UnixRuntime.HostFS.HostDirFD;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.xzc.bilibili.model.Account;
@@ -59,9 +61,14 @@ public class BilibiliService {
 	 * 绑定的账号
 	 */
 	private Account a;
+	private String proxyHost;
+	private int proxyPort;
 
-	public BilibiliService(final Account account) {
+	public BilibiliService(final Account account, String proxyHost, int proxyPort) {
 		this.a = account;
+		this.proxyHost = proxyHost;
+		this.proxyPort = proxyPort;
+
 		//控制连接并发量
 		PoolingHttpClientConnectionManager m = new PoolingHttpClientConnectionManager();
 		m.setDefaultMaxPerRoute( 4 );
@@ -69,7 +76,11 @@ public class BilibiliService {
 
 		//忽略cookie
 		RequestConfig rc = RequestConfig.custom().setCookieSpec( CookieSpecs.IGNORE_COOKIES ).build();
-		CloseableHttpClient chc = HttpClients.custom().setDefaultRequestConfig( rc )
+		HttpHost proxy = null;
+		if (proxyHost != null) {
+			proxy = new HttpHost( proxyHost, proxyPort );
+		}
+		CloseableHttpClient chc = HttpClients.custom().setProxy( proxy ).setDefaultRequestConfig( rc )
 				.addInterceptorFirst( new HttpRequestInterceptor() {
 					public void process(HttpRequest request, HttpContext context) throws HttpException, IOException {
 						request.addHeader( "Cookie",
@@ -78,7 +89,10 @@ public class BilibiliService {
 				} ).setConnectionManager( m ).build();
 
 		hc = new HC( chc );
+	}
 
+	public BilibiliService(final Account account) {
+		this( account, null, 0 );
 	}
 
 	@PostConstruct
@@ -95,7 +109,12 @@ public class BilibiliService {
 	public int addFavotite(final int aid) {
 		String url = "http://api.bilibili.com/favourite/add?id=" + aid;
 		String content = hc.getAsString( url );
-		return JSON.parseObject( content ).getIntValue( "code" );
+		try {
+			return JSON.parseObject( content ).getIntValue( "code" );
+		} catch (RuntimeException e) {
+			Utils.log( content );
+			throw (RuntimeException) e;
+		}
 	}
 
 	/**

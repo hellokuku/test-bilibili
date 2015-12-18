@@ -228,6 +228,14 @@ public class TestApp {
 	@Autowired
 	private AutoCommentWokerThread acwt;
 
+	private static void sleep(long millis) {
+		try {
+			Thread.sleep( millis );
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
 	/**
 	 * 用一个线程 不断使用getVideo1方法探测视频
 	 * @throws Exception
@@ -235,7 +243,7 @@ public class TestApp {
 	@Test
 	public void 持续跟进最新的视频() throws Exception {
 		Utils.blockUntil( "持续跟进最新的视频", new DateTime( 2015, 12, 18, 2, 40 ), 60000 );
-		acwt.start();
+		//acwt.start();
 		int batch = 50;//每次检测50个aid
 		int aid = db.getMaxAid( 3349048 ) + 1;//aid起点
 		while (true) {
@@ -254,6 +262,7 @@ public class TestApp {
 								aid = aid + i;
 								break;
 							}
+							sleep( 1000 );//睡觉一下
 						}
 						if (code == -1111) {
 							reachBoundary = true;
@@ -266,17 +275,20 @@ public class TestApp {
 						continue;
 					}
 					++aid;
+					sleep( 1000 );
 				}
 				消耗收藏夹( parsedCallback );
 				if (reachBoundary) {
 					System.out.println( "真的达到边界了, 休息300秒,再继续" );
-					Thread.sleep( 300000 );
+					Utils.blockUntil( "达到边界再开始 ", DateTime.now().plusSeconds( 300 ), 30000 );
+				} else {//没有到达边界 但是也是睡觉一下
+					Utils.blockUntil( "达到边界再开始 ", DateTime.now().plusSeconds( 100 ), 25000);
 				}
 			} catch (Exception ex) {
 				ex.printStackTrace();
 				FileUtils.writeStringToFile( new File( "error.log" ), ex.getMessage() + "\r\n", true );
 				System.out.println( "出问题了, 睡觉20秒" );
-				Thread.sleep( 20000 );
+				sleep( 20000 );
 				continue;
 			}
 		}
