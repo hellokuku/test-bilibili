@@ -26,7 +26,7 @@ public class AppConfig {
 	@Bean(name = "simpleBilibiliService")
 	public BilibiliService simpleBilibiliService() {
 		//2015-12-14 10:08 xuzhichaoxh1@163.com
-		Account a = new Account( 19216452, "704fe3e6,1450663497,f2f2cdd9" );
+		Account a = new Account( 19216452, "704fe3e6,1450788690,9bc262e4" );
 		BilibiliService bs = new BilibiliService( a );
 		return bs;
 	}
@@ -34,7 +34,7 @@ public class AppConfig {
 	@Bean(name = "mainBilibiliService")
 	public BilibiliService mainBilibiliService() {
 		//duruofeixh1@163.com
-		Account a = new Account( 19533545, "f0ee7f17,1450611284,7a892989" );
+		Account a = new Account( 19539291, "73c2bd41,1450787705,761f369a" );
 		BilibiliService bs = new BilibiliService( a );
 		return bs;
 	}

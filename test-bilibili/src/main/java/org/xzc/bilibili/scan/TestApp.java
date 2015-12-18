@@ -234,7 +234,7 @@ public class TestApp {
 	 */
 	@Test
 	public void 持续跟进最新的视频() throws Exception {
-		Utils.blockUntil( "持续跟进最新的视频", new DateTime( 2015, 12, 15, 1, 40 ), 60000 );
+		Utils.blockUntil( "持续跟进最新的视频", new DateTime( 2015, 12, 18, 2, 40 ), 60000 );
 		acwt.start();
 		int batch = 50;//每次检测50个aid
 		int aid = db.getMaxAid( 3349048 ) + 1;//aid起点
@@ -273,6 +273,7 @@ public class TestApp {
 					Thread.sleep( 30000 );
 				}
 			} catch (Exception ex) {
+				ex.printStackTrace();
 				FileUtils.writeStringToFile( new File( "error.log" ), ex.getMessage() + "\r\n", true );
 				System.out.println( "出问题了, 睡觉20秒" );
 				Thread.sleep( 20000 );
