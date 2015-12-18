@@ -22,12 +22,14 @@ public class AppConfig {
 			throw new IllegalStateException( e );
 		}
 	}
-
+	
+	private String proxyHost="27.115.75.114";
+	private int port=8080;
 	@Bean(name = "simpleBilibiliService")
 	public BilibiliService simpleBilibiliService() {
 		//2015-12-14 10:08 xuzhichaoxh1@163.com
 		Account a = new Account( 19216452, "704fe3e6,1450788690,9bc262e4" );
-		BilibiliService bs = new BilibiliService( a, "27.115.75.114", 8080 );
+		BilibiliService bs = new BilibiliService( a, proxyHost, port);
 		return bs;
 	}
 
@@ -35,7 +37,7 @@ public class AppConfig {
 	public BilibiliService mainBilibiliService() {
 		//duruofeixh1@163.com
 		Account a = new Account( 19539291, "73c2bd41,1450787705,761f369a" );
-		BilibiliService bs = new BilibiliService( a );
+		BilibiliService bs = new BilibiliService( a, proxyHost, port);
 		return bs;
 	}
 
@@ -43,7 +45,7 @@ public class AppConfig {
 	public BilibiliService commentHelperBilibiliService() {
 		//duruofeixh2@163.com
 		Account a = new Account( 19534281, "ad87375f,1450611219,2e864721" );
-		BilibiliService bs = new BilibiliService( a );
+		BilibiliService bs = new BilibiliService( a, proxyHost, port);
 		return bs;
 	}
 
@@ -51,7 +53,7 @@ public class AppConfig {
 	public BilibiliService testBilibiliService() {
 		// duruofeixh3@163.com
 		Account a = new Account( 19539141, "5609edf4,1450665642,f2c0edc0" );
-		BilibiliService bs = new BilibiliService( a );
+		BilibiliService bs = new BilibiliService( a, proxyHost, port);
 		return bs;
 	}
 }
