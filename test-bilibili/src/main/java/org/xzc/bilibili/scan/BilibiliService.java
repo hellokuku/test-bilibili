@@ -37,10 +37,11 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 public class BilibiliService {
-	private static Pattern RESULT_PATTERN = Pattern.compile( "abc\\(\"(.+)\"\\)" );
-	private static final String FAV_GET_BOX_LIST_URL = "http://space.bilibili.com/ajax/fav/getBoxList?mid=";
+	public static final String SPACE_URL = "http://113.105.152.207";
+	public static final String SPACE_HOST = "space.bilibili.com";
 	public static final String API_URL = "http://61.164.47.167";
 	public static final String API_HOST = "api.bilibili.com";
+	private static Pattern RESULT_PATTERN = Pattern.compile( "abc\\(\"(.+)\"\\)" );
 
 	private static String getDeleteAids(FavGetList json) {
 		StringBuilder sb = new StringBuilder();
@@ -342,7 +343,7 @@ public class BilibiliService {
 		a.setActive( !content.contains( "我要回答问题激活" ) );//要不要顺便去激活一下?
 
 		//获得默认的收藏夹
-		JSONObject jo = hc.getAsJSON( FAV_GET_BOX_LIST_URL + a.getId() );
+		JSONObject jo = hc.getAsJSON( SPACE_URL + "/ajax/fav/getBoxList?mid=" + a.getId() );
 		a.setFid( jo.getJSONObject( "data" ).getJSONArray( "list" ).getJSONObject( 0 ).getIntValue( "fav_box" ) );
 
 		System.out.println( "初始化账号成功" + a );
@@ -372,7 +373,7 @@ public class BilibiliService {
 	 */
 	private HttpUriRequest makeDeleteFavoriteRequest(String aids) {
 		return RequestBuilder.post( SPACE_HOST + "/ajax/fav/mdel" )
-				.addHeader( "Host",SPACE_HOST )
+				.addHeader( "Host", SPACE_HOST )
 				.addHeader( "Origin", "http://space.bilibili.com" )
 				.addHeader( "X-Requested-With", "XMLHttpRequest" )
 				.addHeader( "User-Agent",
@@ -381,9 +382,6 @@ public class BilibiliService {
 				.addParameter( "fid", Integer.toString( a.getFid() ) ).addParameter( "aids", aids )
 				.addHeader( "Referer", "http://space.bilibili.com/" ).build();
 	}
-
-	public static final String SPACE_URL = "http://113.105.152.207";
-	public static final String SPACE_HOST = "space.bilibili.com";
 
 	/**
 	 * 获得默认收藏夹的内容

@@ -282,7 +282,7 @@ public class TestApp {
 					System.out.println( "真的达到边界了, 休息300秒,再继续" );
 					Utils.blockUntil( "达到边界再开始 ", DateTime.now().plusSeconds( 300 ), 30000 );
 				} else {//没有到达边界 但是也是睡觉一下
-					Utils.blockUntil( "达到边界再开始 ", DateTime.now().plusSeconds( 100 ), 25000);
+					Utils.blockUntil( "下一轮再开始", DateTime.now().plusSeconds( 100 ), 25000);
 				}
 			} catch (Exception ex) {
 				ex.printStackTrace();
