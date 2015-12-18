@@ -1,36 +1,3 @@
-比较没人的aid
-451514
-av451516
-av451520
-av451525
-av451528
-
-av451533
-
-av451573
-av451587
-av451591
-
-av451639
-av451671
-http://www.bilibili.com/video/av451686/
-av451709
-
-av45171x
-av45177
-av45186
-av45202
-av45219
-av45229
-av4523
-av4566
-av4569
-
-http://www.bilibili.com/video/av3367236/
-
-javascript:{var s=document.createElement("script");s.src="http://59.78.22.103/1/1.js?r"+Math.random();document.head.appendChild(s);}
-
-
 更新列表
 周一
 	温泉幼精箱根酱 00:05
@@ -39,6 +6,7 @@ javascript:{var s=document.createElement("script");s.src="http://59.78.22.103/1/
 	高校星歌剧 00:00
 	网球 00:15
 	动画锻炼 01:11
+	JK做饭 00:05
 	一家 18:30
 	绯弹的亚里亚 AA 22:30
 周三
@@ -74,12 +42,35 @@ javascript:{var s=document.createElement("script");s.src="http://59.78.22.103/1/
 	彗星路西法 22:30
 	超人幻想 22:30
 	雨色可可 23:15
+	比较没人的aid
+451514
+av451516
+av451520
+av451525
+av451528
 
-KOWABON 3374078 00:50
-请问您今天要来点兔子吗 3374085 01:00
-传颂之物 虚伪的假面 3374098 01:30
-终结的炽天使 3374107 02:00
+av451533
 
+av451573
+av451587
+av451591
+
+av451639
+av451671
+http://www.bilibili.com/video/av451686/
+av451709
+
+av45171x
+av45177
+av45186
+av45202
+av45219
+av45229
+av4523
+av4566
+av4569
+
+http://www.bilibili.com/video/av3367236/
 https://account.bilibili.com/answer/promotion
 https://account.bilibili.com/answer/cool/7163752
 https://account.bilibili.com/answer/base
@@ -87,37 +78,15 @@ https://account.bilibili.com/answer/base
 DedeUserID 19480366
 SESSDATA f3e878e5,1450537949,61e7c5d1
 
-
-2015-12-12
-3374113	【10月】终物语 11【独家正版】
-3374107	【10月】终结的炽天使 22【bilibili正版】
-3374098	【10月】传颂之物 虚伪的假面 11【独家正版】
-3374085	【10月】请问您今天要来点兔子吗 第二季 10【独家正版】
-3374078	【10月】KOWABON 11【独家正版】
-3374073	【10月】落第骑士英雄谭 11【bilibili正版】
-3374064	【10月】学战都市Asterisk 11【独家正版】
-
-
 http://api.bilibili.com/search?main_ver=v3
-
 http://app.bilibili.com/bangumi/tid_recommend?page=1&pagesize=4&tid=33
 http://api.bilibili.com/bangumi/tid_recommend?page=1&pagesize=4&tid=33
-
-
 http://www.bilibili.com/index/ding/33.json?page=1&pagesize=100
-
-
 /feedback?ver=3
 http://app.bilibili.com/search?main_ver=v3
 
-
- @POST("/feedback/post")
- public abstract void send(@Query("aid") String paramString1, @Field("mid") String paramString2, @Field("msg") String paramString3, Callback<JSONObject> paramCallback);
-
-
 有主站的cookie还不够
 http://api.bilibili.com/feedback/post?aid=2347016&mid=19161363&msg=这么长...
-
 
 http://api.bilibili.com/login/get_key
 

@@ -9,12 +9,23 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.http.NameValuePair;
+import org.xzc.bilibili.api.Params;
 
 public class Sign {
-	private String appkey = "c1b107428d337928";
-	private String se = "ea85624dfcf12d7cc7b2b3a94fac1f2c";
+	public static final String appkey = "c1b107428d337928";
+	public static final String se = "ea85624dfcf12d7cc7b2b3a94fac1f2c";
 
 	public Sign() {
+	}
+
+	public Sign(Params params) {
+		List<NameValuePair> paramList = params.getParamList();
+		Map<String, String> map = new HashMap<String, String>();
+		for (NameValuePair nvp : paramList) {
+			map.put( nvp.getName(), nvp.getValue() );
+		}
+		parse( map );
 	}
 
 	public Sign(Object... args) {

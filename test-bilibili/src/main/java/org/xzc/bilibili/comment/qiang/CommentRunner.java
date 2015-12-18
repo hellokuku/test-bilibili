@@ -74,20 +74,14 @@ public class CommentRunner {
 		//senderList.add( new Sender( "116.246.6.52", 80, 16, "代理10" ) );
 		//senderList.add( new Sender( "122.72.33.139", 80, 16, "代理11" ) );
 		//senderList.add( new Sender( "112.25.41.136", 80, 16, "代理12" ) );
-		senderList.add( new Sender( null, 0, 32, "本机" ) );
+		senderList.add( new Sender( null, 0, 512, "本机" ) );
 
-		addJob( s, commentJob, new Config( "高校星歌剧", 3386711, "高校星歌剧",
-				new DateTime( 2015, 12, 14, 23, 59 ).toDate(),
-				new DateTime( 2015, 12, 15, 0, 4 ).toDate() ).setSenderList( senderList ) );
-		addJob( s, commentJob, new Config( "JK做饭", 3386723, "好饿好饿好饿, 我真的好饿~",
-				new DateTime( 2015, 12, 15, 0, 4, 30 ).toDate(),
-				new DateTime( 2015, 12, 15, 0, 10 ).toDate() ).setSenderList( senderList ) );
-		addJob( s, commentJob, new Config( "网球", 3386727, "这集的封面似乎没上一集那么过激~",
-				new DateTime( 2015, 12, 15, 0, 13 ).toDate(),
-				new DateTime( 2015, 12, 15, 0, 25 ).toDate() ).setSenderList( senderList ) );
-		addJob( s, commentJob, new Config( "动画锻炼", 3386731, "越锻炼身体越糟糕...",
-				new DateTime( 2015, 12, 15, 1, 9 ).toDate(),
-				new DateTime( 2015, 12, 15, 1, 20 ).toDate() ).setSenderList( senderList ) );
+		addJob( s, commentJob, new Config( "创圣的大天使", 3401586, "这番有点冷",
+				new DateTime( 2015, 12, 18, 0, 28 ).toDate(),
+				new DateTime( 2015, 12, 18, 0, 38 ).toDate() ).setSenderList( senderList ) );
+		addJob( s, commentJob, new Config( "全部成为F", 3401592, "完结撒花, 其实蛮不错看的.",
+				new DateTime( 2015, 12, 18, 1, 33 ).toDate(),
+				new DateTime( 2015, 12, 18, 1, 43 ).toDate() ).setSenderList( senderList ) );
 	}
 
 	public void 强大的抢评论策略(long delay, int aid, String msg) throws Exception {
