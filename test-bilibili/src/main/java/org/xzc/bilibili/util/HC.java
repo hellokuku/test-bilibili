@@ -13,6 +13,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.xzc.bilibili.api.Params;
+import org.xzc.bilibili.scan.BilibiliService;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -50,6 +51,13 @@ public class HC {
 	}
 
 	public String asString(final HttpUriRequest req) {
+		if (!req.containsHeader( "Host" )) {
+			String host = req.getURI().toString();
+			if (host.startsWith( BilibiliService.API_URL ))
+				req.addHeader( "Host", BilibiliService.API_HOST );
+			if (host.startsWith( BilibiliService.SPACE_URL ))
+				req.addHeader( "Host", BilibiliService.SPACE_HOST );
+		}
 		return safeRun( new SafeRunner<String>() {
 			public String run() throws Exception {
 				CloseableHttpResponse res = null;

@@ -39,8 +39,8 @@ import com.alibaba.fastjson.JSONObject;
 public class BilibiliService {
 	private static Pattern RESULT_PATTERN = Pattern.compile( "abc\\(\"(.+)\"\\)" );
 	private static final String FAV_GET_BOX_LIST_URL = "http://space.bilibili.com/ajax/fav/getBoxList?mid=";
-	private static final String API_URL = "http://61.164.47.167";
-	private static final String API_HOST = "api.bilibili.com";
+	public static final String API_URL = "http://61.164.47.167";
+	public static final String API_HOST = "api.bilibili.com";
 
 	private static String getDeleteAids(FavGetList json) {
 		StringBuilder sb = new StringBuilder();
@@ -334,7 +334,6 @@ public class BilibiliService {
 		if (!content.contains( Integer.toString( a.getId() ) ))//账号还没有登陆
 			return false;
 		String jsonStr = hc.getAsString( API_URL + "/userinfo?mid=" + a.getId() );
-
 		Account aa = JSON.parseObject( jsonStr, Account.class );
 		aa.setSESSIDATA( a.getSESSIDATA() );
 		aa.setId( a.getId() );
