@@ -2,7 +2,7 @@
 http://api.bilibili.com/userinfo?user=xzchaooDR4
 
 先登陆再访问 就可以签到了!
-http://api.bilibili.com/myinfo?access_key=9770211f472fe224b3eeb7769797d8b5
+http://api.bilibili.com/myinfo?access_key=5be9b8caed10c4cfe1e34bed8b3d247c
 
 
 5be9b8caed10c4cfe1e34bed8b3d247c
@@ -30,14 +30,15 @@ http://api.bilibili.com/favourite/add?id=3335348
 
 获取用户信息
 http://api.bilibili.com/userinfo?user=xzchaooDRF8
+http://api.bilibili.com/myinfo?access_key=5be9b8caed10c4cfe1e34bed8b3d247c
 
 获取用户的收藏夹
 这个似乎没有做权限认证, 所以可以获取其他人的收藏夹?
 http://space.bilibili.com/ajax/fav/getBoxList?mid=19539141
 和[获取收藏的视频]搭配使用可以获取别人的收藏信息!
 
-收藏列表 xzchaooDRF3
-http://space.bilibili.com/ajax/fav/getList?mid=19539141&pagesize=30&fid=19796220
+收藏列表 xzchaooDRF8
+http://space.bilibili.com/ajax/fav/getList?mid=19557513&pagesize=30&fid=19764585
 pagesize最大在70左右
 
 获得评论列表

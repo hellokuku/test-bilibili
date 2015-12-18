@@ -269,8 +269,8 @@ public class TestApp {
 				}
 				消耗收藏夹( parsedCallback );
 				if (reachBoundary) {
-					System.out.println( "真的达到边界了, 休息30秒,再继续" );
-					Thread.sleep( 30000 );
+					System.out.println( "真的达到边界了, 休息300秒,再继续" );
+					Thread.sleep( 300000 );
 				}
 			} catch (Exception ex) {
 				ex.printStackTrace();

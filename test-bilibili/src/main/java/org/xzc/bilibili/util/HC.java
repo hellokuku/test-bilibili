@@ -12,6 +12,7 @@ import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.xzc.bilibili.api.Params;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -30,6 +31,14 @@ public class HC {
 
 	public String getAsString(String url) {
 		return asString( RequestBuilder.get( url ).build() );
+	}
+
+	public String postAsString(String url, Params params) {
+		return asString( RequestBuilder.post( url ).setEntity( params.toEntity() ).build() );
+	}
+
+	public String postAsString(String url) {
+		return asString( RequestBuilder.post( url ).build() );
 	}
 
 	public JSONObject getAsJSON(String url) {
@@ -86,5 +95,18 @@ public class HC {
 		} catch (Exception ex) {
 		}
 		return e;
+	}
+
+	public String postAsString(String url, Params params, Params datas, boolean sign) {
+		if (sign) {
+			if (params == null)
+				params = new Params();
+			params.add( "appkey", Sign.appkey );
+			url = url + "?" + new Sign( params ).getResult();
+		}
+		RequestBuilder rb = RequestBuilder.post( url );
+		if (datas != null)
+			datas.paramsTo( rb );
+		return asString( rb.build() );
 	}
 }

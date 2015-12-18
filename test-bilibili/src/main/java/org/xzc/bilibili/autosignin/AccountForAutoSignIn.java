@@ -9,20 +9,33 @@ import com.j256.ormlite.table.DatabaseTable;
 
 @DatabaseTable(tableName = "afasi")
 public class AccountForAutoSignIn {
-	@DatabaseField(id = true)
+	@DatabaseField
 	public int mid;
 	@DatabaseField
 	@JSONField(name = "uname")
 	public String name;
 	@DatabaseField
 	public int coins;
+	@DatabaseField(id = true)
+	public String userid;
+	@DatabaseField
+	public String password;
 	@DatabaseField
 	public String access_key;
-	@DatabaseField(dataType = DataType.DATE_STRING)
-	public Date updateAt;
+	@DatabaseField
+	public int currentLevel;
+	@DatabaseField
+	public int currentMin;
+	@DatabaseField
+	public int currentExp;
+	@DatabaseField
+	public int nextExp;
 	@Override
 	public String toString() {
-		return "AccountForAutoSignIn [mid=" + mid + ", name=" + name + ", coins=" + coins + ", access_key=" + access_key
-				+ ", updateAt=" + updateAt + "]";
+		return "AccountForAutoSignIn [mid=" + mid + ", name=" + name + ", coins=" + coins + ", userid=" + userid
+				+ ", access_key=" + access_key + ", currentLevel=" + currentLevel + ", currentMin=" + currentMin
+				+ ", currentExp=" + currentExp + ", nextExp=" + nextExp + "]";
 	}
+
+
 }
