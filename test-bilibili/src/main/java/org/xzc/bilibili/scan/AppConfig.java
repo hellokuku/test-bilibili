@@ -22,9 +22,9 @@ public class AppConfig {
 			throw new IllegalStateException( e );
 		}
 	}
-	
-	private String proxyHost="27.115.75.114";
-	private int port=8080;
+
+	private String proxyHost="60.190.252.29";
+	private int port=808;
 	@Bean(name = "simpleBilibiliService")
 	public BilibiliService simpleBilibiliService() {
 		//2015-12-14 10:08 xuzhichaoxh1@163.com

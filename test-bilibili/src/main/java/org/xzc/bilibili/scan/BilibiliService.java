@@ -39,6 +39,8 @@ import com.alibaba.fastjson.JSONObject;
 public class BilibiliService {
 	private static Pattern RESULT_PATTERN = Pattern.compile( "abc\\(\"(.+)\"\\)" );
 	private static final String FAV_GET_BOX_LIST_URL = "http://space.bilibili.com/ajax/fav/getBoxList?mid=";
+	private static final String API_URL = "http://61.164.47.167";
+	private static final String API_HOST = "api.bilibili.com";
 
 	private static String getDeleteAids(FavGetList json) {
 		StringBuilder sb = new StringBuilder();
@@ -107,7 +109,7 @@ public class BilibiliService {
 	 * @return
 	 */
 	public int addFavotite(final int aid) {
-		String url = "http://api.bilibili.com/favourite/add?id=" + aid;
+		String url = API_URL + "/favourite/add?id=" + aid;
 		String content = hc.getAsString( url );
 		try {
 			return JSON.parseObject( content ).getIntValue( "code" );
@@ -302,7 +304,8 @@ public class BilibiliService {
 	 * @return
 	 */
 	private HttpUriRequest makeCommentListRequest(int aid, int page, int pagesize) {
-		return RequestBuilder.get( "http://api.bilibili.com/feedback" ).addParameter( "page", Integer.toString( page ) )
+		return RequestBuilder.get( API_URL + "/feedback" ).addParameter( "page", Integer.toString( page ) )
+				.addHeader( "Host", API_HOST )
 				.addParameter( "mode", "arc" ).addParameter( "type", "json" ).addParameter( "ver", "3" )
 				.addParameter( "aid", Integer.toString( aid ) ).addParameter( "order", "default" )
 				.addParameter( "pagesize", Integer.toString( pagesize ) ).build();
@@ -330,7 +333,7 @@ public class BilibiliService {
 		String content = hc.getAsString( url );
 		if (!content.contains( Integer.toString( a.getId() ) ))//账号还没有登陆
 			return false;
-		String jsonStr = hc.getAsString( "http://api.bilibili.com/userinfo?mid=" + a.getId() );
+		String jsonStr = hc.getAsString( API_URL + "/userinfo?mid=" + a.getId() );
 
 		Account aa = JSON.parseObject( jsonStr, Account.class );
 		aa.setSESSIDATA( a.getSESSIDATA() );
@@ -369,7 +372,8 @@ public class BilibiliService {
 	 * @return
 	 */
 	private HttpUriRequest makeDeleteFavoriteRequest(String aids) {
-		return RequestBuilder.post( "http://space.bilibili.com/ajax/fav/mdel" )
+		return RequestBuilder.post( SPACE_HOST + "/ajax/fav/mdel" )
+				.addHeader( "Host",SPACE_HOST )
 				.addHeader( "Origin", "http://space.bilibili.com" )
 				.addHeader( "X-Requested-With", "XMLHttpRequest" )
 				.addHeader( "User-Agent",
@@ -379,13 +383,17 @@ public class BilibiliService {
 				.addHeader( "Referer", "http://space.bilibili.com/" ).build();
 	}
 
+	public static final String SPACE_URL = "http://113.105.152.207";
+	public static final String SPACE_HOST = "space.bilibili.com";
+
 	/**
 	 * 获得默认收藏夹的内容
 	 * @param pagesize
 	 * @return
 	 */
 	private HttpUriRequest makeGetFavoriteListRequest(int pagesize) {
-		return RequestBuilder.get( "http://space.bilibili.com/ajax/fav/getList" )
+		return RequestBuilder.get( SPACE_URL + "/ajax/fav/getList" )
+				.addHeader( "Host", SPACE_HOST )
 				.addParameter( "mid", Integer.toString( a.getId() ) )
 				.addParameter( "fid", Integer.toString( a.getFid() ) )
 				.addParameter( "pagesize", Integer.toString( pagesize ) ).addParameter( "order", "ftime" ).build();
