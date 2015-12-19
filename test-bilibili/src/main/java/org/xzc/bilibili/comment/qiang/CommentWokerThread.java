@@ -74,8 +74,11 @@ public class CommentWokerThread extends Thread {
 	}
 
 	private static HttpUriRequest makeCommentRequest(Config cfg) {
-		return RequestBuilder.get( "http://interface.bilibili.com/feedback/post" )
+		//String sip = "60.221.255.15"; 113.105.152.207 61.164.47.167 112.25.85.6
+		String sip = "112.25.85.6";
+		return RequestBuilder.get( "http://" + sip + "/feedback/post" )
 				.addHeader( "Cookie", "DedeUserID=19480366; SESSDATA=f3e878e5,1450537949,61e7c5d1;" )
+				.addHeader( "Host", "interface.bilibili.com" )
 				//duruofeixh8
 				//.addHeader( "Cookie", "DedeUserID=19557513; SESSDATA=315c6283,1451014585,d1ef321d;" )
 				.addParameter( "callback", "abc" )
@@ -124,7 +127,7 @@ public class CommentWokerThread extends Thread {
 							res.close();
 							int count = tcount.incrementAndGet();
 							//System.out.println( content );
-							if (count % 1000 == 0) {
+							if (count % 1 == 0) {
 								System.out.println( content );
 								System.out.println( "[" + cfg.getTag() + "," + cfg.getSubTag() + "] " + count + " 时间="
 										+ ( end - tbeg ) / 1000 + "秒 间隔="
