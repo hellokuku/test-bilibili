@@ -54,11 +54,47 @@ public class CommentRunner {
 		//senderList.add( new Sender( "116.246.6.52", 80, 16, "代理10" ) );
 		//senderList.add( new Sender( "122.72.33.139", 80, 16, "代理11" ) );
 		//senderList.add( new Sender( "112.25.41.136", 80, 16, "代理12" ) );
-		senderList.add( new Sender( 256, "本机" ) );
+		senderList.add( new Sender( 512, "本机" ) );
 		addJob( s, commentJob, new Config(
-				"一拳超人", 3407473, "测试测试",
+				"学战都市", 3413822, "百度百科上不是说24集么!? 怎么就完结了!? 不过还是完结撒花.",
+				new DateTime( 2015, 12, 19, 20, 55 ).toDate(),
+				new DateTime( 2015, 12, 19, 21, 25 ).toDate() ).setSenderList( senderList ) );
+		addJob( s, commentJob, new Config(
+				"落第骑士", 3413825, "最后来一次深夜的一刀修罗. 完结撒花.",
+				new DateTime( 2015, 12, 19, 22, 55 ).toDate(),
+				new DateTime( 2015, 12, 19, 23, 30 ).toDate() ).setSenderList( senderList ) );
+		addJob( s, commentJob, new Config(
+				"KOWABON", 3413832, "每天吓吓更健康.",
+				new DateTime( 2015, 12, 20, 0, 48 ).toDate(),
+				new DateTime( 2015, 12, 20, 0, 55 ).toDate() ).setSenderList( senderList ) );
+		addJob( s, commentJob, new Config(
+				"点兔", 3413842, "请给我来点智乃.",
+				new DateTime( 2015, 12, 20, 0, 57 ).toDate(),
+				new DateTime( 2015, 12, 20, 1, 20 ).toDate() ).setSenderList( senderList ) );
+		addJob( s, commentJob, new Config(
+				"传颂之物", 3413848, "第一季才补完...",
+				new DateTime( 2015, 12, 20, 1, 25 ).toDate(),
+				new DateTime( 2015, 12, 20, 1, 50 ).toDate() ).setSenderList( senderList ) );
+		addJob( s, commentJob, new Config(
+				"炽天使", 3413854, "上一集看得太基动了.",
+				new DateTime( 2015, 12, 20, 1, 55 ).toDate(),
+				new DateTime( 2015, 12, 20, 2, 25 ).toDate() ).setSenderList( senderList ) );
+
+		List<Sender> senderList2 = new ArrayList<Sender>();
+		senderList2.add( new Sender( 1, "本机" ) );
+		addJob( s, commentJob, new Config(
+				"终物语", 3413894, "卡米亚的声音真心好听, 完结撒花.",
+				new DateTime().toDate(),
+				new DateTime( 2015, 12, 20, 10, 0 ).toDate() ).setSenderList( senderList2 ) );
+
+		/*addJob( s, commentJob, new Config(
+				"一拳超人1", 3407473, "测试测试",
 				new DateTime().plusSeconds( 2 ).toDate(),
-				new DateTime( 2015, 12, 19, 12, 0 ).toDate() ).setSenderList( senderList ) );
+				new DateTime().plusSeconds( 5 ).toDate() ).setSenderList( senderList ) );
+		addJob( s, commentJob, new Config(
+				"一拳超人2", 3407473, "测试测试",
+				new DateTime().plusSeconds( 5 ).toDate(),
+				new DateTime().plusSeconds( 10 ).toDate() ).setSenderList( senderList ) );*/
 	}
 
 }

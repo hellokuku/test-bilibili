@@ -37,7 +37,6 @@ public class CommentJob implements Job {
 		}
 		for (Thread t : threadList) {
 			try {
-				System.out.println( "开始等待 "+t );
 				t.join();
 			} catch (InterruptedException e) {
 				e.printStackTrace();

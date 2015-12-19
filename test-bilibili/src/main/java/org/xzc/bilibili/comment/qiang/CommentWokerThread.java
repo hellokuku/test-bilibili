@@ -97,6 +97,7 @@ public class CommentWokerThread extends Thread {
 			hcb.setProxy( new HttpHost( cfg.getProxyHost(), cfg.getProxyPort() ) );
 		}
 		CloseableHttpClient hc = hcb.build();
+		System.out.println( cfg.getBatch() );
 		ExecutorService es = Executors.newFixedThreadPool( cfg.getBatch() );
 		work( hc, es );
 	}
@@ -111,7 +112,6 @@ public class CommentWokerThread extends Thread {
 		for (int ii = 0; ii < cfg.getBatch(); ++ii) {
 			Future<?> f = es.submit( new Callable<Void>() {
 				public Void call() throws Exception {
-					//System.out.println( "在这里" );
 					while (!stop.get()) {
 						try {
 							CloseableHttpResponse res = hc.execute( req );
@@ -126,8 +126,6 @@ public class CommentWokerThread extends Thread {
 							//System.out.println( content );
 							if (count % 1000 == 0) {
 								System.out.println( content );
-							}
-							if (count % 1000 == 0) {
 								System.out.println( "[" + cfg.getTag() + "," + cfg.getSubTag() + "] " + count + " 时间="
 										+ ( end - tbeg ) / 1000 + "秒 间隔="
 										+ ( end - llast ) );

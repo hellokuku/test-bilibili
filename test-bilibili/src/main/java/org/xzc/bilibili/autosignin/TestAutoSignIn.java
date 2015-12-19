@@ -115,7 +115,7 @@ public class TestAutoSignIn {
 			dao.update( a2 );
 			System.out.println( a2 );
 			String result = hc.postAsString( "http://api.bilibili.com/x/share/first",
-					new Params( "access_key", access_key ), new Params( "type", 54, "id", 3386858 ),
+					new Params( "access_key", access_key ), new Params( "type", 20, "id", 3406584 ),
 					true );
 			System.out.println( result );
 		}
