@@ -127,7 +127,7 @@ public class CommentWokerThread extends Thread {
 							res.close();
 							int count = tcount.incrementAndGet();
 							//System.out.println( content );
-							if (count % 1 == 0) {
+							if (count % 1000 == 0) {
 								System.out.println( content );
 								System.out.println( "[" + cfg.getTag() + "," + cfg.getSubTag() + "] " + count + " 时间="
 										+ ( end - tbeg ) / 1000 + "秒 间隔="
