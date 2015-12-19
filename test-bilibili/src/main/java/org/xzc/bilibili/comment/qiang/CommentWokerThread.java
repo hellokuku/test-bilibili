@@ -75,8 +75,9 @@ public class CommentWokerThread extends Thread {
 
 	private static HttpUriRequest makeCommentRequest(Config cfg) {
 		return RequestBuilder.get( "http://interface.bilibili.com/feedback/post" )
-				//%2C
 				.addHeader( "Cookie", "DedeUserID=19480366; SESSDATA=f3e878e5,1450537949,61e7c5d1;" )
+				//duruofeixh8
+				//.addHeader( "Cookie", "DedeUserID=19557513; SESSDATA=315c6283,1451014585,d1ef321d;" )
 				.addParameter( "callback", "abc" )
 				.addParameter( "aid", Integer.toString( cfg.getAid() ) ).addParameter( "msg", cfg.getMsg() )
 				.addParameter( "action", "send" )
@@ -97,49 +98,21 @@ public class CommentWokerThread extends Thread {
 		}
 		CloseableHttpClient hc = hcb.build();
 		ExecutorService es = Executors.newFixedThreadPool( cfg.getBatch() );
-		try {
-			while (!work( hc, es )) {
-				System.out.println( "[" + cfg.getSubTag() + "] 超速, 休息一下" );
-				try {
-					Thread.sleep( 2000 );
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		} finally {
-			HttpClientUtils.closeQuietly( hc );
-			es.shutdown();
-		}
+		work( hc, es );
 	}
 
 	private static Pattern RESULT_PATTERN = Pattern.compile( "abc\\(\"(.+)\"\\)" );
 
-	private boolean work(final CloseableHttpClient hc, ExecutorService es) {
-		CloseableHttpResponse res = null;
-		try {
-			res = hc.execute( RequestBuilder.get( "http://api.bilibili.com/view" ).build() );
-			String content = EntityUtils.toString( res.getEntity() );
-			if (!content.contains( "code" )) {
-				System.out.println( "该代理服务器无法运行" );
-				return true;
-			}
-		} catch (Exception e) {
-			System.out.println( "该代理服务器无法运行" );
-			e.printStackTrace();
-			return true;
-		} finally {
-			HttpClientUtils.closeQuietly( res );
-		}
+	private void work(final CloseableHttpClient hc, ExecutorService es) {
 		List<Future<?>> futureList = new ArrayList<Future<?>>();
 		final AtomicInteger tcount = new AtomicInteger( 0 );
-		final AtomicBoolean overspeed = new AtomicBoolean( false );
-		//final AtomicLong last = new AtomicLong( 0 );
 		final long tbeg = System.currentTimeMillis();
 		final long endAt = cfg.getEndAt().getTime();
 		for (int ii = 0; ii < cfg.getBatch(); ++ii) {
 			Future<?> f = es.submit( new Callable<Void>() {
 				public Void call() throws Exception {
-					while (!stop.get() && !overspeed.get()) {
+					//System.out.println( "在这里" );
+					while (!stop.get()) {
 						try {
 							CloseableHttpResponse res = hc.execute( req );
 							long end = System.currentTimeMillis();
@@ -148,10 +121,13 @@ public class CommentWokerThread extends Thread {
 							long llast = last.getAndSet( end );
 							String content = EntityUtils.toString( res.getEntity() ).trim();
 							content = Utils.decodeUnicode( content );
-							//System.out.println( content );
 							res.close();
 							int count = tcount.incrementAndGet();
-							if (count % 10 == 0) {
+							//System.out.println( content );
+							if (count % 1000 == 0) {
+								System.out.println( content );
+							}
+							if (count % 1000 == 0) {
 								System.out.println( "[" + cfg.getTag() + "," + cfg.getSubTag() + "] " + count + " 时间="
 										+ ( end - tbeg ) / 1000 + "秒 间隔="
 										+ ( end - llast ) );
@@ -178,7 +154,6 @@ public class CommentWokerThread extends Thread {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		return stop.get();
 	}
 
 }

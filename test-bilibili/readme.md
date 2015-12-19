@@ -42,7 +42,7 @@ http://space.bilibili.com/ajax/fav/getList?mid=19557513&pagesize=30&fid=19764585
 pagesize最大在70左右
 
 获得评论列表
-http://api.bilibili.com/feedback?page=1&mode=arc&type=json&ver=3&order=default&pagesize=1&aid=3356314
+http://api.bilibili.com/feedback?page=1&mode=arc&type=json&ver=3&order=default&pagesize=1&aid=3393468
 
 获得视频信息
 http://api.bilibili.cn/view?appkey=03fc8eb101b091fb&id=3342515

@@ -9,8 +9,7 @@ public class Sender {
 	public Sender() {
 	}
 
-	public Sender(String ip, int port, int batch, String tag) {
-		super();
+	public Sender(int batch, String tag) {
 		this.ip = ip;
 		this.port = port;
 		this.batch = batch;

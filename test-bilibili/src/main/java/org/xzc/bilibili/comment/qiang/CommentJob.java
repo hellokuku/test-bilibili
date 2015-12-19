@@ -20,6 +20,7 @@ public class CommentJob implements Job {
 		JobDataMap data = context.getTrigger().getJobDataMap();
 		Config c0 = JSON.parseObject( data.getString( ARG_CONFIG ), Config.class );
 		List<Thread> threadList = new ArrayList<Thread>( c0.getSenderList().size() );
+		System.out.println( "开始执行 " + c0 );
 		//根据senderList创建多个子线程去工作
 		try {
 			AtomicBoolean stop = new AtomicBoolean( false );
@@ -36,6 +37,7 @@ public class CommentJob implements Job {
 		}
 		for (Thread t : threadList) {
 			try {
+				System.out.println( "开始等待 "+t );
 				t.join();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
