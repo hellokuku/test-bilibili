@@ -34,26 +34,22 @@ public class CommentRunner {
 		JobDetail commentJob = JobBuilder.newJob( CommentJob.class ).withIdentity( "comment" ).storeDurably().build();
 		s.addJob( commentJob, false );
 		List<Sender> senderList = new ArrayList<Sender>();
-		senderList.add( new Sender( 512, "本机" ) );
-		addJob( s, commentJob, new Config(
-				"落第骑士", 3413825, "最后来一次深夜的一刀修罗. 完结撒花.",
-				new DateTime( 2015, 12, 19, 22, 55 ).toDate(),
-				new DateTime( 2015, 12, 19, 23, 30 ).toDate() ).setSenderList( senderList ) );
+		senderList.add( new Sender( 1024, "本机" ) );
 		addJob( s, commentJob, new Config(
 				"KOWABON", 3413832, "每天吓吓更健康.",
 				new DateTime( 2015, 12, 20, 0, 48 ).toDate(),
 				new DateTime( 2015, 12, 20, 0, 55 ).toDate() ).setSenderList( senderList ) );
 		addJob( s, commentJob, new Config(
 				"点兔", 3413842, "请给我来点智乃.",
-				new DateTime( 2015, 12, 20, 0, 57 ).toDate(),
+				new DateTime( 2015, 12, 20, 0, 58 ).toDate(),
 				new DateTime( 2015, 12, 20, 1, 20 ).toDate() ).setSenderList( senderList ) );
 		addJob( s, commentJob, new Config(
 				"传颂之物", 3413848, "第一季才补完...",
-				new DateTime( 2015, 12, 20, 1, 25 ).toDate(),
+				new DateTime( 2015, 12, 20, 1, 28 ).toDate(),
 				new DateTime( 2015, 12, 20, 1, 50 ).toDate() ).setSenderList( senderList ) );
 		addJob( s, commentJob, new Config(
 				"炽天使", 3413854, "上一集看得太基动了.",
-				new DateTime( 2015, 12, 20, 1, 55 ).toDate(),
+				new DateTime( 2015, 12, 20, 1, 58 ).toDate(),
 				new DateTime( 2015, 12, 20, 2, 25 ).toDate() ).setSenderList( senderList ) );
 		/*
 				List<Sender> senderList2 = new ArrayList<Sender>();

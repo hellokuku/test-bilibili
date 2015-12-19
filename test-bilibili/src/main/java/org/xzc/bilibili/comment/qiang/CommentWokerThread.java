@@ -74,10 +74,10 @@ public class CommentWokerThread extends Thread {
 	}
 
 	private static HttpUriRequest makeCommentRequest(Config cfg) {
-		//String sip = "60.221.255.15"; 113.105.152.207 61.164.47.167 112.25.85.6
-		String sip = "112.25.85.6";
+		//String sip = "60.221.255.15"; 113.105.152.207 61.164.47.167 112.25.85.6 125.39.7.139
+		String sip = "61.164.47.167";
 		return RequestBuilder.get( "http://" + sip + "/feedback/post" )
-				.addHeader( "Cookie", "DedeUserID=19480366; SESSDATA=f3e878e5,1450537949,61e7c5d1;" )
+				.addHeader( "Cookie", "DedeUserID=19480366; SESSDATA=f3e878e5,1451143184,7458bb46;" )
 				.addHeader( "Host", "interface.bilibili.com" )
 				//duruofeixh8
 				//.addHeader( "Cookie", "DedeUserID=19557513; SESSDATA=315c6283,1451014585,d1ef321d;" )
@@ -102,12 +102,13 @@ public class CommentWokerThread extends Thread {
 		CloseableHttpClient hc = hcb.build();
 		System.out.println( cfg.getBatch() );
 		ExecutorService es = Executors.newFixedThreadPool( cfg.getBatch() );
-		work( hc, es );
+		int count = work( hc, es );
+		System.out.println( cfg + " 完成 count=" + count );
 	}
 
 	private static Pattern RESULT_PATTERN = Pattern.compile( "abc\\(\"(.+)\"\\)" );
 
-	private void work(final CloseableHttpClient hc, ExecutorService es) {
+	private int work(final CloseableHttpClient hc, ExecutorService es) {
 		List<Future<?>> futureList = new ArrayList<Future<?>>();
 		final AtomicInteger tcount = new AtomicInteger( 0 );
 		final long tbeg = System.currentTimeMillis();
@@ -136,7 +137,7 @@ public class CommentWokerThread extends Thread {
 							Matcher m = RESULT_PATTERN.matcher( content );
 							if (m.find()) {
 								String code = m.group( 1 );
-								if ("OK".equals( code ) || code.contains( "验证码" )) {
+								if ("OK".equals( code ) || code.contains( "验证码" ) || code.contains( "禁言" )) {
 									stop.set( true );
 								}
 							}
@@ -155,6 +156,7 @@ public class CommentWokerThread extends Thread {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+		return tcount.get();
 	}
 
 }
