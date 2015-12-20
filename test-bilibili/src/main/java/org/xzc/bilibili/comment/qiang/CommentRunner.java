@@ -32,7 +32,7 @@ public class CommentRunner {
 		JobDetail commentJob = JobBuilder.newJob( CommentJob.class ).withIdentity( "comment" ).storeDurably().build();
 		s.addJob( commentJob, false );
 		//String sip = "60.221.255.15"; 113.105.152.207 61.164.47.167 112.25.85.6 125.39.7.139
-		Config c0 = new Config( "tag", "61.164.47.167", "19480366", "f3e878e5,1451143184,7458bb46", 1024,
+		Config c0 = new Config( "tag", "112.25.85.6", "19480366", "f3e878e5,1451143184,7458bb46", 1024,
 				1000, true,
 				0, "msg", null, null );
 		addJob( s, commentJob, c0.custom( "小森", 3420289, "小森,大谷,完结后快去领证.",
