@@ -1,20 +1,28 @@
 package org.xzc.bilibili.comment.qiang;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 public class Config {
 	private int aid;
 	private String msg;
-	private String proxyHost;
-	private int proxyPort;
 	private String tag;
-	private String subTag;
-	private List<Sender> senderList = new ArrayList<Sender>();
 	private int batch;
 	private Date endAt;
 	private Date startAt;
+	private String sip;
+	private String DedeUserID;
+	private String SESSDATA;
+	private int interval;
+	private boolean stopWhenForbidden;
+
+	public boolean isStopWhenForbidden() {
+		return stopWhenForbidden;
+	}
+
+	public Config setStopWhenForbidden(boolean stopWhenForbidden) {
+		this.stopWhenForbidden = stopWhenForbidden;
+		return this;
+	}
 
 	public Date getStartAt() {
 		return startAt;
@@ -28,16 +36,26 @@ public class Config {
 		// this(null, 0, 0, null, null, 0);
 	}
 
-	public Config(String tag, int aid, String msg, Date startAt, Date endAt) {
+	public Config(String tag, String sip, String DedeUserID, String SESSDATA, int batch, int interval,
+			boolean stopWhenForbidden,
+			int aid, String msg,
+			Date startAt, Date endAt) {
 		this.tag = tag;
+		this.sip = sip;
+		this.DedeUserID = DedeUserID;
+		this.SESSDATA = SESSDATA;
+		this.batch = batch;
+		this.interval = interval;
+		this.stopWhenForbidden = stopWhenForbidden;
 		this.aid = aid;
 		this.msg = msg;
 		this.startAt = startAt;
 		this.endAt = endAt;
 	}
 
-	public Config copy() {
-		return new Config( tag, aid, msg, startAt, endAt );
+	public Config custom(String tag, int aid, String msg, Date startAt, Date endAt) {
+		return new Config( tag, sip, DedeUserID, SESSDATA, batch, interval, stopWhenForbidden, aid, msg, startAt,
+				endAt );
 	}
 
 	public int getAid() {
@@ -54,22 +72,6 @@ public class Config {
 
 	public String getMsg() {
 		return msg;
-	}
-
-	public String getProxyHost() {
-		return proxyHost;
-	}
-
-	public int getProxyPort() {
-		return proxyPort;
-	}
-
-	public List<Sender> getSenderList() {
-		return senderList;
-	}
-
-	public String getSubTag() {
-		return subTag;
 	}
 
 	public String getTag() {
@@ -96,35 +98,51 @@ public class Config {
 		return this;
 	}
 
-	public Config setProxyHost(String proxyHost) {
-		this.proxyHost = proxyHost;
-		return this;
-	}
-
-	public Config setProxyPort(int proxyPort) {
-		this.proxyPort = proxyPort;
-		return this;
-	}
-
-	public Config setSenderList(List<Sender> senderList) {
-		this.senderList = senderList;
-		return this;
-	}
-
-	public Config setSubTag(String subTag) {
-		this.subTag = subTag;
-		return this;
-	}
-
 	public Config setTag(String tag) {
 		this.tag = tag;
 		return this;
 	}
 
+	public String getSip() {
+		return sip;
+	}
+
+	public Config setSip(String sip) {
+		this.sip = sip;
+		return this;
+	}
+
+	public String getDedeUserID() {
+		return DedeUserID;
+	}
+
+	public Config setDedeUserID(String dedeUserID) {
+		DedeUserID = dedeUserID;
+		return this;
+	}
+
+	public String getSESSDATA() {
+		return SESSDATA;
+	}
+
+	public Config setSESSDATA(String sESSDATA) {
+		SESSDATA = sESSDATA;
+		return this;
+	}
+
+	public int getInterval() {
+		return interval;
+	}
+
+	public Config setInterval(int interval) {
+		this.interval = interval;
+		return this;
+	}
+
 	@Override
 	public String toString() {
-		return "Config [aid=" + aid + ", msg=" + msg + ", proxyHost=" + proxyHost + ", proxyPort=" + proxyPort
-				+ ", tag=" + tag + ", subTag=" + subTag + ", senderList=" + senderList + ", batch=" + batch + "]";
+		return "Config [aid=" + aid + ", msg=" + msg + ", tag=" + tag + ", batch=" + batch + ", endAt=" + endAt
+				+ ", startAt=" + startAt + "]";
 	}
 
 }
