@@ -53,7 +53,7 @@ public class CommentRunner {
 		addJob( s, commentJob, c0.custom( "一拳超人", 3407473, "测试测试",
 				new DateTime().plusSeconds( 0 ).toDate(),
 				new DateTime().plusSeconds( 122 ).toDate() ).setStopWhenForbidden( false ).setInterval( 1 )
-				.setBatch( 1 ) );
+				.setBatch( 1024 ) );
 		System.out.println( "现在的时间是 " + DateTime.now().toString( "yyyy年MM月dd日 HH时mm分ss秒" ) );
 	}
 }
