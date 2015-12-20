@@ -31,26 +31,13 @@ public class CommentRunner {
 		s.start();
 		JobDetail commentJob = JobBuilder.newJob( CommentJob.class ).withIdentity( "comment" ).storeDurably().build();
 		s.addJob( commentJob, false );
-		/*
-				List<Sender> senderList2 = new ArrayList<Sender>();
-				senderList2.add( new Sender( 1, "本机" ) );
-				addJob( s, commentJob, new Config(
-						"终物语", 3413894, "卡米亚的声音真心好听, 完结撒花.",
-						new DateTime().toDate(),
-						new DateTime( 2015, 12, 20, 10, 0 ).toDate() ).setSenderList( senderList2 ) );
-		*/
-
 		//String sip = "60.221.255.15"; 113.105.152.207 61.164.47.167 112.25.85.6 125.39.7.139
-		Config c0 = new Config( "tag", "61.164.47.167", "DedeUserID", "SESSDATA", 512, 1000, true, 0, "msg", null,
+		Config c0 = new Config( "tag", "61.164.47.167", "19480366", "f3e878e5,1451143184,7458bb46", 512, 1000, true, 0,
+				"msg", null,
 				null );
 		addJob( s, commentJob, c0.custom( "一拳超人", 3407473, "测试测试",
 				new DateTime().plusSeconds( 1 ).toDate(),
 				new DateTime().plusSeconds( 10 ).toDate() )
 				.setStopWhenForbidden( false ) );
-		addJob( s, commentJob, c0.custom( "一拳超人", 3407473, "测试测试",
-				new DateTime().plusSeconds( 12 ).toDate(),
-				new DateTime().plusSeconds( 20 ).toDate() )
-				.setStopWhenForbidden( false ) );
 	}
-
 }
