@@ -99,6 +99,11 @@ public class CommentWoker {
 								stop.set( true );
 							long llast = last.getAndSet( end );
 							String content = EntityUtils.toString( res.getEntity() ).trim();
+							if (content.length() > 100) {
+								//丢包了
+								res.close();
+								continue;
+							}
 							content = Utils.decodeUnicode( content );
 							res.close();
 							int count = tcount.incrementAndGet();
