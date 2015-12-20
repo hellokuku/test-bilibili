@@ -41,11 +41,8 @@ public class CommentWoker {
 
 	private static HttpUriRequest makeCommentRequest(Config cfg) {
 		return RequestBuilder.get( "http://" + cfg.getSip() + "/feedback/post" )
-				//.addHeader( "Cookie", "DedeUserID=19480366; SESSDATA=f3e878e5,1451143184,7458bb46;" )
 				.addHeader( "Cookie", "DedeUserID=" + cfg.getDedeUserID() + "; SESSDATA=" + cfg.getSESSDATA() + ";" )
 				.addHeader( "Host", "interface.bilibili.com" )
-				//duruofeixh8
-				//.addHeader( "Cookie", "DedeUserID=19557513; SESSDATA=315c6283,1451014585,d1ef321d;" )
 				.addParameter( "callback", "abc" )
 				.addParameter( "aid", Integer.toString( cfg.getAid() ) ).addParameter( "msg", cfg.getMsg() )
 				.addParameter( "action", "send" )

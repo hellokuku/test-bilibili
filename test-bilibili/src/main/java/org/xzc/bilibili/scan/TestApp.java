@@ -243,7 +243,7 @@ public class TestApp {
 	@Test
 	public void 持续跟进最新的视频() throws Exception {
 		Utils.blockUntil( "持续跟进最新的视频", new DateTime( 2015, 12, 18, 2, 40 ), 60000 );
-		//acwt.start();
+		acwt.start();
 		int batch = 50;//每次检测50个aid
 		int aid = db.getMaxAid( 3349048 ) + 1;//aid起点
 		while (true) {

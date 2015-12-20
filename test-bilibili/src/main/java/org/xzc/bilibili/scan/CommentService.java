@@ -54,7 +54,7 @@ public class CommentService {
 			return "UP主确实厉害啊， 每周都有得看， 太感谢你了。";
 		}
 		if (v.typeid == 15 && v.title.contains( "监狱学园" )) {
-			return "这个动画和真人版真心非常不错。希望动画第二季继续啊！";
+			return "这个动画和真人版真心非常不错。希望动画和真人版都第二季继续啊！";
 		}
 		//return "第一第一" + 重复( '!' ) + " 来支持一下视频" + 重复( '.' );
 		return null;
