@@ -112,9 +112,10 @@ public class CommentWoker {
 							//System.out.println( content );
 							if (count % interval == 0) {
 								System.out.println( content );
-								System.out.println( "[" + cfg.getTag() + "] " + count + " 时间="
-										+ ( end - tbeg ) / 1000 + "秒 间隔="
-										+ ( end - llast ) );
+								System.out
+										.println( "[" + cfg.getTag() + "] count=" + count + " diu=" + tdiu.get() + " 时间="
+												+ ( end - tbeg ) / 1000 + "秒 间隔="
+												+ ( end - llast ) );
 							}
 							Matcher m = RESULT_PATTERN.matcher( content );
 							if (m.find()) {
