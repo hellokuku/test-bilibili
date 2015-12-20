@@ -67,12 +67,13 @@ public class CommentWoker {
 				.setConnectionManager( p )
 				.build();
 		ExecutorService es = Executors.newFixedThreadPool( cfg.getBatch() );
-		int count = 0;
+		AtomicInteger tcount = new AtomicInteger( 0 );
+		AtomicInteger tdiu = new AtomicInteger( 0 );
 		try {
 			System.out.println( "开始执行 " + cfg );
-			count = work( hc, es );
+			work( hc, es, tcount, tdiu );
 		} finally {
-			System.out.println( cfg.getTag() + " 执行完毕! count=" + count );
+			System.out.println( cfg.getTag() + " 执行完毕! count=" + tcount.get() + " diu=" + tdiu.get() );
 			es.shutdown();
 			p.close();
 			HttpClientUtils.closeQuietly( hc );
@@ -81,9 +82,9 @@ public class CommentWoker {
 
 	private static Pattern RESULT_PATTERN = Pattern.compile( "abc\\(\"(.+)\"\\)" );
 
-	private int work(final CloseableHttpClient hc, ExecutorService es) {
+	private void work(final CloseableHttpClient hc, ExecutorService es, final AtomicInteger tcount,
+			final AtomicInteger tdiu) {
 		List<Future<?>> futureList = new ArrayList<Future<?>>();
-		final AtomicInteger tcount = new AtomicInteger( 0 );
 		final long tbeg = System.currentTimeMillis();
 		final long endAt = cfg.getEndAt().getTime();
 		final int interval = cfg.getInterval();
@@ -100,6 +101,7 @@ public class CommentWoker {
 							long llast = last.getAndSet( end );
 							String content = EntityUtils.toString( res.getEntity() ).trim();
 							if (content.length() > 100) {
+								tdiu.incrementAndGet();
 								//丢包了
 								res.close();
 								continue;
@@ -142,7 +144,6 @@ public class CommentWoker {
 				e.printStackTrace();
 			}
 		futureList.clear();
-		return tcount.get();
 	}
 
 }
