@@ -19,6 +19,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.client.utils.HttpClientUtils;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -71,7 +72,7 @@ public class CommentWoker {
 			System.out.println( "开始执行 " + cfg );
 			count = work( hc, es );
 		} finally {
-			System.out.println( cfg + " 执行完毕! count=" + count );
+			System.out.println( cfg.getTag() + " 执行完毕! count=" + count );
 			es.shutdown();
 			p.close();
 			HttpClientUtils.closeQuietly( hc );
@@ -116,6 +117,8 @@ public class CommentWoker {
 									stop.set( true );
 								}
 							}
+						} catch (ConnectTimeoutException ex) {
+							//忽略
 						} catch (SocketTimeoutException ex) {
 							//忽略
 						} catch (Exception ex) {
