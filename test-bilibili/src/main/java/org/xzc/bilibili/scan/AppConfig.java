@@ -29,15 +29,15 @@ public class AppConfig {
 	@Bean(name = "simpleBilibiliService")
 	public BilibiliService simpleBilibiliService() {
 		//2015-12-14 10:08 xuzhichaoxh1@163.com
-		Account a = new Account( 19216452, "704fe3e6,1450788690,9bc262e4" );
+		Account a = new Account( 19216452, "704fe3e6,1451314068,c4d56f5e" );
 		BilibiliService bs = new BilibiliService( a, proxyHost, port );
 		return bs;
 	}
 
 	@Bean(name = "mainBilibiliService")
 	public BilibiliService mainBilibiliService() {
-		//duruofeixh1@163.com
-		Account a = new Account( 19539291, "73c2bd41,1450787705,761f369a" );
+		//duruofeixh4@163.com
+		Account a = new Account( 19539291, "73c2bd41,1451314198,b861fec0" );
 		BilibiliService bs = new BilibiliService( a, proxyHost, port );
 		return bs;
 	}
@@ -45,7 +45,7 @@ public class AppConfig {
 	@Bean(name = "commentHelperBilibiliService")
 	public BilibiliService commentHelperBilibiliService() {
 		//duruofeixh2@163.com
-		Account a = new Account( 19534281, "ad87375f,1451264731,7e016250" );
+		Account a = new Account( 19534281, "ad87375f,1451314246,d36e1145" );
 		BilibiliService bs = new BilibiliService( a, proxyHost, port );
 		return bs;
 	}
@@ -53,7 +53,7 @@ public class AppConfig {
 	@Bean(name = "testBilibiliService")
 	public BilibiliService testBilibiliService() {
 		// duruofeixh3@163.com
-		Account a = new Account( 19539141, "5609edf4,1450665642,f2c0edc0" );
+		Account a = new Account( 19539141, "5609edf4,1451314280,439316e9" );
 		BilibiliService bs = new BilibiliService( a, proxyHost, port );
 		return bs;
 	}
