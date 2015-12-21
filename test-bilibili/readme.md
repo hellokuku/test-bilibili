@@ -13,7 +13,7 @@ duruofeixh6@163.com access_key=c33da748da58b980a3089d8001f2ff2c
 duruofeixh7@163.com d89fa82e6dec663949f89abdf56d8ad1
 
 
-http://space.bilibili.com/ajax/member/GetInfo?mid=1643718
+http://space.bilibili.com/ajax/member/GetInfo?mid=19539291
 http://api.bilibili.cn/userinfo?user=xuzhichaoxh1
 
 

@@ -242,7 +242,7 @@ public class CommentWoker {
 														+ ( end - tbeg ) / 1000 + "秒 间隔="
 														+ ( end - llast ) );
 							}
-							if (code == 0) {//成功
+							if (code == 0 || code == -105) {//成功 -105是验证码问题
 								stop.set( true );
 							} else if (code == -404) {//还不可评论
 							} else if (code == -503) {//超速
