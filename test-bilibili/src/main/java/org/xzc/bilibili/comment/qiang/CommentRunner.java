@@ -39,12 +39,12 @@ public class CommentRunner {
 		//基于api的两个字段
 		//线程 间隔 禁言是否停止
 		//aid 消息 开始时间 结束时间
-		int mode = 1;
+		int mode = 0;
 		if (mode == 0) {
 			Config c0 = new Config( 0, "61.164.47.167",
 					"19480366", "f3e878e5,1451143184,7458bb46", // xzchao xuzhichaoxh3@163.com
 					"19997766", "454ba9153a48adeb7fc170806aadbd2c", // jzxcai bzhxh1@sina.com
-					512, 1000, true,
+					1024, 1000, true,
 					"tag", 0, "msg", null, null );
 			//for 0
 			addJob( s, commentJob, c0.custom( "高校星歌剧12", 3426180, "还给我麦克风.",

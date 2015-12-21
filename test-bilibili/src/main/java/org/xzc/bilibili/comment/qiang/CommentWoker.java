@@ -1,5 +1,6 @@
 package org.xzc.bilibili.comment.qiang;
 
+import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -189,11 +190,9 @@ public class CommentWoker {
 									stop.set( true );
 								}
 							}
-						} catch (ConnectTimeoutException ex) {
+						} catch (IOException ex) {
 							//忽略
-						} catch (SocketTimeoutException ex) {
-							//忽略
-						} catch (Exception ex) {
+						} catch (Exception ex) {//其他异常就打印一下
 							ex.printStackTrace();
 						}
 					}
