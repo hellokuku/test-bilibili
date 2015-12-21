@@ -33,10 +33,9 @@ public class CommentRunner {
 		s.addJob( commentJob, false );
 		// 60.221.255.15 113.105.152.207 61.164.47.167 112.25.85.6 125.39.7.139
 		//125.39.7.139 106.39.192.38  14.152.58.20 218.76.137.149 183.247.180.15
-		Config c0 = new Config( "tag", "61.164.47.167", "19480366", "f3e878e5,1451143184,7458bb46", 512,
-				//Config c0 = new Config( "tag", "61.164.47.167", "19557513", "315c6283,1451220847,814dab29", 1024,
-				1000, true,
-				0, "msg", null, null );
+		Config c0 = new Config( 1, "tag", "61.164.47.167", "19997766", "f3e878e5,1451143184,7458bb46",
+				"454ba9153a48adeb7fc170806aadbd2c",
+				512, 1000, true, 0, "msg", null, null );
 		/*
 		addJob( s, commentJob, c0.custom( "测试测试", 3381920, "坐等12集更新.",
 				new DateTime().plusSeconds( 0 ).toDate(),
@@ -45,7 +44,7 @@ public class CommentRunner {
 		*/
 		addJob( s, commentJob, c0.custom( "一拳超人", 3407473, "测试测试",
 				new DateTime().plusSeconds( 0 ).toDate(),
-				new DateTime().plusSeconds( 10 ).toDate() ).setBatch( 1 ).setInterval( 1 ) );
+				new DateTime().plusSeconds( 36000 ).toDate() ).setBatch( 4 ).setInterval( 1 ) );
 
 		System.out.println( "现在的时间是 " + DateTime.now().toString( "yyyy年MM月dd日 HH时mm分ss秒" ) );
 	}
