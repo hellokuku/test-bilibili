@@ -69,16 +69,16 @@ public class CommentRunner {
 					8, 500, true,
 					"tag", 0, "msg", null, null );
 			//for 1
-			addJob( s, commentJob, c1.custom( "高校星歌剧12", 3426180, "还给我麦克风.",
+			addJob( s, commentJob, c1.custom( "高校星歌剧12", 3426180, "(＾－＾)V",
 					new DateTime( 2015, 12, 21, 23, 58, 0 ).toDate(),
 					new DateTime( 2015, 12, 22, 0, 3, 20 ).toDate() ) );
-			addJob( s, commentJob, c1.custom( "JK做饭", 3426189, "然而还没有完结.",
+			addJob( s, commentJob, c1.custom( "JK做饭", 3426189, "\\(^o^)/~",
 					new DateTime( 2015, 12, 22, 0, 3, 30 ).toDate(),
 					new DateTime( 2015, 12, 22, 0, 12 ).toDate() ) );
-			addJob( s, commentJob, c1.custom( "网球并不可笑嘛", 3426213, "语速如此之快, 完结撒花.",
+			addJob( s, commentJob, c1.custom( "网球并不可笑嘛", 3426213, "\\(^o^)/YES!",
 					new DateTime( 2015, 12, 22, 0, 13 ).toDate(),
 					new DateTime( 2015, 12, 22, 0, 25 ).toDate() ) );
-			addJob( s, commentJob, c1.custom( "动画锻炼11", 3426217, "身体已经如此虚弱, 还是要看动画锻炼！EX.",
+			addJob( s, commentJob, c1.custom( "动画锻炼11", 3426217, "Y(^o^)Y",
 					new DateTime( 2015, 12, 22, 1, 3 ).toDate(),
 					new DateTime( 2015, 12, 22, 1, 20 ).toDate() ) );
 			addJob( s, commentJob, c1.custom( "一拳超人", 3407473, "测试测试测试测试",
