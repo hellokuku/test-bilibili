@@ -30,6 +30,7 @@ http://api.bilibili.com/favourite/add?id=3335348
 
 获取用户信息
 http://api.bilibili.com/userinfo?user=xzchaooDRF8
+http://api.bilibili.com/userinfo?mid=19480366
 http://api.bilibili.com/myinfo?access_key=5be9b8caed10c4cfe1e34bed8b3d247c
 
 获取用户的收藏夹

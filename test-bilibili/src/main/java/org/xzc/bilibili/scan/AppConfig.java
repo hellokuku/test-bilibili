@@ -45,7 +45,7 @@ public class AppConfig {
 	@Bean(name = "commentHelperBilibiliService")
 	public BilibiliService commentHelperBilibiliService() {
 		//duruofeixh2@163.com
-		Account a = new Account( 19534281, "ad87375f,1450611219,2e864721" );
+		Account a = new Account( 19534281, "ad87375f,1451264731,7e016250" );
 		BilibiliService bs = new BilibiliService( a, proxyHost, port );
 		return bs;
 	}
