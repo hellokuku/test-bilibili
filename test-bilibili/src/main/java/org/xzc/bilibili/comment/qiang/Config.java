@@ -13,55 +13,15 @@ public class Config {
 	private String DedeUserID;
 	private String mid;
 	private String accessKey;
-
-	public String getMid() {
-		return mid;
-	}
-
-	public Config setMid(String mid) {
-		this.mid = mid;
-		return this;
-	}
-
-	public String getAccessKey() {
-		return accessKey;
-	}
-
-	public Config setAccessKey(String accessKey) {
-		this.accessKey = accessKey;
-		return this;
-	}
-
-	public int getMode() {
-		return mode;
-	}
-
-	public Config setMode(int mode) {
-		this.mode = mode;
-		return this;
-	}
+	private boolean diu;
 
 	private String SESSDATA;
+
 	private int interval;
+
 	private boolean stopWhenForbidden;
+
 	private int mode;
-
-	public boolean isStopWhenForbidden() {
-		return stopWhenForbidden;
-	}
-
-	public Config setStopWhenForbidden(boolean stopWhenForbidden) {
-		this.stopWhenForbidden = stopWhenForbidden;
-		return this;
-	}
-
-	public Date getStartAt() {
-		return startAt;
-	}
-
-	public void setStartAt(Date startAt) {
-		this.startAt = startAt;
-	}
 
 	public Config() {
 		// this(null, 0, 0, null, null, 0);
@@ -71,7 +31,7 @@ public class Config {
 			int mode, String sip,
 			String DedeUserID, String SESSDATA,
 			String mid, String accessKey,
-			int batch, int interval, boolean stopWhenForbidden,
+			int batch, int interval, boolean stopWhenForbidden, boolean diu,
 			String tag, int aid, String msg, Date startAt, Date endAt) {
 
 		this.mode = mode;
@@ -86,6 +46,7 @@ public class Config {
 		this.batch = batch;
 		this.interval = interval;
 		this.stopWhenForbidden = stopWhenForbidden;
+		this.diu = diu;
 
 		this.tag = tag;
 		this.aid = aid;
@@ -99,28 +60,70 @@ public class Config {
 				mode, sip,
 				DedeUserID, SESSDATA,
 				mid, accessKey,
-				batch, interval, stopWhenForbidden,
+				batch, interval, stopWhenForbidden, diu,
 				tag, aid, msg, startAt, endAt );
 	}
-
+	public String getAccessKey() {
+		return accessKey;
+	}
 	public int getAid() {
 		return aid;
 	}
-
 	public int getBatch() {
 		return batch;
+	}
+
+	public String getDedeUserID() {
+		return DedeUserID;
 	}
 
 	public Date getEndAt() {
 		return endAt;
 	}
 
+	public int getInterval() {
+		return interval;
+	}
+
+	public String getMid() {
+		return mid;
+	}
+
+	public int getMode() {
+		return mode;
+	}
+
 	public String getMsg() {
 		return msg;
 	}
 
+	public String getSESSDATA() {
+		return SESSDATA;
+	}
+
+	public String getSip() {
+		return sip;
+	}
+
+	public Date getStartAt() {
+		return startAt;
+	}
+
 	public String getTag() {
 		return tag;
+	}
+
+	public boolean isDiu() {
+		return diu;
+	}
+
+	public boolean isStopWhenForbidden() {
+		return stopWhenForbidden;
+	}
+
+	public Config setAccessKey(String accessKey) {
+		this.accessKey = accessKey;
+		return this;
 	}
 
 	public Config setAid(int aid) {
@@ -133,8 +136,33 @@ public class Config {
 		return this;
 	}
 
+	public Config setDedeUserID(String dedeUserID) {
+		DedeUserID = dedeUserID;
+		return this;
+	}
+
+	public Config setDiu(boolean diu) {
+		this.diu = diu;
+		return this;
+	}
+
 	public Config setEndAt(Date endAt) {
 		this.endAt = endAt;
+		return this;
+	}
+
+	public Config setInterval(int interval) {
+		this.interval = interval;
+		return this;
+	}
+
+	public Config setMid(String mid) {
+		this.mid = mid;
+		return this;
+	}
+
+	public Config setMode(int mode) {
+		this.mode = mode;
 		return this;
 	}
 
@@ -143,13 +171,9 @@ public class Config {
 		return this;
 	}
 
-	public Config setTag(String tag) {
-		this.tag = tag;
+	public Config setSESSDATA(String sESSDATA) {
+		SESSDATA = sESSDATA;
 		return this;
-	}
-
-	public String getSip() {
-		return sip;
 	}
 
 	public Config setSip(String sip) {
@@ -157,30 +181,17 @@ public class Config {
 		return this;
 	}
 
-	public String getDedeUserID() {
-		return DedeUserID;
+	public void setStartAt(Date startAt) {
+		this.startAt = startAt;
 	}
 
-	public Config setDedeUserID(String dedeUserID) {
-		DedeUserID = dedeUserID;
+	public Config setStopWhenForbidden(boolean stopWhenForbidden) {
+		this.stopWhenForbidden = stopWhenForbidden;
 		return this;
 	}
 
-	public String getSESSDATA() {
-		return SESSDATA;
-	}
-
-	public Config setSESSDATA(String sESSDATA) {
-		SESSDATA = sESSDATA;
-		return this;
-	}
-
-	public int getInterval() {
-		return interval;
-	}
-
-	public Config setInterval(int interval) {
-		this.interval = interval;
+	public Config setTag(String tag) {
+		this.tag = tag;
 		return this;
 	}
 

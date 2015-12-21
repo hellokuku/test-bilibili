@@ -154,6 +154,7 @@ public class CommentWoker {
 		final long endAt = cfg.getEndAt().getTime();
 		final int interval = cfg.getInterval();
 		final boolean stopWhenForbidden = cfg.isStopWhenForbidden();
+		final boolean diu = cfg.isDiu();
 		for (int ii = 0; ii < cfg.getBatch(); ++ii) {
 			Future<?> f = es.submit( new Callable<Void>() {
 				public Void call() throws Exception {
@@ -165,7 +166,7 @@ public class CommentWoker {
 								stop.set( true );
 							long llast = last.getAndSet( end );
 							String content = EntityUtils.toString( res.getEntity() ).trim();
-							if (content.length() > 100) {
+							if (diu && content.length() > 100) {
 								tdiu.incrementAndGet();
 								//丢包了
 								res.close();
