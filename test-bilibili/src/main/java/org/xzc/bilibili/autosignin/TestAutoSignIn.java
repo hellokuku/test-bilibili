@@ -104,6 +104,14 @@ public class TestAutoSignIn {
 	}
 
 	@Test
+	public void add() throws SQLException {
+		AccountForAutoSignIn a = new AccountForAutoSignIn();
+		a.userid = "bzhxh1@sina.com";
+		a.password = "a";
+		String access_key = login( hc, a );
+		System.out.println( access_key );
+	}
+
 	public void test11() throws Exception {
 		List<AccountForAutoSignIn> list = dao.queryForAll();
 		for (AccountForAutoSignIn a : list) {

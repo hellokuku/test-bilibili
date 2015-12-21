@@ -2,7 +2,10 @@ package org.xzc.bilibili.comment.qiang;
 
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -13,8 +16,10 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.http.NameValuePair;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
@@ -23,7 +28,9 @@ import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.xzc.bilibili.util.Sign;
 import org.xzc.bilibili.util.Utils;
 
 public class CommentWoker {
@@ -36,10 +43,35 @@ public class CommentWoker {
 		this.cfg = cfg;
 		this.stop = new AtomicBoolean( false );
 		//这里为了节省资源 而将它做成一个成员变量
-		this.req = makeCommentRequest( cfg );
+		this.req = makeCommentRequest2( cfg );
 		this.last = new AtomicLong( 0 );
 	}
 
+	private static HttpUriRequest makeCommentRequest2(Config cfg) {
+		Map<String, String> params = new HashMap<String, String>();
+		params.put( "access_key", "454ba9153a48adeb7fc170806aadbd2c" );
+		params.put( "appkey", "c1b107428d337928" );
+		params.put( "platform", "android" );
+		params.put( "_device", "android" );
+		params.put( "aid", Integer.toString( cfg.getAid() ) );
+		Sign s = new Sign( params );
+		params.put( "sign", s.getSign() );
+		UrlEncodedFormEntity entity = null;
+		List<NameValuePair> list = new ArrayList<NameValuePair>();
+		list.add( new BasicNameValuePair( "msg", cfg.getMsg() ) );
+		list.add( new BasicNameValuePair( "mid", "19997766" ) );
+		try {
+			entity = new UrlEncodedFormEntity( list, "utf-8" );
+		} catch (Exception ex) {
+		}
+		RequestBuilder rb = RequestBuilder.post( "http://api.bilibili.com/feedback/post" ).setEntity( entity );
+		rb.addHeader( "User-Agent","Mozilla/5.0 BiliDroid/3.3.0 (bbcallen@gmail.com)" );
+		for (Entry<String, String> e : params.entrySet()) {
+			rb.addParameter( e.getKey(), e.getValue() );
+		}
+		return rb.build();
+	}
+	
 	private static HttpUriRequest makeCommentRequest(Config cfg) {
 		return RequestBuilder.get( "http://" + cfg.getSip() + "/feedback/post" )
 				.addHeader( "Cookie", "DedeUserID=" + cfg.getDedeUserID() + "; SESSDATA=" + cfg.getSESSDATA() + ";" )
@@ -100,12 +132,12 @@ public class CommentWoker {
 								stop.set( true );
 							long llast = last.getAndSet( end );
 							String content = EntityUtils.toString( res.getEntity() ).trim();
-							if (content.length() > 100) {
+							/*if (content.length() > 100) {
 								tdiu.incrementAndGet();
 								//丢包了
 								res.close();
 								continue;
-							}
+							}*/
 							content = Utils.decodeUnicode( content );
 							res.close();
 							int count = tcount.incrementAndGet();

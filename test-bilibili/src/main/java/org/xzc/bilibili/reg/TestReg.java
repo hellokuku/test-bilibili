@@ -10,7 +10,9 @@ public class TestReg {
 	@Test
 	public void test1() throws Exception {
 		List<String[]> list = new ArrayList<String[]>();
-		list.add( new String[] { "19752845", "ed4d7491%2C1481871559%2C4915ad08" } );
+		list.add( new String[] { "19997766", "bc2f0737%2C1482199747%2C17f88d16" } );
+		list.add( new String[] { "19997827", "e4357dd0%2C1482199857%2Cae6f4a86" } );
+		list.add( new String[] { "19997736", "9f8ee641%2C1482199682%2Cb62922e8" } );
 		for (String[] ss : list) {
 			RegService rs = new RegService( ss[0], ss[1] );
 			boolean ok = rs.isOK();
