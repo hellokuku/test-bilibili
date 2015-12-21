@@ -103,7 +103,7 @@ public class CommentWoker {
 		PoolingHttpClientConnectionManager p = new PoolingHttpClientConnectionManager();
 		p.setMaxTotal( cfg.getBatch() * 4 );
 		p.setDefaultMaxPerRoute( cfg.getBatch() );
-		int timeout = 10000;
+		int timeout = 2000;
 		RequestConfig rc = RequestConfig.custom()
 				.setCookieSpec( CookieSpecs.IGNORE_COOKIES )
 				.setConnectionRequestTimeout( timeout )

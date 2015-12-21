@@ -39,7 +39,7 @@ public class CommentRunner {
 		//基于api的两个字段
 		//线程 间隔 禁言是否停止
 		//aid 消息 开始时间 结束时间
-		int mode = 0;
+		int mode = 1;
 		if (mode == 0) {
 			Config c0 = new Config( 0, "112.25.85.6",
 					"19480366", "f3e878e5,1451143184,7458bb46", // xzchao xuzhichaoxh3@163.com
@@ -61,12 +61,12 @@ public class CommentRunner {
 					new DateTime( 2015, 12, 22, 1, 12 ).toDate() ) );
 			addJob( s, commentJob, c0.custom( "一拳超人", 3407473, "测试测试测试测试",
 					new DateTime().plusSeconds( 0 ).toDate(),
-					new DateTime().plusSeconds( 122 ).toDate() ) );
+					new DateTime().plusSeconds( 100 ).toDate() ) );
 		} else {
 			Config c1 = new Config( 1, "61.164.47.167",
 					"19480366", "f3e878e5,1451143184,7458bb46", // xzchao xuzhichaoxh3@163.com
 					"19997766", "454ba9153a48adeb7fc170806aadbd2c", // jzxcai bzhxh1@sina.com
-					8, 500, true, true,
+					16, 500, true, true,
 					"tag", 0, "msg", null, null );
 			//for 1
 			addJob( s, commentJob, c1.custom( "高校星歌剧12", 3426180, "(＾－＾)V",
@@ -83,7 +83,7 @@ public class CommentRunner {
 					new DateTime( 2015, 12, 22, 1, 20 ).toDate() ) );
 			addJob( s, commentJob, c1.custom( "一拳超人", 3407473, "测试测试测试测试",
 					new DateTime().plusSeconds( 0 ).toDate(),
-					new DateTime().plusSeconds( 10 ).toDate() ).setInterval( 100 ) );
+					new DateTime().plusSeconds( 100 ).toDate() ).setInterval( 1 ) );
 		}
 		/*
 		 */
