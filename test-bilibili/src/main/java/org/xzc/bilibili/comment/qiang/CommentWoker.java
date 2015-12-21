@@ -230,7 +230,9 @@ public class CommentWoker {
 							content = Utils.decodeUnicode( content );
 							res.close();
 							int count = tcount.incrementAndGet();
-							if (count % interval == 0) {
+							JSONObject json = JSON.parseObject( content );
+							int code = json.getIntValue( "code" );
+							if (count % interval == 0 || ( code != 0 && code != -404 && code != -503 )) {
 								System.out.println( content );
 								System.out
 										.println(
@@ -238,12 +240,14 @@ public class CommentWoker {
 														+ ( end - tbeg ) / 1000 + "秒 间隔="
 														+ ( end - llast ) );
 							}
-							JSONObject json = JSON.parseObject( content );
-							int code = json.getIntValue( "code" );
 							if (code == 0) {//成功
 								stop.set( true );
 							} else if (code == -404) {//还不可评论
 							} else if (code == -503) {//超速
+								overspeed.set( true );
+							} else if (code == -103) {
+								//{"code":-103,"message":"Credits is not enought.","ts":1450673739}
+								//该怎么解决?
 								overspeed.set( true );
 							} else {
 								System.out.println( "遇到其他情况" );
