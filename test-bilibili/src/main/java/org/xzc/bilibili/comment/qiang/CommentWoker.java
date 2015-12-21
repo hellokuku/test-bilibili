@@ -63,21 +63,23 @@ public class CommentWoker {
 	private static HttpUriRequest makeCommentRequest1(Config cfg) {
 		Map<String, String> params = new HashMap<String, String>();
 		params.put( "access_key", cfg.getAccessKey() );
-		params.put( "appkey", "c1b107428d337928" );
+		params.put( "appkey", Sign.appkey );
 		params.put( "platform", "android" );
 		params.put( "_device", "android" );
+		params.put( "type", "json" );
 		params.put( "aid", Integer.toString( cfg.getAid() ) );
 		Sign s = new Sign( params );
 		params.put( "sign", s.getSign() );
 		UrlEncodedFormEntity entity = null;
 		List<NameValuePair> list = new ArrayList<NameValuePair>();
 		list.add( new BasicNameValuePair( "msg", cfg.getMsg() ) );
-		list.add( new BasicNameValuePair( "mid", cfg.getDedeUserID() ) );
+		list.add( new BasicNameValuePair( "mid", cfg.getMid() ) );
 		try {
 			entity = new UrlEncodedFormEntity( list, "utf-8" );
 		} catch (Exception ex) {
 		}
-		RequestBuilder rb = RequestBuilder.post( "http://api.bilibili.com/feedback/post" ).setEntity( entity );
+		RequestBuilder rb = RequestBuilder.post( "http://" + cfg.getSip() + "/feedback/post" ).setEntity( entity );
+		rb.addHeader( "Host", "api.bilibili.com" );
 		rb.addHeader( "User-Agent", "Mozilla/5.0 BiliDroid/3.3.0 (bbcallen@gmail.com)" );
 		for (Entry<String, String> e : params.entrySet()) {
 			rb.addParameter( e.getKey(), e.getValue() );
@@ -107,7 +109,7 @@ public class CommentWoker {
 				.setConnectTimeout( timeout )
 				.setSocketTimeout( timeout )
 				.build();
-		CloseableHttpClient hc = HttpClients.custom()
+		CloseableHttpClient chc = HttpClients.custom()
 				.setDefaultRequestConfig( rc )
 				.setConnectionManager( p )
 				.build();
@@ -119,10 +121,10 @@ public class CommentWoker {
 			while (!stop.get()) {
 				switch (cfg.getMode()) {
 				case 0:
-					work0( hc, es, tcount, tdiu );
+					work0( chc, es, tcount, tdiu );
 					break;
 				case 1:
-					work1( hc, es, tcount, tdiu );
+					work1( chc, es, tcount, tdiu );
 					break;
 				default:
 					throw new IllegalArgumentException( "不合法的mode" );
@@ -138,7 +140,7 @@ public class CommentWoker {
 			System.out.println( cfg.getTag() + " 执行完毕! count=" + tcount.get() + " diu=" + tdiu.get() );
 			es.shutdown();
 			p.close();
-			HttpClientUtils.closeQuietly( hc );
+			HttpClientUtils.closeQuietly( chc );
 		}
 	}
 

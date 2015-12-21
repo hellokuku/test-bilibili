@@ -11,7 +11,17 @@ public class Config {
 	private Date startAt;
 	private String sip;
 	private String DedeUserID;
+	private String mid;
 	private String accessKey;
+
+	public String getMid() {
+		return mid;
+	}
+
+	public Config setMid(String mid) {
+		this.mid = mid;
+		return this;
+	}
 
 	public String getAccessKey() {
 		return accessKey;
@@ -57,20 +67,27 @@ public class Config {
 		// this(null, 0, 0, null, null, 0);
 	}
 
-	public Config(int mode, String tag, String sip, String DedeUserID, String SESSDATA, String accessKey, int batch,
-			int interval,
-			boolean stopWhenForbidden,
-			int aid, String msg,
-			Date startAt, Date endAt) {
+	public Config(
+			int mode, String sip,
+			String DedeUserID, String SESSDATA,
+			String mid, String accessKey,
+			int batch, int interval, boolean stopWhenForbidden,
+			String tag, int aid, String msg, Date startAt, Date endAt) {
+
 		this.mode = mode;
-		this.tag = tag;
 		this.sip = sip;
+
 		this.DedeUserID = DedeUserID;
 		this.SESSDATA = SESSDATA;
+
+		this.mid = mid;
 		this.accessKey = accessKey;
+
 		this.batch = batch;
 		this.interval = interval;
 		this.stopWhenForbidden = stopWhenForbidden;
+
+		this.tag = tag;
 		this.aid = aid;
 		this.msg = msg;
 		this.startAt = startAt;
@@ -78,9 +95,12 @@ public class Config {
 	}
 
 	public Config custom(String tag, int aid, String msg, Date startAt, Date endAt) {
-		return new Config( mode, tag, sip, DedeUserID, SESSDATA, accessKey, batch, interval, stopWhenForbidden, aid,
-				msg, startAt,
-				endAt );
+		return new Config(
+				mode, sip,
+				DedeUserID, SESSDATA,
+				mid, accessKey,
+				batch, interval, stopWhenForbidden,
+				tag, aid, msg, startAt, endAt );
 	}
 
 	public int getAid() {

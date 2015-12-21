@@ -33,19 +33,60 @@ public class CommentRunner {
 		s.addJob( commentJob, false );
 		// 60.221.255.15 113.105.152.207 61.164.47.167 112.25.85.6 125.39.7.139
 		//125.39.7.139 106.39.192.38  14.152.58.20 218.76.137.149 183.247.180.15
-		Config c0 = new Config( 1, "tag", "61.164.47.167", "19997766", "f3e878e5,1451143184,7458bb46",
-				"454ba9153a48adeb7fc170806aadbd2c",
-				512, 1000, true, 0, "msg", null, null );
-		/*
-		addJob( s, commentJob, c0.custom( "测试测试", 3381920, "坐等12集更新.",
-				new DateTime().plusSeconds( 0 ).toDate(),
-				new DateTime().plusSeconds( 122 ).toDate() ).setStopWhenForbidden( false ).setBatch( 1 )
-				.setInterval( 1 ) );
-		*/
-		addJob( s, commentJob, c0.custom( "一拳超人", 3407473, "测试测试",
-				new DateTime().plusSeconds( 0 ).toDate(),
-				new DateTime().plusSeconds( 36000 ).toDate() ).setBatch( 4 ).setInterval( 500 ) );
 
+		//模式 tag 服务器ip
+		//基于cookie的两个数据
+		//基于api的两个字段
+		//线程 间隔 禁言是否停止
+		//aid 消息 开始时间 结束时间
+		int mode = 1;
+		if (mode == 0) {
+			Config c0 = new Config( 0, "61.164.47.167",
+					"19480366", "f3e878e5,1451143184,7458bb46", // xzchao xuzhichaoxh3@163.com
+					"19997766", "454ba9153a48adeb7fc170806aadbd2c", // jzxcai bzhxh1@sina.com
+					512, 1000, true,
+					"tag", 0, "msg", null, null );
+			//for 0
+			addJob( s, commentJob, c0.custom( "高校星歌剧12", 3426180, "还给我麦克风.",
+					new DateTime( 2015, 12, 21, 23, 58, 0 ).toDate(),
+					new DateTime( 2015, 12, 22, 0, 3, 20 ).toDate() ) );
+			addJob( s, commentJob, c0.custom( "JK做饭", 3426189, "然而还没有完结.",
+					new DateTime( 2015, 12, 22, 0, 3, 30 ).toDate(),
+					new DateTime( 2015, 12, 22, 0, 12 ).toDate() ) );
+			addJob( s, commentJob, c0.custom( "网球并不可笑嘛", 3426213, "语速如此之快, 完结撒花.",
+					new DateTime( 2015, 12, 22, 0, 20 ).toDate(),
+					new DateTime( 2015, 12, 22, 0, 25 ).toDate() ) );
+			addJob( s, commentJob, c0.custom( "动画锻炼11", 3426217, "身体已经如此虚弱, 还是要看动画锻炼！EX.",
+					new DateTime( 2015, 12, 22, 1, 3 ).toDate(),
+					new DateTime( 2015, 12, 22, 1, 12 ).toDate() ) );
+			addJob( s, commentJob, c0.custom( "一拳超人", 3407473, "测试测试测试测试",
+					new DateTime().plusSeconds( 0 ).toDate(),
+					new DateTime().plusSeconds( 10 ).toDate() ) );
+		} else {
+			Config c1 = new Config( 1, "61.164.47.167",
+					"19480366", "f3e878e5,1451143184,7458bb46", // xzchao xuzhichaoxh3@163.com
+					"19997766", "454ba9153a48adeb7fc170806aadbd2c", // jzxcai bzhxh1@sina.com
+					8, 500, true,
+					"tag", 0, "msg", null, null );
+			//for 1
+			addJob( s, commentJob, c1.custom( "高校星歌剧12", 3426180, "还给我麦克风.",
+					new DateTime( 2015, 12, 21, 23, 58, 0 ).toDate(),
+					new DateTime( 2015, 12, 22, 0, 3, 20 ).toDate() ) );
+			addJob( s, commentJob, c1.custom( "JK做饭", 3426189, "然而还没有完结.",
+					new DateTime( 2015, 12, 22, 0, 3, 30 ).toDate(),
+					new DateTime( 2015, 12, 22, 0, 12 ).toDate() ) );
+			addJob( s, commentJob, c1.custom( "网球并不可笑嘛", 3426213, "语速如此之快, 完结撒花.",
+					new DateTime( 2015, 12, 22, 0, 13 ).toDate(),
+					new DateTime( 2015, 12, 22, 0, 25 ).toDate() ) );
+			addJob( s, commentJob, c1.custom( "动画锻炼11", 3426217, "身体已经如此虚弱, 还是要看动画锻炼！EX.",
+					new DateTime( 2015, 12, 22, 1, 3 ).toDate(),
+					new DateTime( 2015, 12, 22, 1, 20 ).toDate() ) );
+			addJob( s, commentJob, c1.custom( "一拳超人", 3407473, "测试测试测试测试",
+					new DateTime().plusSeconds( 0 ).toDate(),
+					new DateTime().plusSeconds( 10 ).toDate() ).setInterval( 100 ) );
+		}
+		/*
+		 */
 		System.out.println( "现在的时间是 " + DateTime.now().toString( "yyyy年MM月dd日 HH时mm分ss秒" ) );
 	}
 }
