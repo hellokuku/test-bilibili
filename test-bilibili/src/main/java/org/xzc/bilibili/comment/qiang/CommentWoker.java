@@ -245,7 +245,7 @@ public class CommentWoker extends Thread {
 							int count1 = count.incrementAndGet();
 							JSONObject json = JSON.parseObject( content );
 							int code = json.getIntValue( "code" );
-							if (count1 % interval == 0 || ( code != 0 && code != -404 && code != -503 )) {
+							if (count1 % interval == 0 || ( code != 0 && code != -404 && code != -503 &&code!=-105)) {
 								System.out.println( content );
 								System.out
 										.println(

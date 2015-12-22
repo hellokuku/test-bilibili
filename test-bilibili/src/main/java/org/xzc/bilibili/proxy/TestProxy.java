@@ -55,12 +55,11 @@ public class TestProxy {
 	@Test
 	public void filter() {
 		Set<String> set = new TreeSet<String>( Arrays.asList(
+				"202.195.192.197:3128",
 				"113.240.246.165:1209",
-				"118.163.165.250:3128",
 				"120.24.248.225:8080",
 				"121.41.93.201:808",
 				"121.42.220.79:8088",
-				"122.114.48.173:8000",
 				"122.225.107.70:8080",
 				"125.64.5.3:8000",
 				"182.90.13.116:80",
@@ -73,13 +72,10 @@ public class TestProxy {
 				"58.218.198.61:808",
 				"58.251.47.101:8081",
 				"59.108.61.132:808",
-				"59.78.160.244:8080",
 				"60.13.8.225:8888",
 				"60.169.78.218:808",
 				"60.18.164.46:63000",
-				"60.190.252.29:808",
-				"61.149.182.102:8080"
-				) );
+				"61.149.182.102:8080" ) );
 		for (String s : set) {
 			System.out.println( "\"" + s + "\"" + "," );
 		}
@@ -110,14 +106,10 @@ public class TestProxy {
 		ExecutorService es = Executors.newFixedThreadPool( ps.getBatch() );
 		List<Future<?>> futureList = new ArrayList<Future<?>>();
 		System.out.println( "共有" + list.size() + "个" );
-		int i = 0;
 		for (Proxy p0 : list) {
-			final int index = ++i;
 			final Proxy p = p0;
 			Future<Void> f = es.submit( new Callable<Void>() {
 				public Void call() throws Exception {
-					//if (index % 100 == 0)
-					System.out.println( "处理第" + index + "个" );
 					ps.tryProxy( p );
 					p.setUpdateAt( new Date() );
 					return null;
@@ -125,20 +117,28 @@ public class TestProxy {
 			} );
 			futureList.add( f );
 		}
-		for (Future<?> f : futureList)
+		int index = 0;
+		for (Future<?> f : futureList) {
 			f.get();
+			++index;
+			if (index % 50 == 0)
+				System.out.println( String.format( "%d/%d", index, futureList.size() ) );
+		}
 		es.shutdown();
+		final int[] count = new int[] { 0 };
 		proxyDao.callBatchTasks( new Callable<Void>() {
 			public Void call() throws Exception {
 				for (Proxy p : list) {
 					proxyDao.createOrUpdate( p );
 					if (p.isSuccess()) {
 						System.out.println( String.format( "\"%s:%d\",", p.getIp(), p.getPort() ) );
+						++count[0];
 					}
 				}
 				return null;
 			}
 		} );
+		System.out.println( count[0] );
 	}
 
 	//http://www.xicidaili.com/nn/1

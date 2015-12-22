@@ -34,7 +34,6 @@ public class CommentJob implements Job {
 				String[] ss = sender.split( ":" );
 				String proxyHost = ss[0];
 				int proxyPort = Integer.parseInt( ss[1] );
-				System.out.println( proxyHost + " " + proxyPort );
 				CommentWoker t = new CommentWoker( cfg, stop, last, proxyHost, proxyPort );
 				t.start();
 				threadList.add( t );
