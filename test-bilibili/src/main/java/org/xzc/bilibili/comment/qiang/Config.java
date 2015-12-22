@@ -1,30 +1,44 @@
 package org.xzc.bilibili.comment.qiang;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class Config {
-	private int aid;
-	private String msg;
-	private String tag;
-	private int batch;
-	private Date endAt;
-	private Date startAt;
-	private String sip;
-	private String DedeUserID;
-	private String mid;
-	private String accessKey;
-	private boolean diu;
 
-	private String SESSDATA;
+	private int batch; //线程数
 
-	private int interval;
+	private String tag; //一个tag用于表示本次评论任务
+	private int aid; //视频的aid
+	private String msg; //评论的消息
+	private Date endAt; //超过这个时间就不再评论
+	private Date startAt; //开始评论的时间
+	private String sip; //服务器的ip地址
 
-	private boolean stopWhenForbidden;
+	private String DedeUserID; //用于Cookie
+	private String SESSDATA; //用于Cookie
 
-	private int mode;
+	private String mid; //用于api的参数
+	private String accessKey; //用于api的参数
+
+	private boolean diu = true; //是否统计丢失问题
+	private int interval; //间隔多少个评论就打印一次信息
+	private boolean stopWhenForbidden = true; //当禁言的时候停止评论
+
+	private int mode; //评论的方法 基于cookie还是基于api调用
+
+	private List<String> senderList = new ArrayList<String>();
 
 	public Config() {
-		// this(null, 0, 0, null, null, 0);
+	}
+
+	public List<String> getSenderList() {
+		return senderList;
+	}
+
+	public Config setSenderList(List<String> senderList) {
+		this.senderList = senderList;
+		return this;
 	}
 
 	public Config(
@@ -55,20 +69,43 @@ public class Config {
 		this.endAt = endAt;
 	}
 
+	public Config(
+			int mode, String sip,
+			String DedeUserID, String SESSDATA,
+			String mid, String accessKey,
+			int batch, int interval, boolean stopWhenForbidden, boolean diu,
+			String tag, int aid, String msg, Date startAt, Date endAt, List<String> senderList) {
+		this( mode, sip, DedeUserID, SESSDATA, mid, accessKey, batch, interval, stopWhenForbidden, diu, tag, aid, msg,
+				startAt, endAt );
+		this.senderList = senderList;
+	}
+
 	public Config custom(String tag, int aid, String msg, Date startAt, Date endAt) {
 		return new Config(
 				mode, sip,
 				DedeUserID, SESSDATA,
 				mid, accessKey,
 				batch, interval, stopWhenForbidden, diu,
-				tag, aid, msg, startAt, endAt );
+				tag, aid, msg, startAt, endAt, senderList );
 	}
+
+	public Config custom() {
+		return new Config(
+				mode, sip,
+				DedeUserID, SESSDATA,
+				mid, accessKey,
+				batch, interval, stopWhenForbidden, diu,
+				tag, aid, msg, startAt, endAt, senderList );
+	}
+
 	public String getAccessKey() {
 		return accessKey;
 	}
+
 	public int getAid() {
 		return aid;
 	}
+
 	public int getBatch() {
 		return batch;
 	}

@@ -28,7 +28,7 @@ import com.alibaba.fastjson.JSON;
 @Component
 public class ProxyService {
 	private CloseableHttpClient hc;
-	private int batch = 16;
+	private int batch = 32;
 
 	@PostConstruct
 	public void postConstruct() {
@@ -43,32 +43,36 @@ public class ProxyService {
 		return batch;
 	}
 
-	private String url = "http://api.bilibili.com/view?abc";
+	private String url = "http://61.164.47.167/view?abc";
 
 	public void tryProxy(Proxy p) {
-		try {
-			int timeout = 5000;
-			long beg = System.currentTimeMillis();
-			String content = asString( RequestBuilder.get( url ).setConfig(
-					RequestConfig.custom()
-							.setSocketTimeout( timeout )
-							.setConnectTimeout( timeout )
-							.setConnectionRequestTimeout( timeout )
-							.setProxy( new HttpHost( p.getIp(), p.getPort() ) )
-							.setCookieSpec( CookieSpecs.IGNORE_COOKIES )
-							.build() )
-					.build() );
-			p.setDuration( System.currentTimeMillis() - beg );
-			p.setSuccess( JSON.parseObject( content ).getIntValue( "code" ) == -1 );
-		} catch (RuntimeException e) {
-			p.setSuccess( false );
+		for (int i = 0; i < 10; ++i) {
+			try {
+				int timeout = 10000;
+				long beg = System.currentTimeMillis();
+				String content = asString( RequestBuilder.get( url ).addHeader( "Host", "api.bilibili.com" ).setConfig(
+						RequestConfig.custom()
+								.setSocketTimeout( timeout )
+								.setConnectTimeout( timeout )
+								.setConnectionRequestTimeout( timeout )
+								.setProxy( new HttpHost( p.getIp(), p.getPort() ) )
+								.setCookieSpec( CookieSpecs.IGNORE_COOKIES )
+								.build() )
+						.build() );
+				p.setDuration( System.currentTimeMillis() - beg );
+				p.setSuccess( JSON.parseObject( content ).getIntValue( "code" ) == -1 );
+			} catch (RuntimeException e) {
+				p.setSuccess( false );
+			}
+			if (p.isSuccess())
+				return;
 		}
 	}
 
 	public List<Proxy> getProxyList() {
 		//目前主要是从http://www.xicidaili.com这个网站拉取数据
 		List<Proxy> list = new ArrayList<Proxy>();
-		for (int page = 1; page <= 10; ++page) {
+		for (int page = 1; page <= 2; ++page) {
 			String url = "http://www.xicidaili.com/nn/" + page;
 			String content = asString( url );
 			Document d = Jsoup.parse( content );
@@ -117,7 +121,7 @@ public class ProxyService {
 
 	public void directlyConnect() {
 		long beg = System.currentTimeMillis();
-		String content = asString( RequestBuilder.get( url ).setConfig(
+		String content = asString( RequestBuilder.get( url ).addHeader( "Host", "api.bilibili.com" ).setConfig(
 				RequestConfig.custom()
 						.setSocketTimeout( timeout )
 						.setConnectTimeout( timeout )

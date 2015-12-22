@@ -1,7 +1,6 @@
 package org.xzc.bilibili.comment.qiang;
 
 import java.io.IOException;
-import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +16,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
@@ -25,7 +25,6 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.client.utils.HttpClientUtils;
-import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -35,20 +34,34 @@ import org.xzc.bilibili.util.Sign;
 import org.xzc.bilibili.util.Utils;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 
-public class CommentWoker {
+public class CommentWoker extends Thread {
 	private final Config cfg;
 	private final HttpUriRequest req;
 	private final AtomicBoolean stop;
 	private final AtomicLong last;
+	private final String proxyHost;
+	private final int proxyPort;
 
-	public CommentWoker(Config cfg) {
+	public CommentWoker(Config cfg, AtomicBoolean stop, AtomicLong last) {
 		this.cfg = cfg;
-		this.stop = new AtomicBoolean( false );
-		//这里为了节省资源 而将它做成一个成员变量
+		this.stop = stop;
+		this.last = last;
 		this.req = makeCommentRequest( cfg );
-		this.last = new AtomicLong( 0 );
+		this.proxyHost=null;
+		this.proxyPort=0;
+	}
+
+	public CommentWoker(Config cfg, AtomicBoolean stop, AtomicLong last, String proxyHost,
+			int proxyPort) {
+		this.cfg = cfg;
+		this.stop = stop;
+		this.last = last;
+		this.req = makeCommentRequest( cfg );
+		this.proxyHost = proxyHost;
+		this.proxyPort = proxyPort;
 	}
 
 	private static HttpUriRequest makeCommentRequest(Config cfg) {
@@ -99,6 +112,10 @@ public class CommentWoker {
 				.build();
 	}
 
+	private AtomicInteger count = new AtomicInteger( 0 );
+	private AtomicInteger diu = new AtomicInteger( 0 );
+	private long tbeg;
+
 	public void run() {
 		PoolingHttpClientConnectionManager p = new PoolingHttpClientConnectionManager();
 		p.setMaxTotal( cfg.getBatch() * 4 );
@@ -110,35 +127,33 @@ public class CommentWoker {
 				.setConnectTimeout( timeout )
 				.setSocketTimeout( timeout )
 				.build();
+		HttpHost proxy = null;
+		if (proxyHost != null) {
+			proxy = new HttpHost( proxyHost, proxyPort );
+		}
 		CloseableHttpClient chc = HttpClients.custom()
 				.setDefaultRequestConfig( rc )
 				.setConnectionManager( p )
+				.setProxy( proxy )
 				.build();
 		ExecutorService es = Executors.newFixedThreadPool( cfg.getBatch() );
-		AtomicInteger tcount = new AtomicInteger( 0 );
-		AtomicInteger tdiu = new AtomicInteger( 0 );
 		try {
+			tbeg = System.currentTimeMillis();
 			System.out.println( "开始执行 " + cfg );
-			while (!stop.get()) {
-				switch (cfg.getMode()) {
-				case 0:
-					work0( chc, es, tcount, tdiu );
-					break;
-				case 1:
-					work1( chc, es, tcount, tdiu );
-					break;
-				default:
-					throw new IllegalArgumentException( "不合法的mode" );
+			if (cfg.getMode() == 0) {
+				work0( chc, es );
+			} else {
+				while (!stop.get()) {
+					work1( chc, es );
+					if (!stop.get()) {
+						System.out.println( cfg.getTag() + " 超速, 休息2秒 count=" + count.get() );
+						Thread.sleep( 2000 );
+					}
 				}
-				System.out.println( cfg.getTag() + " 超速, 休息2秒 count=" + tcount.get() + " diu=" + tdiu.get() );
-				Thread.sleep( 2000 );
-				tcount.set( 0 );
-				tdiu.set( 0 );
 			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		} finally {
-			System.out.println( cfg.getTag() + " 执行完毕! count=" + tcount.get() + " diu=" + tdiu.get() );
 			es.shutdown();
 			p.close();
 			HttpClientUtils.closeQuietly( chc );
@@ -147,14 +162,12 @@ public class CommentWoker {
 
 	private static Pattern RESULT_PATTERN = Pattern.compile( "abc\\(\"(.+)\"\\)" );
 
-	private void work0(final CloseableHttpClient hc, ExecutorService es, final AtomicInteger tcount,
-			final AtomicInteger tdiu) {
+	private void work0(final CloseableHttpClient hc, ExecutorService es) {
 		List<Future<?>> futureList = new ArrayList<Future<?>>();
-		final long tbeg = System.currentTimeMillis();
 		final long endAt = cfg.getEndAt().getTime();
 		final int interval = cfg.getInterval();
 		final boolean stopWhenForbidden = cfg.isStopWhenForbidden();
-		final boolean diu = cfg.isDiu();
+		final boolean isDiu = cfg.isDiu();
 		for (int ii = 0; ii < cfg.getBatch(); ++ii) {
 			Future<?> f = es.submit( new Callable<Void>() {
 				public Void call() throws Exception {
@@ -166,20 +179,20 @@ public class CommentWoker {
 								stop.set( true );
 							long llast = last.getAndSet( end );
 							String content = EntityUtils.toString( res.getEntity() ).trim();
-							if (diu && content.length() > 100) {
-								tdiu.incrementAndGet();
+							if (isDiu && content.length() > 100) {
+								diu.incrementAndGet();
 								//丢包了
 								res.close();
 								continue;
 							}
 							content = Utils.decodeUnicode( content );
 							res.close();
-							int count = tcount.incrementAndGet();
-							if (count % interval == 0) {
+							int count1 = count.incrementAndGet();
+							if (count1 % interval == 0) {
 								System.out.println( content );
 								System.out
 										.println(
-												"[" + cfg.getTag() + "] count=" + count + " diu=" + tdiu.get() + " 时间="
+												"[" + cfg.getTag() + "] count=" + count1 + " diu=" + diu.get() + " 时间="
 														+ ( end - tbeg ) / 1000 + "秒 间隔="
 														+ ( end - llast ) );
 							}
@@ -211,10 +224,8 @@ public class CommentWoker {
 		futureList.clear();
 	}
 
-	private void work1(final CloseableHttpClient hc, ExecutorService es, final AtomicInteger tcount,
-			final AtomicInteger tdiu) {
+	private void work1(final CloseableHttpClient hc, ExecutorService es) {
 		List<Future<?>> futureList = new ArrayList<Future<?>>();
-		final long tbeg = System.currentTimeMillis();
 		final long endAt = cfg.getEndAt().getTime();
 		final int interval = cfg.getInterval();
 		final AtomicBoolean overspeed = new AtomicBoolean( false );
@@ -231,14 +242,15 @@ public class CommentWoker {
 							String content = EntityUtils.toString( res.getEntity() ).trim();
 							content = Utils.decodeUnicode( content );
 							res.close();
-							int count = tcount.incrementAndGet();
+							int count1 = count.incrementAndGet();
 							JSONObject json = JSON.parseObject( content );
 							int code = json.getIntValue( "code" );
-							if (count % interval == 0 || ( code != 0 && code != -404 && code != -503 )) {
+							if (count1 % interval == 0 || ( code != 0 && code != -404 && code != -503 )) {
 								System.out.println( content );
 								System.out
 										.println(
-												"[" + cfg.getTag() + "] count=" + count + " diu=" + tdiu.get() + " 时间="
+												"[" + cfg.getTag() + "] [" + ( proxyHost == null ? "本机" : proxyHost )
+														+ "]  count=" + count1 + " 时间="
 														+ ( end - tbeg ) / 1000 + "秒 间隔="
 														+ ( end - llast ) );
 							}
@@ -257,10 +269,8 @@ public class CommentWoker {
 								System.exit( 0 );
 								//其他情况
 							}
-						} catch (ConnectTimeoutException ex) {
-							//忽略
-						} catch (SocketTimeoutException ex) {
-							//忽略
+						} catch (JSONException ex) {//忽略
+						} catch (IOException ex) {//忽略
 						} catch (Exception ex) {
 							ex.printStackTrace();
 						}
@@ -270,13 +280,30 @@ public class CommentWoker {
 			} );
 			futureList.add( f );
 		}
-		for (Future<?> f : futureList)
-			try {
+		for (
+
+		Future<?> f : futureList)
+			try
+
+			{
 				f.get();
-			} catch (Exception e) {
+			} catch (
+
+			Exception e)
+
+			{
 				e.printStackTrace();
 			}
 		futureList.clear();
+
+	}
+
+	public String getProxyHost() {
+		return proxyHost;
+	}
+
+	public int getCount() {
+		return count.get();
 	}
 
 }

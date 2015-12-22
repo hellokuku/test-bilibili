@@ -2,14 +2,18 @@ package org.xzc.bilibili.proxy;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.junit.Test;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -42,10 +46,42 @@ public class TestProxy {
 
 	public void run() throws Exception {
 		ps.directlyConnect();
-		//doUpdate( ps.getProxyList() );
 		doUpdate( ps.getProxyList() );
 		//doUpdate( proxyDao.queryForEq( "success", false ) );
 		//doUpdate( proxyDao.queryForEq( "success", true ) );
+	}
+
+	@Test
+	public void filter() {
+		Set<String> set = new TreeSet<String>( Arrays.asList(
+				"113.240.246.165:1209",
+				"118.163.165.250:3128",
+				"120.24.248.225:8080",
+				"121.41.93.201:808",
+				"121.42.220.79:8088",
+				"122.114.48.173:8000",
+				"122.225.107.70:8080",
+				"125.64.5.3:8000",
+				"182.90.13.116:80",
+				"183.224.171.150:2076",
+				"202.120.17.158:2076",
+				"202.120.38.17:2076",
+				"218.213.166.218:81",
+				"218.63.208.223:3128",
+				"222.73.173.169:808",
+				"58.218.198.61:808",
+				"58.251.47.101:8081",
+				"59.108.61.132:808",
+				"59.78.160.244:8080",
+				"60.13.8.225:8888",
+				"60.169.78.218:808",
+				"60.18.164.46:63000",
+				"60.190.252.29:808",
+				"61.149.182.102:8080"
+				) );
+		for (String s : set) {
+			System.out.println( "\"" + s + "\"" + "," );
+		}
 	}
 
 	@Bean(destroyMethod = "close")
@@ -79,7 +115,8 @@ public class TestProxy {
 			final Proxy p = p0;
 			Future<Void> f = es.submit( new Callable<Void>() {
 				public Void call() throws Exception {
-					System.out.println( "处理第" + index + "个" );
+					if (index % 100 == 0)
+						System.out.println( "处理第" + index + "个" );
 					ps.tryProxy( p );
 					p.setUpdateAt( new Date() );
 					return null;
@@ -94,6 +131,9 @@ public class TestProxy {
 			public Void call() throws Exception {
 				for (Proxy p : list) {
 					proxyDao.createOrUpdate( p );
+					if (p.isSuccess()) {
+						System.out.println( String.format( "\"%s:%d\",", p.getIp(), p.getPort() ) );
+					}
 				}
 				return null;
 			}
