@@ -42,7 +42,6 @@ public class JobExecutor {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-			resultList = new ArrayList<ProxyExecutionResult>();
 			threadList.add( t );
 			total = 0;
 			//统计信息
@@ -67,7 +66,7 @@ public class JobExecutor {
 		System.out.println( String.format( "[%s] %d台 total=%d", cfg.getTag(), resultList.size(), total ) );
 	}
 
-	private List<ProxyExecutionResult> resultList;
+	private List<ProxyExecutionResult>resultList = new ArrayList<ProxyExecutionResult>();
 
 	public List<ProxyExecutionResult> getResultList() {
 		return resultList;
