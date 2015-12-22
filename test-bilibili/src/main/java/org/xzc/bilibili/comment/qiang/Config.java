@@ -218,8 +218,9 @@ public class Config {
 		return this;
 	}
 
-	public void setStartAt(Date startAt) {
+	public Config setStartAt(Date startAt) {
 		this.startAt = startAt;
+		return this;
 	}
 
 	public Config setStopWhenForbidden(boolean stopWhenForbidden) {

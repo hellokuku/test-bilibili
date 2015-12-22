@@ -50,8 +50,8 @@ public class CommentWoker extends Thread {
 		this.stop = stop;
 		this.last = last;
 		this.req = makeCommentRequest( cfg );
-		this.proxyHost=null;
-		this.proxyPort=0;
+		this.proxyHost = null;
+		this.proxyPort = 0;
 	}
 
 	public CommentWoker(Config cfg, AtomicBoolean stop, AtomicLong last, String proxyHost,
@@ -139,7 +139,6 @@ public class CommentWoker extends Thread {
 		ExecutorService es = Executors.newFixedThreadPool( cfg.getBatch() );
 		try {
 			tbeg = System.currentTimeMillis();
-			System.out.println( "开始执行 " + cfg );
 			if (cfg.getMode() == 0) {
 				work0( chc, es );
 			} else {
@@ -242,10 +241,11 @@ public class CommentWoker extends Thread {
 							String content = EntityUtils.toString( res.getEntity() ).trim();
 							content = Utils.decodeUnicode( content );
 							res.close();
-							int count1 = count.incrementAndGet();
 							JSONObject json = JSON.parseObject( content );
 							int code = json.getIntValue( "code" );
-							if (count1 % interval == 0 || ( code != 0 && code != -404 && code != -503 &&code!=-105)) {
+							int count1 = count.incrementAndGet();
+							if (count1 % interval == 0
+									|| ( code != 0 && code != -404 && code != -503 && code != -105 )) {
 								System.out.println( content );
 								System.out
 										.println(
@@ -264,9 +264,9 @@ public class CommentWoker extends Thread {
 								//该怎么解决?
 								overspeed.set( true );
 							} else {
-								System.out.println( "遇到其他情况" );
+								System.out.println( "遇到其他情况 " + proxyHost );
 								System.out.println( content );
-								System.exit( 0 );
+								overspeed.set( true );
 								//其他情况
 							}
 						} catch (JSONException ex) {//忽略
@@ -280,18 +280,10 @@ public class CommentWoker extends Thread {
 			} );
 			futureList.add( f );
 		}
-		for (
-
-		Future<?> f : futureList)
-			try
-
-			{
+		for (Future<?> f : futureList)
+			try {
 				f.get();
-			} catch (
-
-			Exception e)
-
-			{
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		futureList.clear();
@@ -300,6 +292,10 @@ public class CommentWoker extends Thread {
 
 	public String getProxyHost() {
 		return proxyHost;
+	}
+
+	public int getProxyPort() {
+		return proxyPort;
 	}
 
 	public int getCount() {

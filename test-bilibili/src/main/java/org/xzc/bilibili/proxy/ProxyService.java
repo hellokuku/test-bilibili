@@ -103,12 +103,12 @@ public class ProxyService {
 		List<Proxy> list = new ArrayList<Proxy>();
 		//xici( "http://www.xicidaili.com/nn/", list );
 		//xici( "http://www.xicidaili.com/nt/", list );
-		xici( "http://www.xicidaili.com/wn/", list );
-		xici( "http://www.xicidaili.com/wt/", list );
+		//xici( "http://www.xicidaili.com/wn/", list );
+		//xici( "http://www.xicidaili.com/wt/", list );
 		//kuaidili( "http://www.kuaidaili.com/free/inha/", list );
 		//kuaidili( "http://www.kuaidaili.com/free/intr/", list );
-		//kuaidili( "http://www.kuaidaili.com/free/outha/", list );
-		//kuaidili( "http://www.kuaidaili.com/free/outtr/", list );
+		kuaidili( "http://www.kuaidaili.com/free/outha/", list );
+		kuaidili( "http://www.kuaidaili.com/free/outtr/", list );
 		return list;
 	}
 
@@ -158,7 +158,7 @@ public class ProxyService {
 	}
 
 	private void kuaidili(String baseUrl, List<Proxy> list) {
-		for (int page = 1; page <= 2; ++page) {
+		for (int page = 1; page <= 10; ++page) {
 			String url = baseUrl + page;
 			String content = asString( url );
 			Document d = Jsoup.parse( content );

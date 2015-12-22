@@ -2,7 +2,10 @@ package org.xzc.bilibili.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.TreeSet;
 
 import org.apache.commons.io.FileUtils;
 import org.joda.time.DateTime;
@@ -114,4 +117,7 @@ public class Utils {
 		return outBuffer.toString();
 	}
 
+	public static List<String> uniqueStringList(List<String> list) {
+		return new ArrayList<String>( new TreeSet<String>( list ) );
+	}
 }
