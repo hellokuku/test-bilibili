@@ -35,7 +35,13 @@ public class ProxyService {
 		PoolingHttpClientConnectionManager p = new PoolingHttpClientConnectionManager();
 		p.setMaxTotal( batch * 4 );
 		p.setDefaultMaxPerRoute( batch );
-		hc = HttpClients.custom().setRetryHandler( new StandardHttpRequestRetryHandler( 10, false ) )
+		int timeout=5000;
+		RequestConfig rc=RequestConfig.custom()
+				.setConnectionRequestTimeout(timeout)
+				.setConnectTimeout( timeout )
+				.setSocketTimeout( timeout )
+				.build();
+		hc = HttpClients.custom().setDefaultRequestConfig( rc ).setRetryHandler( new StandardHttpRequestRetryHandler( 10, false ) )
 				.setConnectionManager( p ).build();
 	}
 
@@ -69,11 +75,9 @@ public class ProxyService {
 		}
 	}
 
-	public List<Proxy> getProxyList() {
-		//目前主要是从http://www.xicidaili.com这个网站拉取数据
-		List<Proxy> list = new ArrayList<Proxy>();
-		for (int page = 1; page <= 2; ++page) {
-			String url = "http://www.xicidaili.com/nn/" + page;
+	private void xici(String baseUrl, List<Proxy> list) {
+		for (int page = 1; page <= 4; ++page) {
+			String url = baseUrl + page;
 			String content = asString( url );
 			Document d = Jsoup.parse( content );
 			Elements trs = d.select( "#ip_list  tr" );
@@ -89,7 +93,40 @@ public class ProxyService {
 				list.add( p );
 			}
 		}
+	}
+
+	public List<Proxy> getProxyList() {
+		//目前主要是从http://www.xicidaili.com这个网站拉取数据
+		List<Proxy> list = new ArrayList<Proxy>();
+		xici( "http://www.xicidaili.com/nn/", list );
+		xici( "http://www.xicidaili.com/nt/", list );
+		xici( "http://www.xicidaili.com/wn/", list );
+		xici( "http://www.xicidaili.com/wt/", list );
+		kuaidili( "http://www.kuaidaili.com/free/inha/", list );
+		kuaidili( "http://www.kuaidaili.com/free/intr/", list );
+		kuaidili( "http://www.kuaidaili.com/free/outha/", list );
+		kuaidili( "http://www.kuaidaili.com/free/outtr/", list );
 		return list;
+	}
+
+	private void kuaidili(String baseUrl, List<Proxy> list) {
+		for (int page = 1; page <= 4; ++page) {
+			String url = baseUrl + page;
+			String content = asString( url );
+			Document d = Jsoup.parse( content );
+			Elements trs = d.select( "#list  tr" );
+			for (int i = 1; i < trs.size(); ++i) {
+				Element tr = trs.get( i );
+				Elements tds = tr.select( "td" );
+				String ip = tds.get( 0 ).text().trim();
+				int port = Integer.parseInt( tds.get( 1 ).text().trim() );
+				Proxy p = new Proxy();
+				p.setIp( ip );
+				p.setPort( port );
+				p.setDescription( tds.get( 4 ).text().trim() );
+				list.add( p );
+			}
+		}
 	}
 
 	private String asString(String url) {

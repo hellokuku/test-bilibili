@@ -45,7 +45,8 @@ public class TestProxy {
 	private ProxyService ps;
 
 	public void run() throws Exception {
-		ps.directlyConnect();
+		//System.out.println( ps.getProxyList().size() );
+		//ps.directlyConnect();
 		doUpdate( ps.getProxyList() );
 		//doUpdate( proxyDao.queryForEq( "success", false ) );
 		//doUpdate( proxyDao.queryForEq( "success", true ) );
@@ -115,8 +116,8 @@ public class TestProxy {
 			final Proxy p = p0;
 			Future<Void> f = es.submit( new Callable<Void>() {
 				public Void call() throws Exception {
-					if (index % 100 == 0)
-						System.out.println( "处理第" + index + "个" );
+					//if (index % 100 == 0)
+					System.out.println( "处理第" + index + "个" );
 					ps.tryProxy( p );
 					p.setUpdateAt( new Date() );
 					return null;
