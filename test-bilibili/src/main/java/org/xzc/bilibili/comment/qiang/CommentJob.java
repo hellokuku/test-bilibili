@@ -15,6 +15,7 @@ public class CommentJob implements Job {
 		//恢复数据
 		JobDataMap data = context.getTrigger().getJobDataMap();
 		CommentJobConfig jobCfg = JSON.parseObject( data.getString( ARG_CONFIG ), CommentJobConfig.class );
+		System.out.println( data.getString( ARG_CONFIG ) );
 		JobExecutor je = new JobExecutor( jobCfg );
 		je.execute();
 		je.printResult();

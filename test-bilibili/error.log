@@ -54,3 +54,4 @@ Fri Dec 18 10:23:16 CST 2015
 </html>
 
 syntax error, pos 1
+java.sql.SQLException: no such column: 'msg'

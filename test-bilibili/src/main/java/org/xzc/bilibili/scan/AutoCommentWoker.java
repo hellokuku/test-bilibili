@@ -23,7 +23,7 @@ import org.xzc.bilibili.task.CommentTask;
  *
  */
 @Component
-public class AutoCommentWokerThread extends Thread {
+public class AutoCommentWoker implements Runnable {
 	@Resource(name = "commentHelperBilibiliService")
 	private BilibiliService commentHelper;
 
@@ -37,7 +37,6 @@ public class AutoCommentWokerThread extends Thread {
 
 	private long lastCommentTime;//上一次的评论时间, 尽量不要太集中
 
-	@Override
 	public void run() {
 		lastCommentTime = System.currentTimeMillis();
 		//System.out.println( "自动评论线程已经启动!" );

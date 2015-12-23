@@ -10,12 +10,14 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 
 public class Utils {
+	private static final Logger log = Logger.getLogger( Utils.class );
 	private static final File LOG_FILE = new File( "error.log" );
 
 	public static void blockUntil(List<Future<?>> futureList) throws InterruptedException, ExecutionException {
@@ -126,5 +128,13 @@ public class Utils {
 
 	public static List<String> uniqueStringList(List<String> list) {
 		return new ArrayList<String>( new TreeSet<String>( list ) );
+	}
+
+	public static void sleep(long millis) {
+		try {
+			Thread.sleep( millis );
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 }

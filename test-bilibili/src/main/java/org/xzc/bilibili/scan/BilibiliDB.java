@@ -161,4 +161,12 @@ public class BilibiliDB {
 		} );
 	}
 
+	/**
+	 * 如果ct不存在就创建它
+	 * @param commentTask
+	 */
+	public void createIfNotExists(CommentTask commentTask) {
+		commentTaskDao.createIfNotExists( commentTask );
+	}
+
 }

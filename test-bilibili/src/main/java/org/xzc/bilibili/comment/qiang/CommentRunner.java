@@ -17,42 +17,77 @@ import com.alibaba.fastjson.JSON;
 
 public class CommentRunner {
 	private static final SimpleDateFormat SDF = new SimpleDateFormat( "MM月dd日HH时mm分ss秒" );
+	private static final String DATETIME_PATTER = "yyyy年MM月dd日HH时mm分ss秒";
+	private static Scheduler scheduler;
+	private static JobDetail commentJob;
 
-	private static final Trigger addJob(Scheduler s, JobDetail job, CommentJobConfig cfg) throws SchedulerException {
-		Trigger t = TriggerBuilder.newTrigger().startAt( cfg.getStartAt() ).forJob( job )
-				.usingJobData( CommentJob.ARG_CONFIG, JSON.toJSONString( cfg ) ).build();
-		s.scheduleJob( t );
-		System.out.println( "[" + cfg.getTag() + "] 将会于" + SDF.format( cfg.getStartAt() ) + "开始, 于"
-				+ SDF.format( cfg.getCommentConfig().getEndAt() ) + "结束." );
+	private static final Trigger addJob(CommentJobConfig jobCfg0, CommentConfig cfg0, String tag, int aid, String msg,
+			DateTime startAt, DateTime endAt) throws SchedulerException {
+
+		CommentJobConfig jobCfg = jobCfg0.clone()
+				.setTag( tag )
+				.setStartAt( startAt.toDate() )
+				.setCommentConfig( cfg0.clone().video( aid, msg, endAt ) );
+
+		Trigger t = TriggerBuilder.newTrigger().startAt( startAt.toDate() ).forJob( commentJob )
+				.usingJobData( CommentJob.ARG_CONFIG, JSON.toJSONString( jobCfg ) ).build();
+		scheduler.scheduleJob( t );
+		System.out.println( String.format( "[%s] 将会于 %s 开始, 于 %s 结束.", tag, startAt.toString( DATETIME_PATTER ),
+				endAt.toString( DATETIME_PATTER ) ) );
 		return t;
 	}
 
-	public static void main(String[] args) throws Exception {
+	private static class TaskHelper {
+		private CommentJobConfig jobCfg0;
+		private CommentConfig cfg0;
+
+		public TaskHelper(CommentJobConfig jobCfg0, CommentConfig cfg0) {
+			this.jobCfg0 = jobCfg0;
+			this.cfg0 = cfg0;
+		}
+
+		public TaskHelper addCommentJob(String tag, int aid, String msg, DateTime startAt, DateTime endAt)
+				throws SchedulerException {
+			addJob( jobCfg0, cfg0, tag, aid, msg, startAt, endAt );
+			return this;
+		}
+	}
+
+	public static void before() throws SchedulerException {
 		StdSchedulerFactory f = new StdSchedulerFactory( "quartz2.properties" );
-		Scheduler s = f.getScheduler();
-		s.start();
-		JobDetail commentJob = JobBuilder.newJob( CommentJob.class ).withIdentity( "comment" ).storeDurably().build();
-		s.addJob( commentJob, false );
-		// 60.221.255.15 113.105.152.207 61.164.47.167 112.25.85.6 125.39.7.139
-		//125.39.7.139 106.39.192.38  14.152.58.20 218.76.137.149 183.247.180.15
+		scheduler = f.getScheduler();
+		scheduler.start();
+		commentJob = JobBuilder.newJob( CommentJob.class ).withIdentity( "comment" ).storeDurably().build();
+		scheduler.addJob( commentJob, false );
+	}
 
+	public static void main(String[] args) throws Exception {
+		before();
 		CommentJobConfig jobCfg00 = new CommentJobConfig()
-				.setMode( 0 );
-
+				.setMode( 2 );
 		CommentConfig cfg00 = new CommentConfig()
-				.thread( 512, 1000 )
+				.thread( 1, 1 )
 				.setServerIP( "61.164.47.167" )
-				.other( true, false )
-				.cookie( "d", "d" );
+				.other( true, true )
+				.cookie( "19480366", "f3e878e5,1451143184,7458bb46" );
+		addJobs( jobCfg00, cfg00 );
+		System.out.println( "现在的时间是 " + DateTime.now().toString( "yyyy年MM月dd日 HH时mm分ss秒" ) );
+	}
 
-		CommentJobConfig jobCfg = jobCfg00.clone()
-				.setTag( "测试测试用" )
-				.setStartAt( DateTime.now().plusSeconds( 2 ).toDate() )
-				.setCommentConfig(
-						cfg00.clone().video( 1, "测试测试测试", DateTime.now().plusSeconds( 12 ) ) );
-		addJob( s, commentJob, jobCfg );
+	private static final void addJobs(CommentJobConfig jobCfg0, CommentConfig cfg0)
+			throws SchedulerException {
+		new TaskHelper( jobCfg0, cfg0 )
+				.addCommentJob( "一拳超人", 3407473, "测试测试测试测试", DateTime.now(), DateTime.now().plusSeconds( 6 ) )
+				//.addCommentJob( "测试", 45219, "测试测试测试测试2", DateTime.now().plusSeconds( 7 ),
+				//		DateTime.now().plusSeconds( 12 ) )
+				.addCommentJob( "庶民样本", 3436839, "庶民样本, 完结撒花.", new DateTime( 2015, 12, 23, 0, 25 ),
+						new DateTime( 2015, 12, 23, 23, 50 ) );
+	}
+}
 
-		/*
+/*
+  		// 60.221.255.15 113.105.152.207 61.164.47.167 112.25.85.6 125.39.7.139
+		//125.39.7.139 106.39.192.38  14.152.58.20 218.76.137.149 183.247.180.15
 		CommentConfig c00 = new CommentConfig( 0, "ip",
 				"19480366", "f3e878e5,1451143184,7458bb46", // xzchao xuzhichaoxh3@163.com
 				"19997766", "454ba9153a48adeb7fc170806aadbd2c", // jzxcai bzhxh1@sina.com
@@ -113,22 +148,4 @@ public class CommentRunner {
 			//System.out.println( result );
 			addJobs( s, commentJob, c0 );
 		}
-		 */
-		System.out.println( "现在的时间是 " + DateTime.now().toString( "yyyy年MM月dd日 HH时mm分ss秒" ) );
-	}
-
-	private static final void addJobs(Scheduler s, JobDetail commentJob, CommentJobConfig jobCfg0)
-			throws SchedulerException {
-		//测试用 跑12秒足够了
-		/*addJob( s, commentJob, c0.custom( "一拳超人", 3407473, "测试测试测试测试",
-				new DateTime().plusSeconds( 0 ).toDate(),
-				new DateTime().plusSeconds( 12 ).toDate() ) );
-		*/
-		//测试用
-		/*
-		addJob( s, commentJob, c0.custom( "45219", 45219, "测试测试测试测试1",
-				new DateTime().plusSeconds( 0 ).toDate(),
-				new DateTime().plusSeconds( 12 ).toDate() ) );
-		*/
-	}
-}
+*/

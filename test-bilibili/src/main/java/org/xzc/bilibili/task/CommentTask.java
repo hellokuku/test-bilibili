@@ -11,6 +11,8 @@ public class CommentTask {
 	@DatabaseField(id = true)
 	public int aid;
 	@DatabaseField
+	public String msg;
+	@DatabaseField
 	public int status;
 	@DatabaseField(dataType = DataType.DATE_STRING)
 	public Date updateAt;
@@ -20,6 +22,11 @@ public class CommentTask {
 
 	public CommentTask(int aid) {
 		this.aid = aid;
+	}
+
+	public CommentTask(int aid, String msg) {
+		this.aid = aid;
+		this.msg = msg;
 	}
 
 	public CommentTask(int aid, int status) {

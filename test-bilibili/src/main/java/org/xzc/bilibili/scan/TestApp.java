@@ -3,7 +3,6 @@ package org.xzc.bilibili.scan;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -35,6 +34,7 @@ import com.j256.ormlite.dao.RuntimeExceptionDao;
 @ContextConfiguration(classes = { AppConfig.class })
 public class TestApp {
 
+
 	@Resource(name = "simpleBilibiliService")
 	private BilibiliService simpleBilibiliService;
 
@@ -42,7 +42,6 @@ public class TestApp {
 	private BilibiliService mainBilibiliService;
 
 	//测试是否登陆
-	@Test
 	public void testIsLogin() {
 		assertTrue( simpleBilibiliService.isLogin() );
 		assertTrue( mainBilibiliService.isLogin() );
@@ -196,9 +195,7 @@ public class TestApp {
 
 	private ParsedCallback parsedCallback = new ParsedCallback() {
 		public void onParsed(Video v) {
-			//System.out.println( "开始评估视频" + v );
-			//我们只想评论 "连载动画" 并且还没有人评论它! 这些是可以马上评论的!
-			if (commentService.accept( v )) {
+			if (commentService.getComment( v ) != null) {
 				CommentTask ct = new CommentTask();
 				ct.aid = v.aid;
 				ct.status = 0;
@@ -211,7 +208,6 @@ public class TestApp {
 	@Resource(name = "testBilibiliService")
 	private BilibiliService testBilibiliService;
 
-	@Test
 	public void 测试删除() {
 		FavGetList fgl = testBilibiliService.getFavoriteListJSON( 50 );
 		System.out.println( fgl );
@@ -226,7 +222,7 @@ public class TestApp {
 	}
 
 	@Autowired
-	private AutoCommentWokerThread acwt;
+	private AutoCommentWoker acwt;
 
 	private static void sleep(long millis) {
 		try {
@@ -243,7 +239,7 @@ public class TestApp {
 	@Test
 	public void 持续跟进最新的视频() throws Exception {
 		Utils.blockUntil( "持续跟进最新的视频", new DateTime( 2015, 12, 18, 2, 40 ), 60000 );
-		acwt.start();
+		new Thread(acwt).start();
 		int batch = 50;//每次检测50个aid
 		int aid = db.getMaxAid( 3349048 ) + 1;//aid起点
 		while (true) {
@@ -282,7 +278,7 @@ public class TestApp {
 					System.out.println( "真的达到边界了, 休息300秒,再继续" );
 					Utils.blockUntil( "达到边界再开始 ", DateTime.now().plusSeconds( 300 ), 30000 );
 				} else {//没有到达边界 但是也是睡觉一下
-					Utils.blockUntil( "下一轮再开始", DateTime.now().plusSeconds( 100 ), 25000);
+					Utils.blockUntil( "下一轮再开始", DateTime.now().plusSeconds( 100 ), 25000 );
 				}
 			} catch (Exception ex) {
 				ex.printStackTrace();
