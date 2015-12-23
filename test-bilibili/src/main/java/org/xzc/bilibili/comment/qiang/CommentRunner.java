@@ -78,8 +78,6 @@ public class CommentRunner {
 			throws SchedulerException {
 		new TaskHelper( jobCfg0, cfg0 )
 				.addCommentJob( "一拳超人", 3407473, "测试测试测试测试", DateTime.now(), DateTime.now().plusSeconds( 20 ) )
-				.addCommentJob( "KZ", 3436859, "然而还没有完结.", new DateTime( 2015, 12, 23, 22, 5 ),
-						new DateTime( 2015, 12, 23, 22, 20 ) )
 				.addCommentJob( "不思议", 3436833, "不思议美眉, 完结撒花.", new DateTime( 2015, 12, 23, 22, 55 ),
 						new DateTime( 2015, 12, 23, 23, 10 ) )
 				.addCommentJob( "庶民样本", 3436839, "庶民样本, 完结撒花.", new DateTime( 2015, 12, 23, 23, 25 ),
