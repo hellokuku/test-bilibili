@@ -7,6 +7,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.xzc.bilibili.api.Params;
 import org.xzc.bilibili.comment.qiang.config.CommentConfig;
+import org.xzc.bilibili.util.Utils;
 
 public class CommentExecutor2 extends CommentExecutor {
 
@@ -28,12 +29,15 @@ public class CommentExecutor2 extends CommentExecutor {
 	}
 
 	@Override
-	protected WorkResult workInternal(String content) {
+	protected WorkResult workInternal(String content, HttpUriRequest req) {
 		if (cfg.isDiu() && content.length() > 100) {
 			diu.incrementAndGet();
 			return WorkResult.DIU;
 		}
-		if ("OK".equals( content ) || content.contains( "验证码" )
+		if ("OK".equals( content )) {
+			Utils.log( "成功了" + req.getURI().getHost() );
+			return WorkResult.STOP;
+		} else if ("OK".equals( content ) || content.contains( "验证码" )
 				|| ( cfg.isStopWhenForbidden() && content.contains( "禁言" ) )) {
 			return WorkResult.STOP;
 		}

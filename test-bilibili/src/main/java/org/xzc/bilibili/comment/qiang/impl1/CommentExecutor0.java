@@ -41,7 +41,7 @@ public class CommentExecutor0 extends CommentExecutor {
 	private static final Pattern RESULT_PATTERN = Pattern.compile( "abc\\(\"(.+)\"\\)" );
 
 	@Override
-	protected WorkResult workInternal(String content) {
+	protected WorkResult workInternal(String content, HttpUriRequest req) {
 		if (cfg.isDiu() && content.length() > 100) {
 			diu.incrementAndGet();
 			return WorkResult.NORMAL;

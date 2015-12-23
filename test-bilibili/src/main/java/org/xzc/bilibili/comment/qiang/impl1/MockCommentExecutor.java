@@ -22,7 +22,7 @@ public class MockCommentExecutor extends CommentExecutor {
 	}
 
 	@Override
-	protected WorkResult workInternal(String content) {
+	protected WorkResult workInternal(String content, HttpUriRequest req) {
 		if ("OK".equals( content ) || content.contains( "验证码" ) || content.contains( "禁言" )) {
 			return WorkResult.STOP;
 		}

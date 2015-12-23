@@ -55,7 +55,7 @@ public class CommentExecutor1 extends CommentExecutor {
 	}
 
 	@Override
-	protected WorkResult workInternal(String content) {
+	protected WorkResult workInternal(String content, HttpUriRequest req) {
 		JSONObject json = JSON.parseObject( content );
 		int code = json.getIntValue( "code" );
 		switch (code) {

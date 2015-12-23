@@ -1,6 +1,7 @@
 package org.xzc.bilibili.comment.qiang;
 
 import java.text.SimpleDateFormat;
+import java.util.Random;
 
 import org.joda.time.DateTime;
 import org.quartz.JobBuilder;
@@ -12,12 +13,12 @@ import org.quartz.TriggerBuilder;
 import org.quartz.impl.StdSchedulerFactory;
 import org.xzc.bilibili.comment.qiang.config.CommentConfig;
 import org.xzc.bilibili.comment.qiang.config.CommentJobConfig;
+import org.xzc.bilibili.util.Utils;
 
 import com.alibaba.fastjson.JSON;
 
 public class CommentRunner {
 	private static final SimpleDateFormat SDF = new SimpleDateFormat( "MM月dd日HH时mm分ss秒" );
-	private static final String DATETIME_PATTER = "yyyy年MM月dd日HH时mm分ss秒";
 	private static Scheduler scheduler;
 	private static JobDetail commentJob;
 
@@ -32,8 +33,8 @@ public class CommentRunner {
 		Trigger t = TriggerBuilder.newTrigger().startAt( startAt.toDate() ).forJob( commentJob )
 				.usingJobData( CommentJob.ARG_CONFIG, JSON.toJSONString( jobCfg ) ).build();
 		scheduler.scheduleJob( t );
-		System.out.println( String.format( "[%s] 将会于 %s 开始, 于 %s 结束.", tag, startAt.toString( DATETIME_PATTER ),
-				endAt.toString( DATETIME_PATTER ) ) );
+		System.out.println( String.format( "[%s] 将会于 %s 开始, 于 %s 结束.", tag, startAt.toString( Utils.DATETIME_PATTER ),
+				endAt.toString( Utils.DATETIME_PATTER ) ) );
 		return t;
 	}
 
@@ -68,7 +69,8 @@ public class CommentRunner {
 		CommentConfig cfg00 = new CommentConfig()
 				.thread( 512, 1000 )
 				.setServerIP( "61.164.47.167" )
-				.other( true, true )
+				.other( true, false )
+				.setTimeout( 5000 )
 				.cookie( "19480366", "f3e878e5,1451143184,7458bb46" );
 		addJobs( jobCfg00, cfg00 );
 		System.out.println( "现在的时间是 " + DateTime.now().toString( "yyyy年MM月dd日 HH时mm分ss秒" ) );
@@ -77,20 +79,13 @@ public class CommentRunner {
 	private static final void addJobs(CommentJobConfig jobCfg0, CommentConfig cfg0)
 			throws SchedulerException {
 		new TaskHelper( jobCfg0, cfg0 )
-				.addCommentJob( "一拳超人", 3407473, "测试测试测试测试", DateTime.now(), DateTime.now().plusSeconds( 20 ) )
-				.addCommentJob( "不思议", 3436833, "不思议美眉, 完结撒花.", new DateTime( 2015, 12, 23, 22, 55 ),
-						new DateTime( 2015, 12, 23, 23, 10 ) )
-				.addCommentJob( "庶民样本", 3436839, "庶民样本, 完结撒花.", new DateTime( 2015, 12, 23, 23, 25 ),
-						new DateTime( 2015, 12, 23, 23, 40 ) )
+				.addCommentJob( "一拳超人", 3407473, "测试测试测试测试", DateTime.now(), DateTime.now().plusSeconds( 10 ) )
 				.addCommentJob( "樱子小姐", 3436845, "樱子小姐, 完结撒花.", new DateTime( 2015, 12, 24, 0, 55 ),
 						new DateTime( 2015, 12, 24, 1, 10 ) )
 				.addCommentJob( "35", 3436851, "35小队, 完结撒花.", new DateTime( 2015, 12, 24, 1, 30 ),
 						new DateTime( 2015, 12, 24, 1, 45 ) )
 				.addCommentJob( "与魔共舞", 3436856, "与魔共舞, 完结撒花.", new DateTime( 2015, 12, 24, 1, 55 ),
 						new DateTime( 2015, 12, 24, 2, 10 ) );
-
-		//.addCommentJob( "测试", 45219, "测试测试测试测试2", DateTime.now().plusSeconds( 7 ),
-		//		DateTime.now().plusSeconds( 12 ) )
 	}
 }
 

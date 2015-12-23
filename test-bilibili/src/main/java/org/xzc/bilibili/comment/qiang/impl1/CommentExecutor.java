@@ -2,6 +2,7 @@ package org.xzc.bilibili.comment.qiang.impl1;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -18,12 +19,15 @@ import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
+import org.xzc.bilibili.api.Params;
 import org.xzc.bilibili.comment.qiang.Proxy;
 import org.xzc.bilibili.comment.qiang.config.CommentConfig;
 import org.xzc.bilibili.util.Utils;
@@ -114,12 +118,56 @@ public abstract class CommentExecutor extends Thread {
 
 	protected abstract HttpUriRequest makeCommentRequest();
 
+	private List<HttpUriRequest> makeRequestList() {
+		List<String> serverIPList = Arrays.asList(
+				"107.182.165.170",
+				"111.23.6.114",
+				"112.25.85.6",
+				"113.105.152.207",
+				"117.34.100.9",
+				"119.84.82.202",
+				"121.17.17.90",
+				"122.225.39.202",
+				"124.95.153.199",
+				"125.39.7.139",
+				"14.136.134.118",
+				"14.152.58.20",
+				"182.118.9.10",
+				"183.203.29.34",
+				"183.61.9.45",
+				"192.161.173.58",
+				"211.161.102.180",
+				"218.205.74.9",
+				"218.76.137.149",
+				"220.194.222.7",
+				"221.234.38.238",
+				"47.88.138.238",
+				"58.220.29.10",
+				"61.179.50.21" );
+		List<HttpUriRequest> reqList = new ArrayList<HttpUriRequest>();
+		for (String sip : serverIPList) {
+			HttpUriRequest req = RequestBuilder.post( "http://" + sip + "/feedback/post" )
+					.addHeader( "User-Agent", "Mozilla/5.0 BiliDroid/2.3.4 (bbcallen@gmail.com)" )
+					.addHeader( "Cookie",
+							"DedeUserID=" + cfg.getDedeUserID() + "; SESSDATA=" + cfg.getSESSDATA() + ";" )
+					.addHeader( "Referer", "http://www.bilibili.com" )
+					.addHeader( "Host", "www.bilibili.com" )
+					.setEntity(
+							new Params( "aid", cfg.getAid(), "msg", cfg.getMsg(), "platform",
+									"android"/*, "appkey", "03fc8eb101b091fb"*/ )
+											.toEntity() )
+					.build();
+			reqList.add( req );
+		}
+		return reqList;
+	}
+
 	protected void work(final CloseableHttpClient chc, ExecutorService es)
 			throws InterruptedException, ExecutionException {
 
 		//生成req
-		final HttpUriRequest req = makeCommentRequest();
-
+		//final HttpUriRequest req = makeCommentRequest();
+		List<HttpUriRequest> reqList = makeRequestList();
 		//记录future
 		List<Future<?>> futureList = new ArrayList<Future<?>>();
 
@@ -128,6 +176,7 @@ public abstract class CommentExecutor extends Thread {
 		final long endAt = cfg.getEndAt().getTime();
 		//batch个线程
 		for (int ii = 0; ii < cfg.getBatch(); ++ii) {
+			final HttpUriRequest req = reqList.get( ii % reqList.size() );
 			Future<?> f = es.submit( new Callable<Void>() {
 				public Void call() throws Exception {
 					//没有过期 不要求停止 没有超时
@@ -140,10 +189,11 @@ public abstract class CommentExecutor extends Thread {
 
 							if (count1 % cfg.getInterval() == 0) {
 								System.out.println( content.length() > 100 ? "过长的文本" : content );
-								System.out.println( String.format( "[%s] count=%d diu=%d 已执行%d秒 上一次间隔=%d毫秒",
-										cfg.getTag(), count1, diu.get(), ( now - begAt ) / 1000, now - llast ) );
+								System.out.println( String.format( "[%s] [%s] count=%d diu=%d 已执行%d秒 上一次间隔=%d毫秒 host="+req.getURI().getHost(),
+										cfg.getTag(), DateTime.now().toString( Utils.DATETIME_PATTER ), count1,
+										diu.get(), ( now - begAt ) / 1000, now - llast ) );
 							}
-							WorkResult wr = workInternal( content );
+							WorkResult wr = workInternal( content,req);
 							switch (wr) {
 							case DIU:
 								Utils.sleep( 500 );
@@ -172,5 +222,5 @@ public abstract class CommentExecutor extends Thread {
 		Utils.blockUntil( futureList );
 	}
 
-	protected abstract WorkResult workInternal(String content);
+	protected abstract WorkResult workInternal(String content, HttpUriRequest req);
 }

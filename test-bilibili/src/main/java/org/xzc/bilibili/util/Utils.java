@@ -17,6 +17,7 @@ import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 
 public class Utils {
+	public static final String DATETIME_PATTER = "yyyy年MM月dd日HH时mm分ss秒";
 	private static final Logger log = Logger.getLogger( Utils.class );
 	private static final File LOG_FILE = new File( "error.log" );
 

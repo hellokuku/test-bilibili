@@ -9,12 +9,12 @@ public class CommentConfig implements Cloneable {
 
 	String serverIP; //服务器的ip地址
 
-	int batch; //线程数
-	int interval; //间隔多少个评论就打印一次信息
+	int batch=1; //线程数
+	int interval=1; //间隔多少个评论就打印一次信息
 
-	boolean diu; //是否统计丢失问题
-	boolean stopWhenForbidden; //当禁言的时候停止评论
-	int timeout;
+	boolean diu=true; //是否统计丢失问题
+	boolean stopWhenForbidden=false; //当禁言的时候停止评论
+	int timeout=500;
 
 	Proxy proxy;
 
