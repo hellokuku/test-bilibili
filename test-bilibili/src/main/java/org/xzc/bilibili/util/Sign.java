@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.methods.RequestBuilder;
 import org.xzc.bilibili.api.Params;
 
 public class Sign {
@@ -95,5 +96,14 @@ public class Sign {
 	public String getSign() {
 		return sign;
 
+	}
+
+	public static void signTo(RequestBuilder rb) {
+		List<NameValuePair> parameters = rb.getParameters();
+		Map<String, String> params = new HashMap<String, String>();
+		for (NameValuePair nvp : parameters)
+			params.put( nvp.getName(), nvp.getValue() );
+		String sign = new Sign( params ).getSign();
+		rb.addParameter( "sign", sign );
 	}
 }

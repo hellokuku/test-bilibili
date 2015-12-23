@@ -78,7 +78,7 @@ public class JobExecutor {
 			CommentResult cr = new CommentResult();
 			cr.setCommentConfig( ce.getCommentConfig() );
 			cr.setCount( ce.getCount() );
-			cr.setDiu( cr.getDiu() );
+			cr.setDiu( ce.getDiu() );
 			ret.add( cr );
 		}
 		return ret;

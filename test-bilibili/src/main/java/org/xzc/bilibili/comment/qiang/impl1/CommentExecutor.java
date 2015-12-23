@@ -32,7 +32,7 @@ public abstract class CommentExecutor extends Thread {
 	private static final Logger log = Logger.getLogger( CommentExecutor.class );
 
 	public enum WorkResult {
-		NORMAL, STOP, OVERSPEED
+		NORMAL, STOP, OVERSPEED, DIU
 	}
 
 	protected final CommentConfig cfg;
@@ -145,6 +145,9 @@ public abstract class CommentExecutor extends Thread {
 							}
 							WorkResult wr = workInternal( content );
 							switch (wr) {
+							case DIU:
+								Utils.sleep( 500 );
+								break;
 							case NORMAL:
 								break;
 							case OVERSPEED:

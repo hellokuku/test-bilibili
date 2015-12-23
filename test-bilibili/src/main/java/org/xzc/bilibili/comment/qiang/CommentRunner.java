@@ -66,7 +66,7 @@ public class CommentRunner {
 		CommentJobConfig jobCfg00 = new CommentJobConfig()
 				.setMode( 2 );
 		CommentConfig cfg00 = new CommentConfig()
-				.thread( 1, 1 )
+				.thread( 512, 1000 )
 				.setServerIP( "61.164.47.167" )
 				.other( true, true )
 				.cookie( "19480366", "f3e878e5,1451143184,7458bb46" );
@@ -77,11 +77,22 @@ public class CommentRunner {
 	private static final void addJobs(CommentJobConfig jobCfg0, CommentConfig cfg0)
 			throws SchedulerException {
 		new TaskHelper( jobCfg0, cfg0 )
-				.addCommentJob( "一拳超人", 3407473, "测试测试测试测试", DateTime.now(), DateTime.now().plusSeconds( 6 ) )
-				//.addCommentJob( "测试", 45219, "测试测试测试测试2", DateTime.now().plusSeconds( 7 ),
-				//		DateTime.now().plusSeconds( 12 ) )
-				.addCommentJob( "庶民样本", 3436839, "庶民样本, 完结撒花.", new DateTime( 2015, 12, 23, 0, 25 ),
-						new DateTime( 2015, 12, 23, 23, 50 ) );
+				.addCommentJob( "一拳超人", 3407473, "测试测试测试测试", DateTime.now(), DateTime.now().plusSeconds( 20 ) )
+				.addCommentJob( "KZ", 3436859, "然而还没有完结.", new DateTime( 2015, 12, 23, 22, 5 ),
+						new DateTime( 2015, 12, 23, 22, 20 ) )
+				.addCommentJob( "不思议", 3436833, "不思议美眉, 完结撒花.", new DateTime( 2015, 12, 23, 22, 55 ),
+						new DateTime( 2015, 12, 23, 23, 10 ) )
+				.addCommentJob( "庶民样本", 3436839, "庶民样本, 完结撒花.", new DateTime( 2015, 12, 23, 23, 25 ),
+						new DateTime( 2015, 12, 23, 23, 40 ) )
+				.addCommentJob( "樱子小姐", 3436845, "樱子小姐, 完结撒花.", new DateTime( 2015, 12, 24, 0, 55 ),
+						new DateTime( 2015, 12, 24, 1, 10 ) )
+				.addCommentJob( "35", 3436851, "35小队, 完结撒花.", new DateTime( 2015, 12, 24, 1, 30 ),
+						new DateTime( 2015, 12, 24, 1, 45 ) )
+				.addCommentJob( "与魔共舞", 3436856, "与魔共舞, 完结撒花.", new DateTime( 2015, 12, 24, 1, 55 ),
+						new DateTime( 2015, 12, 24, 2, 10 ) );
+
+		//.addCommentJob( "测试", 45219, "测试测试测试测试2", DateTime.now().plusSeconds( 7 ),
+		//		DateTime.now().plusSeconds( 12 ) )
 	}
 }
 

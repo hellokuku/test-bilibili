@@ -30,9 +30,8 @@ public class CommentExecutor2 extends CommentExecutor {
 	@Override
 	protected WorkResult workInternal(String content) {
 		if (cfg.isDiu() && content.length() > 100) {
-			System.out.println( content );
 			diu.incrementAndGet();
-			return WorkResult.NORMAL;
+			return WorkResult.DIU;
 		}
 		if ("OK".equals( content ) || content.contains( "验证码" )
 				|| ( cfg.isStopWhenForbidden() && content.contains( "禁言" ) )) {
