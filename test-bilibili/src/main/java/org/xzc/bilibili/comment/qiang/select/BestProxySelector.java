@@ -1,11 +1,10 @@
 package org.xzc.bilibili.comment.qiang.select;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.joda.time.DateTime;
-import org.xzc.bilibili.comment.qiang.Config;
 import org.xzc.bilibili.comment.qiang.JobExecutor;
+import org.xzc.bilibili.comment.qiang.Proxy;
+import org.xzc.bilibili.comment.qiang.config.CommentJobConfig;
 
 public class BestProxySelector {
 	private int count = 1;
@@ -16,21 +15,20 @@ public class BestProxySelector {
 		this.pf = pf;
 	}
 
-	public List<String> select(Config cfg) {
-		List<String> senderList = new ArrayList<String>( cfg.getSenderList() );
+	public List<Proxy> select(CommentJobConfig jobCfg0) {
+		CommentJobConfig jobCfg = jobCfg0.clone();
+		List<Proxy> proxyList = jobCfg.getProxyList();
 		for (int i = 0; i < count; ++i) {
-			cfg.setStartAt( DateTime.now().toDate() ).setEndAt( DateTime.now().plusSeconds( 12 ).toDate() );
-			JobExecutor je = new JobExecutor( cfg );
-			je.executor();
-			je.printResult();
-			List<ProxyExecutionResult> list = je.getResultList();
-			//删除执行次数为0的代理
-			for (ProxyExecutionResult r : list) {
-				if (!pf.accept( r ))
-					senderList.remove( r.ip + ":" + r.port );
+			JobExecutor je = new JobExecutor( jobCfg );
+			List<CommentResult> list = je.execute();
+			//删除一些代理
+			for (CommentResult r : list) {
+				if (!pf.accept( r )) {
+					proxyList.remove( r.getCommentConfig().getProxy() );
+				}
 			}
-			cfg.setSenderList( senderList );
+			jobCfg.setProxyList( proxyList );
 		}
-		return senderList;
+		return proxyList;
 	}
 }

@@ -5,70 +5,96 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.xzc.bilibili.comment.qiang.select.ProxyExecutionResult;
+import org.apache.log4j.Logger;
+import org.xzc.bilibili.comment.qiang.config.CommentConfig;
+import org.xzc.bilibili.comment.qiang.config.CommentJobConfig;
+import org.xzc.bilibili.comment.qiang.impl1.CommentExecutor;
+import org.xzc.bilibili.comment.qiang.impl1.CommentExecutorFactory;
+import org.xzc.bilibili.comment.qiang.select.CommentResult;
 
 public class JobExecutor {
-	private Config cfg;
+	private static final Logger log = Logger.getLogger( JobExecutor.class );
 
-	public JobExecutor(Config cfg) {
-		this.cfg = cfg;
+	private CommentJobConfig jobCfg;
+
+	public JobExecutor(CommentJobConfig jobCfg) {
+		this.jobCfg = jobCfg;
 	}
 
-	public void executor() {
+	public List<CommentResult> execute() {
 		AtomicBoolean stop = new AtomicBoolean( false );
 		AtomicLong last = new AtomicLong( 0 );
-		System.out.println( "开始执行 " + cfg );
-		if (cfg.getMode() == 0) {
-			CommentWoker t = new CommentWoker( cfg, stop, last );
-			t.run();
-			System.out.println( String.format( "[%s] 本机 count=%d", cfg.getTag(), t.getCount() ) );
+		List<CommentExecutor> executorList = new ArrayList<CommentExecutor>();
+		int mode = jobCfg.getMode();
+
+		if (log.isDebugEnabled())
+			log.debug( String.format( "[%s] 开始执行, 模式=%d", jobCfg.getTag(), mode ) );
+
+		if (mode == -1 || mode == 0 || mode == 2) {
+			CommentExecutor myExecutor = CommentExecutorFactory.createCommentExecutor( jobCfg,
+					jobCfg.getCommentConfig().setTag( jobCfg.getTag() ), stop, last );
+			if (log.isDebugEnabled())
+				log.debug( jobCfg.getCommentConfig() );
+			myExecutor.run();
+			executorList.add( myExecutor );
 		} else {
-			List<CommentWoker> threadList = new ArrayList<CommentWoker>();
-			for (String sender : cfg.getSenderList()) {//跑代理
-				String[] ss = sender.split( ":" );
-				String proxyHost = ss[0];
-				int proxyPort = Integer.parseInt( ss[1] );
-				CommentWoker t = new CommentWoker( cfg, stop, last, proxyHost, proxyPort );
-				t.start();
-				threadList.add( t );
-			}
+			if (jobCfg.getProxyList() != null)
+				for (Proxy proxy : jobCfg.getProxyList()) {//跑代理
+					CommentConfig cfg = jobCfg.getCommentConfig()
+							.clone()
+							.setProxy( proxy )
+							.setTag( jobCfg.getTag() + "," + proxy.toString() );
+					CommentExecutor ce = CommentExecutorFactory.createCommentExecutor( jobCfg, cfg, stop, last );
+					ce.start();
+					executorList.add( ce );
+				}
 			//本机运行
-			CommentWoker t = new CommentWoker( cfg, stop, last );
-			t.run();
-			//等待其他代理
-			for (CommentWoker th : threadList)
+			CommentExecutor myExecutor = CommentExecutorFactory.createCommentExecutor( jobCfg,
+					jobCfg.getCommentConfig()
+							.clone().setTag( jobCfg.getTag() + " 本机" ),
+					stop,
+					last );
+			myExecutor.start();
+			for (CommentExecutor ce : executorList)
 				try {
-					th.join();
+					ce.join();
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-			threadList.add( t );
-			total = 0;
-			//统计信息
-			for (CommentWoker th : threadList) {
-				ProxyExecutionResult r = new ProxyExecutionResult();
-				r.ip = th.getProxyHost();
-				r.port = th.getProxyPort();
-				r.count = th.getCount();
-				total += r.count;
-				resultList.add( r );
-			}
+			executorList.add( myExecutor );
 		}
+		if (log.isDebugEnabled())
+			log.debug( String.format( "[%s] 执行完毕", jobCfg.getTag() ) );
+		commentResultList = makeCommentResultList( executorList );
+		return commentResultList;
 	}
 
-	private int total = 0;
+	private List<CommentResult> commentResultList;
+
+	private List<CommentResult> makeCommentResultList(List<CommentExecutor> executorList) {
+
+		List<CommentResult> ret = new ArrayList<CommentResult>();
+		for (CommentExecutor ce : executorList) {
+			CommentResult cr = new CommentResult();
+			cr.setCommentConfig( ce.getCommentConfig() );
+			cr.setCount( ce.getCount() );
+			cr.setDiu( cr.getDiu() );
+			ret.add( cr );
+		}
+		return ret;
+	}
 
 	public void printResult() {
-		for (ProxyExecutionResult r : resultList) {
-			System.out.println(
-					String.format( "[%s] [%s] count=%d", cfg.getTag(), ( r.ip == null ? "本机" : r.ip ), r.count ) );
+		int total = 0;
+		for (CommentResult cr : commentResultList) {
+			total += cr.getCount();
+			System.out.println( String.format( "[%s] [%s] count=%d, diu=%d", jobCfg.getTag(),
+					cr.getCommentConfig().getTag(), cr.getCount(), cr.getDiu() ) );
 		}
-		System.out.println( String.format( "[%s] %d台 total=%d", cfg.getTag(), resultList.size(), total ) );
+		System.out.println( String.format( "[%s] %d台 total=%d", jobCfg.getTag(), commentResultList.size(), total ) );
 	}
 
-	private List<ProxyExecutionResult>resultList = new ArrayList<ProxyExecutionResult>();
-
-	public List<ProxyExecutionResult> getResultList() {
-		return resultList;
+	public List<CommentResult> getCommentResultList() {
+		return commentResultList;
 	}
 }

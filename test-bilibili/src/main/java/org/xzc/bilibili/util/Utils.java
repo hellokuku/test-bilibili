@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.TreeSet;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import org.apache.commons.io.FileUtils;
 import org.joda.time.DateTime;
@@ -15,6 +17,11 @@ import org.joda.time.format.PeriodFormatterBuilder;
 
 public class Utils {
 	private static final File LOG_FILE = new File( "error.log" );
+
+	public static void blockUntil(List<Future<?>> futureList) throws InterruptedException, ExecutionException {
+		for (Future<?> f : futureList)
+			f.get();
+	}
 
 	public static void throwAsRuntimeException(Exception e) {
 		if (e instanceof RuntimeException)

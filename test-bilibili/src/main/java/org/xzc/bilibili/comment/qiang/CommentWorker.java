@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -30,6 +31,8 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.xzc.bilibili.api.Params;
+import org.xzc.bilibili.comment.qiang.config.CommentConfig;
 import org.xzc.bilibili.util.Sign;
 import org.xzc.bilibili.util.Utils;
 
@@ -37,44 +40,62 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 
-public class CommentWoker extends Thread {
-	private final Config cfg;
+public class CommentWorker extends Thread {
+	private final CommentConfig cfg;
 	private final HttpUriRequest req;
 	private final AtomicBoolean stop;
 	private final AtomicLong last;
 	private final String proxyHost;
 	private final int proxyPort;
+	private final int mode;
 
-	public CommentWoker(Config cfg, AtomicBoolean stop, AtomicLong last) {
+	public CommentWorker(CommentConfig cfg, AtomicBoolean stop, AtomicLong last, int mode) {
 		this.cfg = cfg;
 		this.stop = stop;
 		this.last = last;
-		this.req = makeCommentRequest( cfg );
+		this.req = makeCommentRequest( mode, cfg );
 		this.proxyHost = null;
 		this.proxyPort = 0;
+		this.mode = mode;
 	}
 
-	public CommentWoker(Config cfg, AtomicBoolean stop, AtomicLong last, String proxyHost,
-			int proxyPort) {
+	public CommentWorker(CommentConfig cfg, AtomicBoolean stop, AtomicLong last, String proxyHost,
+			int proxyPort, int mode) {
 		this.cfg = cfg;
 		this.stop = stop;
 		this.last = last;
-		this.req = makeCommentRequest( cfg );
+		this.req = makeCommentRequest( mode, cfg );
 		this.proxyHost = proxyHost;
 		this.proxyPort = proxyPort;
+		this.mode = mode;
 	}
 
-	private static HttpUriRequest makeCommentRequest(Config cfg) {
-		switch (cfg.getMode()) {
+	private static HttpUriRequest makeCommentRequest(int mode, CommentConfig cfg) {
+		switch (mode) {
 		case 0:
 			return makeCommentRequest0( cfg );
 		case 1:
 			return makeCommentRequest1( cfg );
+		case 2:
+			return makeCommentRequest2( cfg );
 		}
 		throw new IllegalArgumentException( "不合法的mode" );
 	}
 
-	private static HttpUriRequest makeCommentRequest1(Config cfg) {
+	private static HttpUriRequest makeCommentRequest2(CommentConfig cfg) {
+		return RequestBuilder.post( "http://" + cfg.getServerIP() + "/feedback/post" )
+				.addHeader( "User-Agent", "Mozilla/5.0 BiliDroid/2.3.4 (bbcallen@gmail.com)" )
+				.addHeader( "Cookie", "DedeUserID=" + cfg.getDedeUserID() + "; SESSDATA=" + cfg.getSESSDATA() + ";" )
+				.addHeader( "Referer", "http://www.bilibili.com" )
+				.addHeader( "Host", "www.bilibili.com" )
+				.setEntity(
+						new Params( "aid", cfg.getAid(), "msg", cfg.getMsg(), "platform",
+								"android"/*, "appkey", "03fc8eb101b091fb"*/ )
+										.toEntity() )
+				.build();
+	}
+
+	private static HttpUriRequest makeCommentRequest1(CommentConfig cfg) {
 		Map<String, String> params = new HashMap<String, String>();
 		params.put( "access_key", cfg.getAccessKey() );
 		params.put( "appkey", Sign.appkey );
@@ -92,7 +113,7 @@ public class CommentWoker extends Thread {
 			entity = new UrlEncodedFormEntity( list, "utf-8" );
 		} catch (Exception ex) {
 		}
-		RequestBuilder rb = RequestBuilder.post( "http://" + cfg.getSip() + "/feedback/post" ).setEntity( entity );
+		RequestBuilder rb = RequestBuilder.post( "http://" + cfg.getServerIP() + "/feedback/post" ).setEntity( entity );
 		rb.addHeader( "Host", "api.bilibili.com" );
 		rb.addHeader( "User-Agent", "Mozilla/5.0 BiliDroid/3.3.0 (bbcallen@gmail.com)" );
 		for (Entry<String, String> e : params.entrySet()) {
@@ -101,8 +122,8 @@ public class CommentWoker extends Thread {
 		return rb.build();
 	}
 
-	private static HttpUriRequest makeCommentRequest0(Config cfg) {
-		return RequestBuilder.get( "http://" + cfg.getSip() + "/feedback/post" )
+	private static HttpUriRequest makeCommentRequest0(CommentConfig cfg) {
+		return RequestBuilder.get( "http://" + cfg.getServerIP() + "/feedback/post" )
 				.addHeader( "Cookie", "DedeUserID=" + cfg.getDedeUserID() + "; SESSDATA=" + cfg.getSESSDATA() + ";" )
 				.addHeader( "Host", "interface.bilibili.com" )
 				.addParameter( "callback", "abc" )
@@ -139,9 +160,9 @@ public class CommentWoker extends Thread {
 		ExecutorService es = Executors.newFixedThreadPool( cfg.getBatch() );
 		try {
 			tbeg = System.currentTimeMillis();
-			if (cfg.getMode() == 0) {
+			if (mode == 0) {
 				work0( chc, es );
-			} else {
+			} else if (mode == 1) {
 				while (!stop.get()) {
 					work1( chc, es );
 					if (!stop.get()) {
@@ -149,8 +170,12 @@ public class CommentWoker extends Thread {
 						Thread.sleep( 2000 );
 					}
 				}
+			} else if (mode == 2) {
+				work2( chc, es );
+			} else {
+				throw new IllegalArgumentException( "不合法的mode=" + mode );
 			}
-		} catch (InterruptedException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			es.shutdown();
@@ -161,7 +186,8 @@ public class CommentWoker extends Thread {
 
 	private static Pattern RESULT_PATTERN = Pattern.compile( "abc\\(\"(.+)\"\\)" );
 
-	private void work0(final CloseableHttpClient hc, ExecutorService es) {
+	private void work0(final CloseableHttpClient hc, ExecutorService es)
+			throws InterruptedException, ExecutionException {
 		List<Future<?>> futureList = new ArrayList<Future<?>>();
 		final long endAt = cfg.getEndAt().getTime();
 		final int interval = cfg.getInterval();
@@ -214,16 +240,63 @@ public class CommentWoker extends Thread {
 			} );
 			futureList.add( f );
 		}
-		for (Future<?> f : futureList)
-			try {
-				f.get();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		futureList.clear();
+		Utils.blockUntil( futureList );
 	}
 
-	private void work1(final CloseableHttpClient hc, ExecutorService es) {
+	private void work2(final CloseableHttpClient hc, ExecutorService es)
+			throws InterruptedException, ExecutionException {
+
+		final long endAt = cfg.getEndAt().getTime();
+		final int interval = cfg.getInterval();
+		final boolean stopWhenForbidden = cfg.isStopWhenForbidden();
+		final boolean isDiu = cfg.isDiu();
+		List<Future<?>> futureList = new ArrayList<Future<?>>();
+
+		for (int ii = 0; ii < cfg.getBatch(); ++ii) {
+			Future<?> f = es.submit( new Callable<Void>() {
+				public Void call() throws Exception {
+					while (!stop.get()) {
+						try {
+							CloseableHttpResponse res = hc.execute( req );
+							String content = EntityUtils.toString( res.getEntity() ).trim();
+							res.close();
+							long end = System.currentTimeMillis();
+							if (end >= endAt)
+								stop.set( true );
+							long llast = last.getAndSet( end );
+							if (isDiu && content.length() > 100) {//丢包了
+								diu.incrementAndGet();
+								continue;
+							}
+							int count1 = count.incrementAndGet();
+							if (count1 % interval == 0) {
+								System.out.println( content );
+								System.out
+										.println(
+												"[" + cfg.getTag() + "] count=" + count1 + " diu=" + diu.get() + " 时间="
+														+ ( end - tbeg ) / 1000 + "秒 间隔="
+														+ ( end - llast ) );
+							}
+							if ("OK".equals( content ) || content.contains( "验证码" )
+									|| ( stopWhenForbidden && content.contains( "禁言" ) )) {
+								stop.set( true );
+							}
+						} catch (IOException ex) {
+							//忽略
+						} catch (Exception ex) {//其他异常就打印一下
+							ex.printStackTrace();
+						}
+					}
+					return null;
+				}
+			} );
+			futureList.add( f );
+		}
+		Utils.blockUntil( futureList );
+	}
+
+	private void work1(final CloseableHttpClient hc, ExecutorService es)
+			throws InterruptedException, ExecutionException {
 		List<Future<?>> futureList = new ArrayList<Future<?>>();
 		final long endAt = cfg.getEndAt().getTime();
 		final int interval = cfg.getInterval();
@@ -280,14 +353,7 @@ public class CommentWoker extends Thread {
 			} );
 			futureList.add( f );
 		}
-		for (Future<?> f : futureList)
-			try {
-				f.get();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		futureList.clear();
-
+		Utils.blockUntil( futureList );
 	}
 
 	public String getProxyHost() {

@@ -1,9 +1,6 @@
 package org.xzc.bilibili.comment.qiang;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import org.joda.time.DateTime;
 import org.quartz.JobBuilder;
@@ -13,21 +10,20 @@ import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.impl.StdSchedulerFactory;
-import org.xzc.bilibili.comment.qiang.select.BestProxySelector;
-import org.xzc.bilibili.comment.qiang.select.ProxyExecutionResult;
-import org.xzc.bilibili.comment.qiang.select.ProxyFilter;
+import org.xzc.bilibili.comment.qiang.config.CommentConfig;
+import org.xzc.bilibili.comment.qiang.config.CommentJobConfig;
 
 import com.alibaba.fastjson.JSON;
 
 public class CommentRunner {
 	private static final SimpleDateFormat SDF = new SimpleDateFormat( "MM月dd日HH时mm分ss秒" );
 
-	private static final Trigger addJob(Scheduler s, JobDetail job, Config cfg) throws SchedulerException {
+	private static final Trigger addJob(Scheduler s, JobDetail job, CommentJobConfig cfg) throws SchedulerException {
 		Trigger t = TriggerBuilder.newTrigger().startAt( cfg.getStartAt() ).forJob( job )
 				.usingJobData( CommentJob.ARG_CONFIG, JSON.toJSONString( cfg ) ).build();
 		s.scheduleJob( t );
 		System.out.println( "[" + cfg.getTag() + "] 将会于" + SDF.format( cfg.getStartAt() ) + "开始, 于"
-				+ SDF.format( cfg.getEndAt() ) + "结束." );
+				+ SDF.format( cfg.getCommentConfig().getEndAt() ) + "结束." );
 		return t;
 	}
 
@@ -40,23 +36,39 @@ public class CommentRunner {
 		// 60.221.255.15 113.105.152.207 61.164.47.167 112.25.85.6 125.39.7.139
 		//125.39.7.139 106.39.192.38  14.152.58.20 218.76.137.149 183.247.180.15
 
-		//模式 tag 服务器ip
-		//基于cookie的两个数据
-		//基于api的两个字段
-		//线程 间隔 禁言是否停止
-		//aid 消息 开始时间 结束时间
-		Config c00 = new Config( 0, "ip",
+		CommentJobConfig jobCfg00 = new CommentJobConfig()
+				.setMode( 0 );
+
+		CommentConfig cfg00 = new CommentConfig()
+				.thread( 512, 1000 )
+				.setServerIP( "61.164.47.167" )
+				.other( true, false )
+				.cookie( "d", "d" );
+
+		CommentJobConfig jobCfg = jobCfg00.clone()
+				.setTag( "测试测试用" )
+				.setStartAt( DateTime.now().plusSeconds( 2 ).toDate() )
+				.setCommentConfig(
+						cfg00.clone().video( 1, "测试测试测试", DateTime.now().plusSeconds( 12 ) ) );
+		addJob( s, commentJob, jobCfg );
+
+		/*
+		CommentConfig c00 = new CommentConfig( 0, "ip",
 				"19480366", "f3e878e5,1451143184,7458bb46", // xzchao xuzhichaoxh3@163.com
 				"19997766", "454ba9153a48adeb7fc170806aadbd2c", // jzxcai bzhxh1@sina.com
 				1, 1, true, true,
 				"tag", 0, "msg", null, null );
-		int mode = 1;
+		int mode = 2;
 		if (mode == 0) {
-			Config c0 = c00.custom().setMode( 0 ).setSip( "112.25.85.6" )
-					.setBatch( 1024 ).setInterval( 1000 );
+			CommentConfig c0 = c00.custom().setMode( mode ).setSip( "61.164.47.167" )
+					.setBatch( 1 ).setInterval( 1 );
+			addJobs( s, commentJob, c0 );
+		} else if (mode == 2) {
+			CommentConfig c0 = c00.custom().setMode( mode ).setSip( "61.164.47.167" )
+					.setBatch( 1 ).setInterval( 1 );
 			addJobs( s, commentJob, c0 );
 		} else {
-			List<String> senderList = new ArrayList<String>(Arrays.asList(
+			List<String> senderList = new ArrayList<String>( Arrays.asList(
 					"202.120.38.17:2076",
 					"202.120.17.158:2076",
 					"183.224.171.150:2076",
@@ -85,8 +97,8 @@ public class CommentRunner {
 					"122.227.199.178:9797",
 					"202.195.192.197:3128",
 					"121.8.69.107:9797",
-					"121.8.170.53:9797" ));
-			Config c0 = c00.custom().setMode( 1 ).setSip( "61.164.47.167" )
+					"121.8.170.53:9797" ) );
+			CommentConfig c0 = c00.custom().setMode( mode ).setSip( "61.164.47.167" )
 					.setBatch( 32 ).setInterval( 500 ).setSenderList( senderList );
 			/*List<String> result = new BestProxySelector( 10, new ProxyFilter() {
 				public boolean accept(ProxyExecutionResult r) {
@@ -97,25 +109,21 @@ public class CommentRunner {
 					new DateTime().plusSeconds( 12 ).toDate() ) );
 			for (String str : result) {
 				System.out.println( "\"" + str + "\"," );
-			}*/
+			}
 			//System.out.println( result );
 			addJobs( s, commentJob, c0 );
 		}
-		/*
 		 */
 		System.out.println( "现在的时间是 " + DateTime.now().toString( "yyyy年MM月dd日 HH时mm分ss秒" ) );
 	}
 
-	private static final void addJobs(Scheduler s, JobDetail commentJob, Config c0) throws SchedulerException {
-		addJob( s, commentJob, c0.custom( "亚里亚12", 3431356, c0.getMode() == 0 ? "水果忍者在哪里!?" : "多吃水果有益健康.",
-				new DateTime( 2015, 12, 22, 22, 28 ).toDate(),
-				new DateTime( 2015, 12, 22, 22, 40 ).toDate() ) );
-
+	private static final void addJobs(Scheduler s, JobDetail commentJob, CommentJobConfig jobCfg0)
+			throws SchedulerException {
 		//测试用 跑12秒足够了
-		addJob( s, commentJob, c0.custom( "一拳超人", 3407473, "测试测试测试测试",
+		/*addJob( s, commentJob, c0.custom( "一拳超人", 3407473, "测试测试测试测试",
 				new DateTime().plusSeconds( 0 ).toDate(),
 				new DateTime().plusSeconds( 12 ).toDate() ) );
-
+		*/
 		//测试用
 		/*
 		addJob( s, commentJob, c0.custom( "45219", 45219, "测试测试测试测试1",
