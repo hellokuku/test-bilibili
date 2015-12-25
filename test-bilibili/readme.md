@@ -26,17 +26,22 @@ https://account.bilibili.com/ajax/miniLogin/minilogin
 可以不需要验证码!
 
 添加到收藏夹
+get请求 添加到默认的收藏夹 需要带cookie
 http://api.bilibili.com/favourite/add?id=3335348
+post请求 添加到指定的收藏夹 需要带cookie
+http://api.bilibili.com/x/favourite/video/add?jsonp=jsonp&fid=19764585&aid=3425515
 
 获取用户信息
 http://api.bilibili.com/userinfo?user=xzchaooDRF8
-http://api.bilibili.com/userinfo?mid=19480366
+http://api.bilibili.com/userinfo?mid=1655915
 http://api.bilibili.com/myinfo?access_key=5be9b8caed10c4cfe1e34bed8b3d247c
+http://space.bilibili.com/ajax/member/GetInfo?mid=19557513
 
 获取用户的收藏夹
 这个似乎没有做权限认证, 所以可以获取其他人的收藏夹?
 http://space.bilibili.com/ajax/fav/getBoxList?mid=19539141
 和[获取收藏的视频]搭配使用可以获取别人的收藏信息!
+http://api.bilibili.com/x/favourite/folder 这个也行 需要带cookie
 
 收藏列表 xzchaooDRF8
 http://space.bilibili.com/ajax/fav/getList?mid=19557513&pagesize=30&fid=19764585

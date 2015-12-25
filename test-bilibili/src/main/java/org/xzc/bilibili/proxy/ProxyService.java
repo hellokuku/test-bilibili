@@ -103,8 +103,8 @@ public class ProxyService {
 		List<Proxy> list = new ArrayList<Proxy>();
 		//xici( "http://www.xicidaili.com/nn/", list );
 		//xici( "http://www.xicidaili.com/nt/", list );
-		//xici( "http://www.xicidaili.com/wn/", list );
-		//xici( "http://www.xicidaili.com/wt/", list );
+		xici( "http://www.xicidaili.com/wn/", list );
+		xici( "http://www.xicidaili.com/wt/", list );
 		//kuaidili( "http://www.kuaidaili.com/free/inha/", list );
 		//kuaidili( "http://www.kuaidaili.com/free/intr/", list );
 		kuaidili( "http://www.kuaidaili.com/free/outha/", list );

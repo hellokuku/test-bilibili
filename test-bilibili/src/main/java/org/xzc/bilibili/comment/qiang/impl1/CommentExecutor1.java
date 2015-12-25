@@ -18,6 +18,7 @@ import org.xzc.bilibili.comment.qiang.config.CommentConfig;
 import org.xzc.bilibili.util.Sign;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 
 public class CommentExecutor1 extends CommentExecutor {
@@ -56,7 +57,12 @@ public class CommentExecutor1 extends CommentExecutor {
 
 	@Override
 	protected WorkResult workInternal(String content, HttpUriRequest req) {
-		JSONObject json = JSON.parseObject( content );
+		JSONObject json = null;
+		try {
+			json = JSON.parseObject( content );
+		} catch (JSONException e) {
+			return WorkResult.OVERSPEED;
+		}
 		int code = json.getIntValue( "code" );
 		switch (code) {
 		case 0:

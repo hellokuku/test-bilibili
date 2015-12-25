@@ -43,25 +43,29 @@ public class JobExecutor {
 					CommentConfig cfg = jobCfg.getCommentConfig()
 							.clone()
 							.setProxy( proxy )
-							.setTag( jobCfg.getTag() + "," + proxy.toString() );
+							.setTag( jobCfg.getTag() + ", " + proxy.toString() );
 					CommentExecutor ce = CommentExecutorFactory.createCommentExecutor( jobCfg, cfg, stop, last );
 					ce.start();
 					executorList.add( ce );
 				}
-			//本机运行
-			CommentExecutor myExecutor = CommentExecutorFactory.createCommentExecutor( jobCfg,
-					jobCfg.getCommentConfig()
-							.clone().setTag( jobCfg.getTag() + " 本机" ),
-					stop,
-					last );
-			myExecutor.start();
+			CommentExecutor myExecutor = null;
+			if (jobCfg.isSelf()) {
+				myExecutor = CommentExecutorFactory.createCommentExecutor( jobCfg,
+						jobCfg.getCommentConfig()
+								.clone().setTag( jobCfg.getTag() + " 本机" ),
+						stop,
+						last );
+				myExecutor.run();
+			}
 			for (CommentExecutor ce : executorList)
 				try {
 					ce.join();
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-			executorList.add( myExecutor );
+			if (jobCfg.isSelf()) {
+				executorList.add( myExecutor );
+			}
 		}
 		if (log.isDebugEnabled())
 			log.debug( String.format( "[%s] 执行完毕", jobCfg.getTag() ) );

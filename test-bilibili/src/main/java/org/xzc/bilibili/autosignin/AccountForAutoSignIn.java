@@ -1,9 +1,6 @@
 package org.xzc.bilibili.autosignin;
 
-import java.util.Date;
-
 import com.alibaba.fastjson.annotation.JSONField;
-import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
@@ -30,12 +27,12 @@ public class AccountForAutoSignIn {
 	public int currentExp;
 	@DatabaseField
 	public int nextExp;
+	@DatabaseField
+	public String SESSDATA;
 	@Override
 	public String toString() {
 		return "AccountForAutoSignIn [mid=" + mid + ", name=" + name + ", coins=" + coins + ", userid=" + userid
-				+ ", access_key=" + access_key + ", currentLevel=" + currentLevel + ", currentMin=" + currentMin
-				+ ", currentExp=" + currentExp + ", nextExp=" + nextExp + "]";
+				+ ", password=" + password + ", SESSDATA=" + SESSDATA + "]";
 	}
-
 
 }

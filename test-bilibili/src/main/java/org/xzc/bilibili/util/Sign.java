@@ -15,7 +15,9 @@ import org.xzc.bilibili.api.Params;
 
 public class Sign {
 	public static final String appkey = "c1b107428d337928";
+	//public static final String appkey = "84b739484c36d653";
 	public static final String se = "ea85624dfcf12d7cc7b2b3a94fac1f2c";
+	//public static final String se = "92209092eed6a4030308b38964f9c7fa";
 
 	public Sign() {
 	}

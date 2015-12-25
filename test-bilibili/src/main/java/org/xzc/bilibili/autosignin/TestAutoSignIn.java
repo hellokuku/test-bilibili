@@ -19,9 +19,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.xzc.bilibili.api.Params;
+import org.xzc.bilibili.api2.BilibiliService2;
 import org.xzc.bilibili.config.DBConfig;
 import org.xzc.bilibili.util.HC;
 import org.xzc.bilibili.util.Sign;
@@ -36,8 +39,10 @@ import com.j256.ormlite.dao.RuntimeExceptionDao;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = DBConfig.class)
+@ContextConfiguration(classes = { DBConfig.class, TestAutoSignIn.class })
+@Configuration
 public class TestAutoSignIn {
+
 	/**
 	 * 获得账号信息 
 	 * @param hc
@@ -141,14 +146,18 @@ public class TestAutoSignIn {
 	public void test11() throws Exception {
 		List<AccountForAutoSignIn> list = dao.queryForAll();
 		RequestBuilder rb = null;
+		String result = null;
+
 		for (AccountForAutoSignIn a : list) {
 			String access_key = login( hc, a );
+			/*
 			rb = RequestBuilder.get( "https://api.bilibili.com/login/renewToken" )
 					.addParameter( "access_key", access_key )
 					.addParameter( "appkey", Sign.appkey );
 			Sign.signTo( rb );
 			String result = hc.asString( rb.build() );
-			System.out.println( result );
+			System.out.println( result );*/
+
 			//if (true)
 			//	continue;
 			AccountForAutoSignIn a2 = getAccountInfo( hc, access_key );
@@ -156,6 +165,7 @@ public class TestAutoSignIn {
 			a2.password = a.password;
 			dao.update( a2 );
 			System.out.println( a2 );
+
 			rb = RequestBuilder.post( "https://api.bilibili.com/x/share/first" )
 					.addParameter( "access_key", access_key )
 					.setEntity( new Params( "type", 33, "id", 3342515 ).toEntity() );

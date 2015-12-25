@@ -17,6 +17,8 @@ import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 
 public class Utils {
+	public static final String PASSWORD = "xzchaoo".substring( 0, 3 ) + "@" + ( 1771 * 4 + 2 ) + ( 409 * 5 )
+			+ ( 121 / 11 );
 	public static final String DATETIME_PATTER = "yyyy年MM月dd日HH时mm分ss秒";
 	private static final Logger log = Logger.getLogger( Utils.class );
 	private static final File LOG_FILE = new File( "error.log" );

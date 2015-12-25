@@ -13,6 +13,16 @@ public class CommentJobConfig implements Cloneable {
 	CommentConfig commentConfig;
 	List<Proxy> proxyList;
 	int mode = -1;
+	boolean self=true;
+	
+	public boolean isSelf() {
+		return self;
+	}
+
+	public CommentJobConfig setSelf(boolean self) {
+		this.self = self;
+		return this;
+	}
 
 	public CommentJobConfig() {
 	}

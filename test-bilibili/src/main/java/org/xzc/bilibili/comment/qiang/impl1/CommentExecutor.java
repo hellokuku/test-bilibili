@@ -118,6 +118,7 @@ public abstract class CommentExecutor extends Thread {
 
 	protected abstract HttpUriRequest makeCommentRequest();
 
+	@Deprecated
 	private List<HttpUriRequest> makeRequestList() {
 		List<String> serverIPList = Arrays.asList(
 				"107.182.165.170",
@@ -166,17 +167,14 @@ public abstract class CommentExecutor extends Thread {
 			throws InterruptedException, ExecutionException {
 
 		//生成req
-		//final HttpUriRequest req = makeCommentRequest();
-		List<HttpUriRequest> reqList = makeRequestList();
+		final HttpUriRequest req = makeCommentRequest();
 		//记录future
 		List<Future<?>> futureList = new ArrayList<Future<?>>();
-
 		//两个时间点
 		final long begAt = System.currentTimeMillis();
 		final long endAt = cfg.getEndAt().getTime();
 		//batch个线程
 		for (int ii = 0; ii < cfg.getBatch(); ++ii) {
-			final HttpUriRequest req = reqList.get( ii % reqList.size() );
 			Future<?> f = es.submit( new Callable<Void>() {
 				public Void call() throws Exception {
 					//没有过期 不要求停止 没有超时

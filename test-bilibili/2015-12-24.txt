@@ -1,0 +1,30 @@
+查看视频
+http://api.bilibili.com/x/video?aid=7
+
+
+查看评论
+http://api.bilibili.com/x/reply?type=1&sort=0&nohot=1&pn=1&oid=3440187
+oid是aid pn是页数
+
+杂
+http://api.bilibili.com/x/reply?jsonp=jsonp&type=1&sort=0&oid=3420311&pn=2&r=0.007915267255157232&nohot=1&callback=jQuery172004138753586448729_1450927108310&_=1450927116046
+http://api.bilibili.com/feedback?page=1&mode=arc&type=json&ver=3&order=default&pagesize=10&aid=3431351
+http://api.bilibili.com/x/favourite/folder?jsonp=jsonp&_=1450929907614
+http://api.bilibili.com/x/reply?jsonp=json&type=1&sort=0&oid=3420311&pn=3&r=0.007915267255157232&nohot=1&callback=jQuery172004138753586448729_1450927108310&_=1450927116046
+http://api.bilibili.com/x/reply?jsonp=json&type=1&sort=0&oid=3440187&pn=1&nohot=1
+
+
+查看视频的相关推荐
+http://comment.bilibili.com/reommend,3420311
+http://www.bilibili.com/api_proxy?app=tag&action=/tags/archive_list&aid=3420311&nomid=1
+http://bangumi.bilibili.com/jsonp/avseason/3420311.ver?callback=seasonJsonCallback&_=1450928587463
+http://www.bilibili.com/api_proxy?app=bangumi&action=/report_watch&episode_id=81849
+
+可以返回是否已经收藏了某视频
+http://api.bilibili.com/x/favourite/video/favoured?callback=jQuery172014267345174033352_1450928687633&aid=3420311&jsonp=jsonp&_=1450928688168
+http://app.bilibili.com/bangumi/avseason/3420311.ver?callback=seasonJsonCallback&_=1450928688357
+
+//可以拿到一个key 不知道干嘛的
+http://www.bilibili.com/plus/widget/ajaxGetCaptchaKey.php?js&_=1450928689122
+查看评论
+http://api.bilibili.com/x/reply?jsonp=jsonp&type=1&sort=0&oid=3420311&pn=1&r=0.2278350093682744&nohot=1&callback=jQuery172014267345174033352_1450928687636&_=1450928702019
