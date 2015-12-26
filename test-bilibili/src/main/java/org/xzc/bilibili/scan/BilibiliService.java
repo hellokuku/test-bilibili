@@ -208,7 +208,7 @@ public class BilibiliService {
 		String content = hc.asString( req );
 		if (!content.contains( Integer.toString( a.mid ) ))//账号还没有登陆
 			return false;
-		req = RequestBuilder.get( "http://" + API_IP + "/userinfo?mid=" + a.mid )
+		req = RequestBuilder.get( "http://" + API_IP + "/myinfo")
 				.addHeader( "Host", API_HOST )
 				.build();
 		String jsonStr = hc.asString( req );
