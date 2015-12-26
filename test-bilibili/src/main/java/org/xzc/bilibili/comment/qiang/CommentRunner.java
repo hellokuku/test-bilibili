@@ -3,6 +3,8 @@ package org.xzc.bilibili.comment.qiang;
 import java.text.SimpleDateFormat;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeField;
+import org.joda.time.MutableDateTime;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
@@ -75,27 +77,34 @@ public class CommentRunner {
 				.setServerIP( "61.164.47.167" )
 				.other( true, false )
 				.setTimeout( 5000 )
-				.cookie( "19480366", "f3e878e5,1451143184,7458bb46" );
+				.cookie( "19480366", "f3e878e5,1453714595,3e28031c" );
 		addJobs( jobCfg00, cfg00 );
 	}
 
 	private static final void addJobs(CommentJobConfig jobCfg0, CommentConfig cfg0)
 			throws SchedulerException {
+		MutableDateTime mdt = DateTime.now().toMutableDateTime();
+		mdt.setMinuteOfHour( mdt.getMinuteOfHour() + 1 );
+		mdt.setSecondOfMinute( 0 );
+		mdt.setMillisOfSecond( 0 );
+		//下一分钟
+		DateTime dt = mdt.toDateTime();
+
 		new TaskHelper( jobCfg0, cfg0 )
 				//.addCommentJob( "一拳超人", 3407473, "测试测试测试测试", DateTime.now().plusSeconds( 10 ),
 				//		DateTime.now().plusSeconds( 30 ) )
-				.addCommentJob( "一拳超人", 3407473, "测试测试测试1", new DateTime( 2015, 12, 26, 23, 26,0 ),
-						new DateTime( 2015, 12, 27, 23, 27 ) )
-				.addCommentJob( "一拳超人", 3407473, "测试测试测试2", new DateTime( 2015, 12, 26, 23, 26, 10 ),
-						new DateTime( 2015, 12, 27, 23, 27 ) )
-				.addCommentJob( "一拳超人", 3407473, "测试测试测试3", new DateTime( 2015, 12, 26, 23, 26, 20 ),
-						new DateTime( 2015, 12, 27, 23, 27 ) )
+				.addCommentJob( "一拳超人", 3407473, "测试测试测试1", dt,
+						dt.plusMinutes( 1 ) )
+				.addCommentJob( "一拳超人", 3407473, "测试测试测试2", dt.plusSeconds( 4 ),
+						dt.plusMinutes( 1 ) )
+				.addCommentJob( "一拳超人", 3407473, "测试测试测试3", dt.plusSeconds( 8 ),
+						dt.plusMinutes( 1 ) )
 				.addCommentJob( "KOWABON", 3456590, "KOWABON 完结撒花.", new DateTime( 2015, 12, 27, 0, 50 ),
-						new DateTime( 2015, 12, 27, 0, 55 ) )
+						new DateTime( 2015, 12, 27, 0, 5 ) )
 				.addCommentJob( "点兔", 3456601, "没有点兔, 这个冬天这么冷, 明年的冬季番这么冷(...), 怎么过...",
 						new DateTime( 2015, 12, 27, 1, 0 ),
-						new DateTime( 2015, 12, 27, 1, 15 ) )
+						new DateTime( 2015, 12, 27, 1, 5 ) )
 				.addCommentJob( "炽天使", 3456626, "msg", new DateTime( 2015, 12, 27, 2, 0 ),
-						new DateTime( 2015, 12, 27, 2, 15 ) );
+						new DateTime( 2015, 12, 27, 2, 5 ) );
 	}
 }

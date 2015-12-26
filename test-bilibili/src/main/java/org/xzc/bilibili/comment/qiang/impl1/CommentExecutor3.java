@@ -39,7 +39,7 @@ public class CommentExecutor3 extends CommentExecutor {
 		} catch (RuntimeException e) {
 			e.printStackTrace();
 		}
-		return WorkResult.NORMAL;
+		return WorkResult.OVERSPEED;
 	}
 
 }

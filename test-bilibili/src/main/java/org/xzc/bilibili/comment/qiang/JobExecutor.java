@@ -6,11 +6,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
 import org.xzc.bilibili.comment.qiang.config.CommentConfig;
 import org.xzc.bilibili.comment.qiang.config.CommentJobConfig;
 import org.xzc.bilibili.comment.qiang.impl1.CommentExecutor;
 import org.xzc.bilibili.comment.qiang.impl1.CommentExecutorFactory;
 import org.xzc.bilibili.comment.qiang.select.CommentResult;
+import org.xzc.bilibili.util.Utils;
 
 public class JobExecutor {
 	private static final Logger log = Logger.getLogger( JobExecutor.class );
@@ -28,7 +30,8 @@ public class JobExecutor {
 		int mode = jobCfg.getMode();
 
 		if (log.isDebugEnabled())
-			log.debug( String.format( "[%s] 开始执行, 模式=%d", jobCfg.getTag(), mode ) );
+			log.debug( String.format( "[%s] [%s] 开始执行, 模式=%d", jobCfg.getTag(),
+					DateTime.now().toString( Utils.DATETIME_PATTER ), mode ) );
 
 		if (mode == -1 || mode == 0 || mode == 2 || mode == 3) {
 			CommentExecutor myExecutor = CommentExecutorFactory.createCommentExecutor( jobCfg,
