@@ -31,10 +31,10 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.xzc.bilibili.api.Params;
 import org.xzc.bilibili.comment.qiang.config.CommentConfig;
 import org.xzc.bilibili.util.Sign;
 import org.xzc.bilibili.util.Utils;
+import org.xzc.http.Params;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONException;

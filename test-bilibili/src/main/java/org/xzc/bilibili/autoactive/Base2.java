@@ -1,4 +1,4 @@
-package org.xzc.bilibili.reg;
+package org.xzc.bilibili.autoactive;
 
 import java.util.List;
 

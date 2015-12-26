@@ -27,10 +27,10 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
-import org.xzc.bilibili.api.Params;
 import org.xzc.bilibili.comment.qiang.Proxy;
 import org.xzc.bilibili.comment.qiang.config.CommentConfig;
 import org.xzc.bilibili.util.Utils;
+import org.xzc.http.Params;
 
 public abstract class CommentExecutor extends Thread {
 	private static final Logger log = Logger.getLogger( CommentExecutor.class );

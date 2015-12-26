@@ -1,4 +1,4 @@
-package org.xzc.bilibili.reg;
+package org.xzc.bilibili.autoactive;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -21,7 +21,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
-import org.xzc.bilibili.util.HC;
+import org.xzc.http.HC;
+import org.xzc.http.Params;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -30,6 +31,10 @@ import com.alibaba.fastjson.JSONObject;
 public class RegService {
 	private HC hc;
 	private String mainHtml;
+
+	public RegService(HC hc) {
+		this.hc = hc;
+	}
 
 	public RegService(final String DedeUserID, final String SESSDATA) {
 		RequestConfig rc = RequestConfig.custom().setCookieSpec( CookieSpecs.IGNORE_COOKIES ).build();
@@ -40,10 +45,16 @@ public class RegService {
 					}
 				} ).build();
 		hc = new HC( hc0 );
-		mainHtml = hc.getAsString( "http://member.bilibili.com/main.html" );
-		if (!mainHtml.contains( DedeUserID )) {
-			throw new IllegalArgumentException( "该账号还没有登陆." );
+		boolean ok = false;
+		for (int i = 0; i < 10; ++i) {
+			mainHtml = hc.getAsString( "http://member.bilibili.com/main.html" );
+			if (mainHtml.contains( DedeUserID )) {
+				ok = true;
+				break;
+			}
 		}
+		if (!ok)
+			throw new IllegalArgumentException( "该账号还没有登陆." );
 	}
 
 	public Base1 getBase1() {
@@ -161,9 +172,8 @@ public class RegService {
 	public Base2 getBase2() {
 		HttpUriRequest req = RequestBuilder.post( "https://account.bilibili.com/answer/getQstByType" )
 				//.addHeader( "User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:42.0) Gecko/20100101 Firefox/42.0" )
-				.setEntity( HC.makeFormEntity( "type_ids", "11,12,13" ) )
+				.setEntity( new Params( "type_ids", "11,12,13" ).toEntity() )
 				.build();
-		String content = hc.asString( req );
 		return JSON.toJavaObject( hc.asJSON( req ), Base2.class );
 	}
 

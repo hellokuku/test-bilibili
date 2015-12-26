@@ -33,7 +33,7 @@ public class AutoCommentWoker implements Runnable {
 	private CommentService commentService;
 
 	@Autowired
-	private BilibiliDB db;
+	private ScanDB db;
 
 	private long lastCommentTime;//上一次的评论时间, 尽量不要太集中
 

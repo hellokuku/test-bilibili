@@ -30,9 +30,9 @@ public class TestBilibiliService2 {
 
 	@Test
 	public void testLogin() {
-		boolean result = bs.login( "duruofeixh9@163.com", Utils.PASSWORD );
-		System.out.println( bs.getDedeUserID() );
-		System.out.println( bs.getSESSDATA() );
+		boolean result = bs.login( "xzchaoo", "xzc@7086204511" );
+		//System.out.println( bs.getDedeUserID() );
+		//System.out.println( bs.getSESSDATA() );
 		System.out.println( result );
 	}
 }

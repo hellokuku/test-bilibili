@@ -20,7 +20,7 @@ import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 
 @Component
-public class BilibiliDB {
+public class ScanDB {
 	@Autowired
 	private ConnectionSource cs;
 	RuntimeExceptionDao<Video, Integer> videoDao;

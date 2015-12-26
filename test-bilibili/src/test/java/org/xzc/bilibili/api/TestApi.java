@@ -11,6 +11,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.config.CookieSpecs;
@@ -28,7 +30,8 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.xzc.bilibili.config.DBConfig;
-import org.xzc.bilibili.util.HC;
+import org.xzc.http.HC;
+import org.xzc.http.Params;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -45,8 +48,7 @@ public class TestApi {
 		PoolingHttpClientConnectionManager p = new PoolingHttpClientConnectionManager();
 		p.setMaxTotal( 200 );
 		p.setDefaultMaxPerRoute( 100 );
-		HttpHost proxy = new HttpHost( "40.118.131.11", 8080 );
-		proxy = null;
+		HttpHost proxy = new HttpHost( "202.195.192.197", 3128 );
 		chc = HttpClients.custom().setProxy( proxy ).setDefaultRequestConfig( rc ).setConnectionManager( p ).build();
 		hc = new HC( chc );
 	}
@@ -183,18 +185,23 @@ public class TestApi {
 	}
 
 	@Test
-	public void testShareFirst() {
-		HttpUriRequest req = RequestBuilder.post( "http://api.bilibili.com/x/share/first" )
-				.setEntity( new Params(
-						"id", 45229,
-						"aid", 45229,
-						"typeid", 20,
-						"type", 1 )
-								.toEntity() )
-				.addHeader( "Cookie", "DedeUserID=19557477; SESSDATA=dba5edc0%2C1453529228%2Cc520ae0a;" )
+	public void testStr() {
+		for (int i = 0; i < 10; ++i) {
+			System.out.println( RandomStringUtils.random( 6, true,false).toLowerCase());
+		}
+	}
+
+	public void testXXX() throws InterruptedException {
+		HttpUriRequest req = RequestBuilder.post( "http://api.bilibili.com/x/reply/report?jsonp=jsonp" )
+				.setEntity( new Params( "oid", 3448994, "type", 1, "rpid", 74131349, "reason", 3, "content", "刷屏" )
+						.toEntity() )
+				.addHeader( "Cookie", "DedeUserID=19557477; SESSDATA=dba5edc0%2C1453632378%2C974d1bad;" )
 				.build();
-		String content = hc.asString( req );
-		System.out.println( content );
+		while (true) {
+			String content = hc.asString( req );
+			System.out.println( content );
+			Thread.sleep( 1000 );
+		}
 	}
 
 	public void testReplyDel() {
@@ -246,14 +253,5 @@ public class TestApi {
 	}
 
 	public void test1() throws IOException {
-		/*Sign sign = new Sign( "access_key", "5a1a64384ce4bcf7f668d6fa769f9e5d" );
-		String result = hc.asString( RequestBuilder.post( "http://api.bilibili.com/x/share/first?" + sign.getResult() )
-				.setEntity( new Params().add( "type", 21 ).add( "id", "3270784" ).toEntity() ).build() );
-		System.out.println( result );*/
-		String result = hc.postAsString( "http://api.bilibili.com/x/share/first",
-				new Params( "access_key", "5a1a64384ce4bcf7f668d6fa769f9e5d" ), new Params( "type", 21, "id", 3270784 ),
-				true );
-		System.out.println( result );
-		chc.close();
 	}
 }

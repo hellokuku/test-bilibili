@@ -1,4 +1,4 @@
-package org.xzc.bilibili.api;
+package org.xzc.http;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -38,7 +38,6 @@ public class Params {
 	}
 
 	public UrlEncodedFormEntity toEntity() {
-
 		UrlEncodedFormEntity e = null;
 		try {
 			e = new UrlEncodedFormEntity( params, "utf-8" );

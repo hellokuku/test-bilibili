@@ -11,7 +11,7 @@ import java.util.Map;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.RequestBuilder;
-import org.xzc.bilibili.api.Params;
+import org.xzc.http.Params;
 
 public class Sign {
 	public static final String appkey = "c1b107428d337928";

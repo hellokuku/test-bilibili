@@ -5,9 +5,9 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
-import org.xzc.bilibili.api.Params;
 import org.xzc.bilibili.comment.qiang.config.CommentConfig;
 import org.xzc.bilibili.util.Utils;
+import org.xzc.http.Params;
 
 public class CommentExecutor2 extends CommentExecutor {
 

@@ -31,7 +31,7 @@ import com.j256.ormlite.dao.CloseableIterator;
 import com.j256.ormlite.dao.RuntimeExceptionDao;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = { AppConfig.class })
+@ContextConfiguration(classes = { ScanConfig.class })
 public class TestApp {
 
 
@@ -48,7 +48,7 @@ public class TestApp {
 	}
 
 	@Resource
-	private BilibiliDB db;
+	private ScanDB db;
 
 	public void 批量占据评论() throws Exception {
 		int from = 2007730;
@@ -75,10 +75,6 @@ public class TestApp {
 				++aid;
 			}
 		}
-	}
-
-	public void 测试弹幕() {
-		simpleBilibiliService.danmu();
 	}
 
 	/**
@@ -411,26 +407,6 @@ public class TestApp {
 		es.shutdown();
 	}
 	*/
-	public void 获取所有番剧信息() {
-		List<Bangumi> list = simpleBilibiliService.getBangumiList();
-		for (Bangumi b : list) {
-			System.out.println( b.getName() );
-			for (String s : b.getAids()) {
-				System.out.println( s );
-			}
-			System.out.println();
-		}
-	}
-
-	public void 获取番剧每集的aid() {
-		String bid = "2744";
-		Bangumi b = simpleBilibiliService.getBangumi( bid );
-		System.out.println( b.getName() );
-		for (int i = 0; i < b.getAids().size(); ++i) {
-			System.out.println( b.getAids().get( i ) );
-		}
-	}
-
 	public void 更新全部() {
 		final RuntimeExceptionDao<Video, Integer> dao = db.getVideoDao();
 		dao.callBatchTasks( new Callable<Void>() {

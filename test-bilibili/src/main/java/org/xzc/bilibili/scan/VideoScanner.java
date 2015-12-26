@@ -18,7 +18,7 @@ public class VideoScanner {
 	private static final Logger log = Logger.getLogger( VideoScanner.class );
 
 	@Autowired
-	private BilibiliDB db;
+	private ScanDB db;
 
 	@Resource(name = "simpleBilibiliService")
 	private BilibiliService simpleBilibiliService;

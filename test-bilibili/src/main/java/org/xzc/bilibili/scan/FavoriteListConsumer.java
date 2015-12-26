@@ -32,7 +32,7 @@ public class FavoriteListConsumer {
 
 	private static final Logger log = Logger.getLogger( FavoriteListConsumer.class );
 	@Autowired
-	private BilibiliDB db;
+	private ScanDB db;
 
 	@Resource(name = "simpleBilibiliService")
 	private BilibiliService simpleBilibiliService;

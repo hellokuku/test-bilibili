@@ -14,7 +14,7 @@ import org.xzc.bilibili.util.Utils;
 @Component
 public class ScanRunner {
 	public static void main(String[] args) {
-		AnnotationConfigApplicationContext ac = new AnnotationConfigApplicationContext( AppConfig.class );
+		AnnotationConfigApplicationContext ac = new AnnotationConfigApplicationContext( ScanConfig.class );
 		Utils.blockUntil( "持续跟进最新的视频", new DateTime( 2015, 12, 18, 2, 40 ), 60000 );
 		ac.getBean( ScanRunner.class ).run();
 		ac.close();
@@ -24,7 +24,7 @@ public class ScanRunner {
 	private AutoCommentWoker acwt;
 
 	@Autowired
-	VideoScanner videoScanner;
+	private VideoScanner videoScanner;
 
 	public void run() {
 		new Thread( acwt ).start();

@@ -6,8 +6,8 @@ import java.net.URISyntaxException;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.junit.Test;
-import org.xzc.bilibili.api.Params;
 import org.xzc.bilibili.util.Sign;
+import org.xzc.http.Params;
 
 public class TestSign {
 	@Test

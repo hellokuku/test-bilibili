@@ -1,104 +1,63 @@
 package org.xzc.bilibili.model;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
 
 /**
  * 表示了一个账号的基本信息
  * @author xzchaoo
  *
  */
+@DatabaseTable(tableName = "account")
 public class Account {
-	private int id;//账号的id
-	private String SESSIDATA;//用于cookie
-	private String sex;
-	private int fid;//默认的收藏夹的id
-	private String name;//名称
-	private boolean active;//是否激活
-	private int coins;
-	private int spacesta;
-	@JSONField(name = "level_info")
-	private LevelInfo levelInfo;
-	public Account() {
-	}
-	public Account(int id, String SESSIDATA) {
-		this.id = id;
-		this.SESSIDATA = SESSIDATA;
-	}
+	@DatabaseField
+	public int mid;
 
-	public int getCoins() {
-		return coins;
-	}
+	@DatabaseField
+	@JSONField(name = "uname")
+	public String name;
 
-	public int getFid() {
-		return fid;
-	}
+	@DatabaseField
+	public int coins;
 
-	public int getId() {
-		return id;
-	}
+	@DatabaseField(id = true)
+	public String userid;
 
-	public LevelInfo getLevelInfo() {
-		return levelInfo;
-	}
+	@DatabaseField
+	public String password;
 
-	public String getName() {
-		return name;
-	}
+	@DatabaseField
+	public String access_key;
 
-	public String getSESSIDATA() {
-		return SESSIDATA;
-	}
+	@DatabaseField
+	public int currentLevel;
 
-	public String getSex() {
-		return sex;
-	}
+	@DatabaseField
+	public int currentMin;
 
-	public int getSpacesta() {
-		return spacesta;
-	}
+	@DatabaseField
+	public int currentExp;
 
-	public boolean isActive() {
-		return active;
-	}
+	@DatabaseField
+	public int nextExp;
 
-	public void setActive(boolean active) {
-		this.active = active;
-	}
+	@DatabaseField
+	public String SESSDATA;
 
-	public void setCoins(int coins) {
-		this.coins = coins;
-	}
+	@DatabaseField
+	public int fid;
 
-	public void setFid(int fid) {
-		this.fid = fid;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public void setLevelInfo(LevelInfo levelInfo) {
-		this.levelInfo = levelInfo;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public void setSESSIDATA(String sESSIDATA) {
-		SESSIDATA = sESSIDATA;
-	}
-
-	public void setSex(String sex) {
-		this.sex = sex;
-	}
-
-	public void setSpacesta(int spacesta) {
-		this.spacesta = spacesta;
-	}
 	@Override
 	public String toString() {
-		return "Account [id=" + id + ", fid=" + fid + ", name=" + name + ", active=" + active + "]";
+		return "[" + mid + ", " + name + ", " + userid + ", " + currentExp + "]";
 	}
 
+	public Account() {
+	}
+
+	public Account(int mid, String SESSDATA) {
+		this.mid = mid;
+		this.SESSDATA = SESSDATA;
+	}
 }
