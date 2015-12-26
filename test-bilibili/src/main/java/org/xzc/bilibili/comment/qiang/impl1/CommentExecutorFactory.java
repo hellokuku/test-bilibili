@@ -18,6 +18,8 @@ public class CommentExecutorFactory {
 			return new CommentExecutor1( cfg, stop, last );
 		case 2:
 			return new CommentExecutor2( cfg, stop, last );
+		case 3:
+			return new CommentExecutor3( cfg, stop, last );
 		default:
 			throw new IllegalArgumentException( "不支持的mode=" + jobCfg.getMode() );
 		}

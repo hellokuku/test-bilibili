@@ -30,7 +30,7 @@ public class JobExecutor {
 		if (log.isDebugEnabled())
 			log.debug( String.format( "[%s] 开始执行, 模式=%d", jobCfg.getTag(), mode ) );
 
-		if (mode == -1 || mode == 0 || mode == 2) {
+		if (mode == -1 || mode == 0 || mode == 2 || mode == 3) {
 			CommentExecutor myExecutor = CommentExecutorFactory.createCommentExecutor( jobCfg,
 					jobCfg.getCommentConfig().setTag( jobCfg.getTag() ), stop, last );
 			if (log.isDebugEnabled())

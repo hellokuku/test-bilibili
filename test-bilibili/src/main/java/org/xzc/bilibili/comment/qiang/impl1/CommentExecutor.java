@@ -175,8 +175,10 @@ public abstract class CommentExecutor extends Thread {
 		final long endAt = cfg.getEndAt().getTime();
 		//batch个线程
 		for (int ii = 0; ii < cfg.getBatch(); ++ii) {
+			System.out.println( "发布了线程" );
 			Future<?> f = es.submit( new Callable<Void>() {
 				public Void call() throws Exception {
+					System.out.println( "线程开始执行" );
 					//没有过期 不要求停止 没有超时
 					while (System.currentTimeMillis() < endAt && !stop.get() && !overspeed.get()) {
 						try {

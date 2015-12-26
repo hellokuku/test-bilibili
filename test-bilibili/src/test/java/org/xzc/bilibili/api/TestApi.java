@@ -191,8 +191,9 @@ public class TestApi {
 		}
 	}
 
+	@Test
 	public void testXXX() throws InterruptedException {
-		HttpUriRequest req = RequestBuilder.post( "http://api.bilibili.com/x/reply/report?jsonp=jsonp" )
+		HttpUriRequest req = RequestBuilder.post( "http://api.bilibili.com/x/reply/del" )
 				.setEntity( new Params( "oid", 3448994, "type", 1, "rpid", 74131349, "reason", 3, "content", "刷屏" )
 						.toEntity() )
 				.addHeader( "Cookie", "DedeUserID=19557477; SESSDATA=dba5edc0%2C1453632378%2C974d1bad;" )

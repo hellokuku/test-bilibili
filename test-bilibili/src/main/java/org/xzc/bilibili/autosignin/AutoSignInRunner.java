@@ -40,7 +40,7 @@ public class AutoSignInRunner {
 	@Before
 	public void before() {
 		bs = new BilibiliService2();
-		bs.setProxy( "202.195.192.197", 3128 );
+		//bs.setProxy( "202.195.192.197", 3128 );
 		bs.postConstruct();
 	}
 
@@ -62,36 +62,42 @@ public class AutoSignInRunner {
 	}
 
 	@Test
-	public void 自动赚积分() throws Exception {
-		List<Account> queryForAll = dao.queryForAll();
-		for (Account a : queryForAll) {
+	public void 所有() throws Exception {
+		//自动赚积分( dao.queryForEq( "mid", 0 ) );
+		自动赚积分( dao.queryForAll() );
+	}
+
+	private void 自动赚积分(List<Account> list) throws Exception {
+		for (Account a : list) {
 			bs.clear();
 			bs.setDedeID( "3435989" );
-			if (a.SESSDATA != null) {//如果有SESSDATA就用它
-				bs.setDedeUserID( Integer.toString( a.mid ) );
-				bs.setSESSDATA( a.SESSDATA );
-			} else {
-				bs.login( a.userid, a.password );
-			}
+			bs.login( a );
 			if (!bs.isLogined()) {//登陆失败就清除它 并跳过
 				a.SESSDATA = null;
 				dao.update( a );
 				log.info( a + " 登录失败, 请手动检查." );
 				continue;
 			}
-			//已经登陆了!
-			boolean result = bs.shareFirst();
-			if (!result)
-				System.out.println( "分享结果=" + result );
-			result = bs.reportWatch();
-			if (!result)
-				System.out.println( "报告观看=" + result );
-			bs.other();
-			Account a2 = bs.getUserInfo();//以a2的数据为标准
-			a2.userid = a.userid;
-			a2.password = a.password;
-			dao.update( a2 );
-			System.out.println( a2 );
+			while (true) {
+				try {
+					//已经登陆了!
+					boolean result = bs.shareFirst();
+					if (!result)
+						System.out.println( "分享结果=" + result );
+					result = bs.reportWatch();
+					if (!result)
+						System.out.println( "报告观看=" + result );
+					bs.other();
+					Account a2 = bs.getUserInfo();//以a2的数据为标准
+					a2.userid = a.userid;
+					a2.password = a.password;
+					dao.update( a2 );
+					System.out.println( a2 );
+					break;
+				} catch (RuntimeException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 
@@ -112,7 +118,7 @@ public class AutoSignInRunner {
 			String content = hc.asString( req );
 			boolean success = content.contains( "注册成功" );
 			if (success) {
-				Account a = new Account();
+				Account a = bs.getUserInfo();
 				a.userid = email;
 				a.password = password;
 				dao.create( a );

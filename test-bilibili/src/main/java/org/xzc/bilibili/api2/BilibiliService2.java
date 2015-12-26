@@ -179,7 +179,6 @@ public class BilibiliService2 {
 				.setHost( API_HOST )
 				.setDatas( "id", DedeID, "type", 0, "jsonp", "json" );
 		String content = hc.asString( req );
-		System.out.println( content );
 		JSONObject json = JSON.parseObject( content );
 		return json.getIntValue( "code" ) == 0;
 	}
@@ -240,6 +239,12 @@ public class BilibiliService2 {
 		} else {
 			return login( a.userid, a.password );
 		}
+	}
+
+	public String action(int aid, int rpid, int action) {
+		Req req = Req.post( "http://api.bilibili.com/x/reply/action" )
+				.setDatas( "jsonp", "jsonp", "oid", aid, "type", 1, "rpid", rpid, "action", action );
+		return hc.asString( req );
 	}
 
 }

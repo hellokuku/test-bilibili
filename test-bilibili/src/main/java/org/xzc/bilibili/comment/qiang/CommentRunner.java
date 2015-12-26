@@ -1,7 +1,6 @@
 package org.xzc.bilibili.comment.qiang;
 
 import java.text.SimpleDateFormat;
-import java.util.Random;
 
 import org.joda.time.DateTime;
 import org.quartz.JobBuilder;
@@ -64,21 +63,39 @@ public class CommentRunner {
 
 	public static void main(String[] args) throws Exception {
 		before();
+		策略1();
+		System.out.println( "现在的时间是 " + DateTime.now().toString( "yyyy年MM月dd日 HH时mm分ss秒" ) );
+	}
+
+	private static void 策略1() throws SchedulerException {
 		CommentJobConfig jobCfg00 = new CommentJobConfig()
-				.setMode( 2 );
+				.setMode( 3 );
 		CommentConfig cfg00 = new CommentConfig()
-				.thread( 512, 1000 )
+				.thread( 1, 1 )
 				.setServerIP( "61.164.47.167" )
 				.other( true, false )
 				.setTimeout( 5000 )
 				.cookie( "19480366", "f3e878e5,1451143184,7458bb46" );
 		addJobs( jobCfg00, cfg00 );
-		System.out.println( "现在的时间是 " + DateTime.now().toString( "yyyy年MM月dd日 HH时mm分ss秒" ) );
 	}
 
 	private static final void addJobs(CommentJobConfig jobCfg0, CommentConfig cfg0)
 			throws SchedulerException {
 		new TaskHelper( jobCfg0, cfg0 )
-				.addCommentJob( "一拳超人", 3407473, "测试测试测试测试", DateTime.now(), DateTime.now().plusSeconds( 10 ) );
+				//.addCommentJob( "一拳超人", 3407473, "测试测试测试测试", DateTime.now().plusSeconds( 10 ),
+				//		DateTime.now().plusSeconds( 30 ) )
+				.addCommentJob( "一拳超人", 3407473, "测试测试测试1", new DateTime( 2015, 12, 26, 23, 26,0 ),
+						new DateTime( 2015, 12, 27, 23, 27 ) )
+				.addCommentJob( "一拳超人", 3407473, "测试测试测试2", new DateTime( 2015, 12, 26, 23, 26, 10 ),
+						new DateTime( 2015, 12, 27, 23, 27 ) )
+				.addCommentJob( "一拳超人", 3407473, "测试测试测试3", new DateTime( 2015, 12, 26, 23, 26, 20 ),
+						new DateTime( 2015, 12, 27, 23, 27 ) )
+				.addCommentJob( "KOWABON", 3456590, "KOWABON 完结撒花.", new DateTime( 2015, 12, 27, 0, 50 ),
+						new DateTime( 2015, 12, 27, 0, 55 ) )
+				.addCommentJob( "点兔", 3456601, "没有点兔, 这个冬天这么冷, 明年的冬季番这么冷(...), 怎么过...",
+						new DateTime( 2015, 12, 27, 1, 0 ),
+						new DateTime( 2015, 12, 27, 1, 15 ) )
+				.addCommentJob( "炽天使", 3456626, "msg", new DateTime( 2015, 12, 27, 2, 0 ),
+						new DateTime( 2015, 12, 27, 2, 15 ) );
 	}
 }
