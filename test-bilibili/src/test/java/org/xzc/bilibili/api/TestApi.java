@@ -4,15 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.TreeSet;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.config.CookieSpecs;
@@ -32,6 +29,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.xzc.bilibili.config.DBConfig;
 import org.xzc.http.HC;
 import org.xzc.http.Params;
+import org.xzc.http.Req;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -49,6 +47,7 @@ public class TestApi {
 		p.setMaxTotal( 200 );
 		p.setDefaultMaxPerRoute( 100 );
 		HttpHost proxy = new HttpHost( "202.195.192.197", 3128 );
+		proxy = null;
 		chc = HttpClients.custom().setProxy( proxy ).setDefaultRequestConfig( rc ).setConnectionManager( p ).build();
 		hc = new HC( chc );
 	}
@@ -187,7 +186,7 @@ public class TestApi {
 	@Test
 	public void testStr() {
 		for (int i = 0; i < 10; ++i) {
-			System.out.println( RandomStringUtils.random( 6, true,false).toLowerCase());
+			System.out.println( RandomStringUtils.random( 6, true, false ).toLowerCase() );
 		}
 	}
 
@@ -253,6 +252,27 @@ public class TestApi {
 		System.out.println( hc.asString( req3 ) );
 	}
 
-	public void test1() throws IOException {
+	@Test
+	public void 新浪注册() throws IOException {
+		Req req = Req.post( "https://mail.sina.com.cn/register/regmail.php" )
+				.datas(
+						"act", 1,
+						"agreement", "on",
+						"email", "sdfgojgce@sina.com",
+						"psw", "70862045",
+						"imgvcode", "2kbsq",
+						"showcode", "imgCodeEN",
+						"swfimgsk", "11dc099f8261af6912b27231307b44202",
+						"forbin", "9b20ee626b2035663aeb57b70d12ea36_14511898452",
+						"extcode", "373db6f057413689e4a42619a062e8332"
+						)
+				.headers( new Params(
+						"Origin", "https://mail.sina.com.cn",
+						"Referer", "https://mail.sina.com.cn/register/regmail.php"
+						//"Cookie",
+						//"U_TRS1=00000067.79c7aba.56500038.2d66bd5e; vjuids=-35419a1d1.15128819dd5.0.367802fa; SGUID=1448083760969_92952915; SINAGLOBAL=59.78.22.103_1448113933.128070; UOR=www.baidu.com,finance.sina.com.cn,; store1=0; vjlast=1451114354; lxlrtst=1451108041_o; lxlrttp=1451108041; freeName=oztogojgce@sina.com; sso_info=v02m4a4vZu3qbSbtp2vmqado5mSlLSMh42pm6aErpi2va2Jp5S9kJWVjpWElYOWl4WDkLORoZW1pa2Ns420mpWZlZmylLORgpSzkYKZq52jtLE=; SUB=_2AkMhIs8zdcNhrAZZmPERyWriZI1H-jjGiefBAH_uJURLHRgXWReHR3vJ-h6xITozm3LQ8k03ug..; SUBP=0033WrSXqPxfM72wWs9jqgMF55529P9D9W5o7.nda9U1sJij81yl9jb.; U_TRS2=00000067.85da4807.567f6651.110350b4; usrmd=usrmdinst_2; Apache=59.78.22.103_1451189843.250662; PHPSESSID=tv0lgd5os33u9stpd5j88v4gj2; SMCHECKMAIL=6962b0878ffe9b0b19451fc7756d0f1c; SWM_IMG=4fff33aaf6e35d5e490e6b8477ab4d46; ULV=1451189847723:31:26:2:59.78.22.103_1451189843.250662:1451189843332"
+						) );
+		String content = hc.asString( req );
+		System.out.println( JSON.parseObject( content) );
 	}
 }

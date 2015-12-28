@@ -99,12 +99,7 @@ public class CommentRunner {
 						dt.plusMinutes( 1 ) )
 				.addCommentJob( "一拳超人", 3407473, "测试测试测试3", dt.plusSeconds( 8 ),
 						dt.plusMinutes( 1 ) )
-				.addCommentJob( "KOWABON", 3456590, "KOWABON 完结撒花.", new DateTime( 2015, 12, 27, 0, 50 ),
-						new DateTime( 2015, 12, 27, 0, 5 ) )
-				.addCommentJob( "点兔", 3456601, "没有点兔, 这个冬天这么冷, 明年的冬季番这么冷(...), 怎么过...",
-						new DateTime( 2015, 12, 27, 1, 0 ),
-						new DateTime( 2015, 12, 27, 1, 5 ) )
-				.addCommentJob( "炽天使", 3456626, "msg", new DateTime( 2015, 12, 27, 2, 0 ),
-						new DateTime( 2015, 12, 27, 2, 5 ) );
+				.addCommentJob( "箱根", 3463007, "幼精 出水大 无限好, 完结撒花.", new DateTime( 2015, 12, 28, 0,5 ),
+						new DateTime( 2015, 12, 28, 0, 6 ) );
 	}
 }

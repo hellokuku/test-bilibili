@@ -33,16 +33,17 @@ import com.alibaba.fastjson.TypeReference;
 
 public class BilibiliService2 {
 	private static final Logger log = Logger.getLogger( BilibiliService2.class );
+	public static final String DEFAULT_IP="61.164.47.167";//14.152.58.20
 	public static final String API_HOST = "api.bilibili.com";
-	public static final String API_IP = "61.164.47.167";
+	public static final String API_IP = DEFAULT_IP;
 	private String apiServerIP = API_IP;
 
 	public static final String ACCOUNT_HOST = "account.bilibili.com";
-	public static final String ACCOUNT_IP = "61.164.47.167";
+	public static final String ACCOUNT_IP = DEFAULT_IP;
 	private String accountServerIP = ACCOUNT_IP;
 
 	public static final String MEMBER_HOST = "member.bilibili.com";
-	public static final String MEMBER_IP = "61.164.47.167";
+	public static final String MEMBER_IP = DEFAULT_IP;
 	private String memberServerIP = MEMBER_IP;
 
 	public BilibiliService2() {
@@ -97,14 +98,6 @@ public class BilibiliService2 {
 	private String proxyHost;
 	private int proxyPort;
 
-	public void setDedeUserID(String dedeUserID) {
-		DedeUserID = dedeUserID;
-	}
-
-	public void setSESSDATA(String sESSDATA) {
-		SESSDATA = sESSDATA;
-	}
-
 	public String getDedeUserID() {
 		return DedeUserID;
 	}
@@ -116,8 +109,8 @@ public class BilibiliService2 {
 	public boolean login(String userid, String pwd) {
 		try {
 			Req req = Req.post( "http://" + accountServerIP + "/ajax/miniLogin/login" )
-					.setHost( ACCOUNT_HOST )
-					.setDatas( new Params( "userid", userid, "pwd", pwd ) );
+					.host( ACCOUNT_HOST )
+					.datas(  "userid", userid, "pwd", pwd );
 			String content = hc.asString( req );
 			JSONObject json = JSON.parseObject( content );
 			if (json.getBooleanValue( "status" )) {
@@ -141,12 +134,12 @@ public class BilibiliService2 {
 		if (DedeUserID == null || SESSDATA == null)
 			return false;
 		String content = hc.asString( Req.get( "http://" + memberServerIP + "/main.html" )
-				.setHost( MEMBER_HOST ) );
+				.host( MEMBER_HOST ) );
 		return content.contains( DedeUserID );
 	}
 
 	public Result<Video> getVideo(int aid) {
-		String content = hc.asString( Req.get( "http://" + apiServerIP + "/x/video?aid=" + aid ).setHost( API_HOST ) );
+		String content = hc.asString( Req.get( "http://" + apiServerIP + "/x/video?aid=" + aid ).host( API_HOST ) );
 		JSONObject json = JSON.parseObject( content );
 		int code = json.getIntValue( "code" );
 		if (code != 0) {
@@ -158,7 +151,7 @@ public class BilibiliService2 {
 	public Result<Page<Reply>> getReplyList(int aid, int page) {
 		String content = hc.asString(
 				Req.get( "http://" + apiServerIP + "/x/reply?type=1&sort=0&nohot=1&pn=" + page + "&oid=" + aid )
-						.setHost( API_HOST ) );
+						.host( API_HOST ) );
 		JSONObject json = JSON.parseObject( content );
 		int code = json.getIntValue( "code" );
 		if (code != 0) {
@@ -176,8 +169,8 @@ public class BilibiliService2 {
 
 	public boolean shareFirst() {
 		Req req = Req.post( "http://" + apiServerIP + "/x/share/first" )
-				.setHost( API_HOST )
-				.setDatas( "id", DedeID, "type", 0, "jsonp", "json" );
+				.host( API_HOST )
+				.datas( "id", DedeID, "type", 0, "jsonp", "json" );
 		String content = hc.asString( req );
 		JSONObject json = JSON.parseObject( content );
 		return json.getIntValue( "code" ) == 0;
@@ -192,10 +185,9 @@ public class BilibiliService2 {
 
 	public Account getUserInfo() {
 
-		Req req = Req.get( "http://" + API_IP + "/myinfo" ).setHost( API_HOST );
+		Req req = Req.get( "http://" + API_IP + "/myinfo" ).host( API_HOST );
 		JSONObject json = hc.asJSON( req );
 		Account a = JSON.toJavaObject( json, Account.class );
-
 		//等级信息
 		JSONObject level_info = json.getJSONObject( "level_info" );
 		a.currentLevel = level_info.getIntValue( "current_level" );
@@ -226,8 +218,8 @@ public class BilibiliService2 {
 
 	public String report(int aid, int rpid, int reason, String content) {
 		Req req = Req.post( "http://" + API_IP + "/x/reply/report?jsonp=jsonp" )
-				.setHost( API_HOST )
-				.setDatas( "oid", aid, "type", 1, "rpid", rpid, "reason", reason, "content", content );
+				.host( API_HOST )
+				.datas( "oid", aid, "type", 1, "rpid", rpid, "reason", reason, "content", content );
 		return hc.asString( req );
 	}
 
@@ -243,8 +235,17 @@ public class BilibiliService2 {
 
 	public String action(int aid, int rpid, int action) {
 		Req req = Req.post( "http://api.bilibili.com/x/reply/action" )
-				.setDatas( "jsonp", "jsonp", "oid", aid, "type", 1, "rpid", rpid, "action", action );
+				.datas( "jsonp", "jsonp", "oid", aid, "type", 1, "rpid", rpid, "action", action );
 		return hc.asString( req );
+	}
+
+	public void login0(Account a) {
+		if (a.SESSDATA == null) {
+			login( a );
+		} else {
+			SESSDATA = a.SESSDATA;
+			DedeUserID = Integer.toString( a.mid );
+		}
 	}
 
 }

@@ -1,13 +1,17 @@
 package org.xzc.bilibili.autoactive;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestInterceptor;
@@ -86,30 +90,68 @@ public class RegService {
 
 	private Random random = new Random();
 
+	private void randomAns(Question q) {
+		int id = random.nextInt( 4 ) + 1;
+		switch (id) {
+		case 1:
+			q.myAns = q.ans1_hash;
+			break;
+		case 2:
+			q.myAns = q.ans2_hash;
+			break;
+		case 3:
+			q.myAns = q.ans3_hash;
+			break;
+		case 4:
+			q.myAns = q.ans4_hash;
+			break;
+		}
+	}
+
 	private void randomAns(List<Question> list) {
 		for (Question q : list) {
-			int id = random.nextInt( 4 ) + 1;
-			switch (id) {
-			case 1:
-				q.myAns = q.ans1_hash;
-				break;
-			case 2:
-				q.myAns = q.ans2_hash;
-				break;
-			case 3:
-				q.myAns = q.ans3_hash;
-				break;
-			case 4:
-				q.myAns = q.ans4_hash;
-				break;
+			randomAns( q );
+		}
+	}
+
+	private Map<String, String> question2AnswerMap = new HashMap<String, String>();
+	{
+		try {
+			List<String> lines = FileUtils.readLines( new File( "ans2.txt" ) );
+			for (int i = 0; i < lines.size(); i += 3) {
+				String qsid = lines.get( i );
+				qsid = qsid.substring( qsid.lastIndexOf( '(' ) + 1, qsid.lastIndexOf( ')' ) );
+				String ans = lines.get( i + 1 );
+				ans = ans.substring( ans.lastIndexOf( '(' ) + 1, ans.lastIndexOf( ')' ) );
+				question2AnswerMap.put( qsid, ans );
 			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		//question2AnswerMap.put( "393", "97e86275630a5bc0010eba7db67dd06f" );
+		//question2AnswerMap.put( "1210", "7a87d1362fe44d899c5f8bc54b73d2b2" );
+		//question2AnswerMap.put( "943", "8cbeff3fb72bfce659855cd55a173fa9" );
+	}
+
+	private void autoAnswer2(List<Question> list) {
+		//randomAns( list);
+		for (Question q : list) {
+			/*String ans = question2AnswerMap.get( q.qs_id );
+			if (ans != null) {
+				System.out.println( "找到一个答案" );
+				q.myAns = ans;
+			} else {*/
+				randomAns( q );
+			//	System.out.println( q );
+		//	}
 		}
 	}
 
 	public boolean answer2() {
 		Base2 b2 = getBase2();
 		//setToNextAns( b2.data );
-		randomAns( b2.data );
+		autoAnswer2( b2.data );
 		String result = submitBase1( "https://account.bilibili.com/answer/checkPAns", b2.data );
 		JSONObject jo = JSON.parseObject( result );
 		result = jo.getString( "data" );
@@ -174,10 +216,16 @@ public class RegService {
 				//.addHeader( "User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:42.0) Gecko/20100101 Firefox/42.0" )
 				.setEntity( new Params( "type_ids", "11,12,13" ).toEntity() )
 				.build();
-		return JSON.toJavaObject( hc.asJSON( req ), Base2.class );
+		String content = hc.asString( req );
+		//System.out.println( content );
+		return JSON.parseObject( content,Base2.class );
+		//return JSON.toJavaObject( hc.asJSON( req ), Base2.class );
 	}
 
 	public boolean isOK() {
+		if(mainHtml==null){
+			mainHtml = hc.getAsString( "http://member.bilibili.com/main.html" );
+		}
 		return !mainHtml.contains( "我要回答问题激活" );
 	}
 

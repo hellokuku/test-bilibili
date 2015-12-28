@@ -1,22 +1,24 @@
 package org.xzc.bilibili.autoactive;
 
 public class Question {
+	public String question;
 	public String qs_id;
 	public String ans1;
 	public String ans2;
 	public String ans3;
 	public String ans4;
-	public String question;
+	public String ans1_hash;
+	public String ans2_hash;
 
 	@Override
 	public String toString() {
-		return "Question [qs_id=" + qs_id + ", ans1=" + ans1 + ", ans2=" + ans2 + ", ans3=" + ans3 + ", ans4=" + ans4
-				+ ", question=" + question + ", ans1_hash=" + ans1_hash + ", ans2_hash=" + ans2_hash + ", ans3_hash="
-				+ ans3_hash + ", ans4_hash=" + ans4_hash + "]";
+		return question + "(" + qs_id + ")\n"
+				+ ans1 + "(" + ans1_hash + ")\n"
+				+ ans2 + "(" + ans2_hash + ")\n"
+				+ ans3 + "(" + ans3_hash + ")\n"
+				+ ans4 + "(" + ans4_hash + ")\n";
 	}
 
-	public String ans1_hash;
-	public String ans2_hash;
 	public String ans3_hash;
 	public String ans4_hash;
 

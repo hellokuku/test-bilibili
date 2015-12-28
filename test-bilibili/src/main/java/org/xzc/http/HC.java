@@ -1,5 +1,8 @@
 package org.xzc.http;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
@@ -77,6 +80,24 @@ public class HC {
 					res = chc.execute( req );
 					String content = EntityUtils.toString( res.getEntity(), encoding );
 					return content;
+				} finally {
+					HttpClientUtils.closeQuietly( res );
+				}
+			}
+		} );
+	}
+
+	public byte[] getAsByteArray(String url) {
+		return asByteArray( RequestBuilder.get( url ).build() );
+	}
+
+	public byte[] asByteArray(final HttpUriRequest req) {
+		return safeRun( new SafeRunner<byte[]>() {
+			public byte[] run() throws Exception {
+				CloseableHttpResponse res = null;
+				try {
+					res = chc.execute( req );
+					return EntityUtils.toByteArray( res.getEntity() );
 				} finally {
 					HttpClientUtils.closeQuietly( res );
 				}
