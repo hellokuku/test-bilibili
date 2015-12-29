@@ -22,7 +22,7 @@ public class Req {
 	}
 
 	public Req header(String name, Object value) {
-		rb.addHeader( "name", value.toString() );
+		rb.addHeader( name, value.toString() );
 		return this;
 	}
 
@@ -80,7 +80,10 @@ public class Req {
 	}
 
 	public Req account(Account a) {
-		rb.addHeader( "Cookie", "DedeUserID=" + a.mid + "; SESSDATA=" + a.SESSDATA + ";" );
+		if (a != null && a.SESSDATA != null && a.mid != 0) {
+			rb.addHeader( "account", "" );
+			rb.addHeader( "Cookie", "DedeUserID=" + a.mid + "; SESSDATA=" + a.SESSDATA + ";" );
+		}
 		return this;
 	}
 }

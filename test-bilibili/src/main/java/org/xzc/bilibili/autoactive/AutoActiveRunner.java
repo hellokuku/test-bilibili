@@ -6,6 +6,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,6 +34,64 @@ public class AutoActiveRunner {
 	private RuntimeExceptionDao<Account, Integer> dao;
 
 	@Test
+	public void test1() throws Exception {
+		final List<Account> list = dao.queryForEq( "currentExp", 0 );
+		ExecutorService es = Executors.newFixedThreadPool( Math.min( list.size(), 256 ) );
+		final AtomicInteger count = new AtomicInteger( 0 );
+		for (Account aa : list) {
+			final Account a = aa;
+			es.submit( new Callable<Void>() {
+				public Void call() throws Exception {
+					单个号激活( a );
+					System.out.println( count.incrementAndGet()+"/"+list.size() );
+					return null;
+				}
+			} );
+		}
+		es.shutdown();
+		es.awaitTermination( 1, TimeUnit.HOURS );
+	}
+	private void 单个号激活(Account a) {
+		BilibiliService2 bs = new BilibiliService2();
+		//bs.setProxy( "202.195.192.197", 3128 );
+		bs.postConstruct();
+		while (true) {
+			try {
+				bs.clear();
+				if (!bs.login( a )) {
+					a.SESSDATA = null;
+					dao.update( a );
+					System.out.println( a.userid + " 登陆失败" );
+					continue;
+				}
+				break;
+			} catch (RuntimeException e) {
+				e.printStackTrace();
+			}
+		}
+		RegService rs = new RegService( bs.getHC() );
+		if (rs.isOK())
+			return;
+		while (true) {
+			try {
+				rs.answer1();
+			} catch (RuntimeException e) {
+				e.printStackTrace();
+			}
+			try {
+				if (rs.answer2()) {
+					//System.out.println( bs.getDedeUserID() + " ok!" );
+					break;
+				}
+			} catch (RuntimeException e) {
+				e.printStackTrace();
+			}
+		}
+
+	}
+
+
+	@Test
 	public void test2() throws Exception {
 		BilibiliService2 bs = new BilibiliService2();
 		bs.postConstruct();
@@ -52,64 +112,4 @@ public class AutoActiveRunner {
 		//单个号激活( a );
 	}
 
-	private void 单个号激活(Account a) {
-		BilibiliService2 bs = new BilibiliService2();
-		//bs.setProxy( "202.195.192.197", 3128 );
-		bs.postConstruct();
-		while (true) {
-			bs.clear();
-			if (!bs.login( a )) {
-				a.SESSDATA = null;
-				dao.update( a );
-				System.out.println( a.userid + " 登陆失败" );
-				continue;
-			}
-			//RegService rs = new RegService( bs.getDedeUserID(), bs.getSESSDATA() );
-			RegService rs = new RegService( bs.getHC() );
-			if (rs.isOK())
-				return;
-			while (true) {
-				System.out.println( bs.getDedeUserID() + " 开始答题" );
-				try {
-					rs.answer1();
-				} catch (RuntimeException e) {
-					e.printStackTrace();
-				}
-				System.out.println( "通过阶段1" );
-				try {
-					if (rs.answer2()) {
-						System.out.println( "通过阶段2" );
-						System.out.println( bs.getDedeUserID() + " ok!" );
-						return;
-					} else {
-						System.out.println( "阶段2失败" );
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
-
-	@Test
-	public void test1() throws Exception {
-		List<Account> list = dao.queryForEq( "currentExp", 23 );
-		ExecutorService es = Executors.newFixedThreadPool( Math.min( list.size(), 50 ) );
-		List<Future> futureList = new ArrayList<Future>();
-		for (Account aa : list.subList( 0, 1 )) {
-			final Account a = aa;
-			Future f = es.submit( new Callable<Void>() {
-				public Void call() throws Exception {
-					单个号激活( a );
-					return null;
-				}
-			} );
-			futureList.add( f );
-		}
-		for (
-
-		Future f : futureList)
-			f.get();
-		es.shutdownNow();
-	}
 }

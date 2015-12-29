@@ -15,9 +15,11 @@ import org.joda.time.DateTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.Cookie;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
@@ -25,6 +27,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.xzc.bilibili.config.DBConfig;
 import org.xzc.bilibili.model.Account;
 
+import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.j256.ormlite.dao.RuntimeExceptionDao;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -38,7 +41,7 @@ public class TestAutoSignIn {
 
 	@Test
 	public void testAutoSignIn() throws InterruptedException, ExecutionException {
-		final LinkedBlockingQueue<FirefoxDriver> fdList = new LinkedBlockingQueue<FirefoxDriver>( 8 );
+		final LinkedBlockingQueue<WebDriver> fdList = new LinkedBlockingQueue<WebDriver>( 8 );
 		for (int i = 0; i < 8; ++i) {
 			FirefoxProfile fp = new FirefoxProfile();
 			FirefoxBinary fb = new FirefoxBinary( new File( FIREFOX_PATH ) );
@@ -48,20 +51,11 @@ public class TestAutoSignIn {
 		ExecutorService es = Executors.newFixedThreadPool( 8 );
 		List<Account> list = dao.queryForAll();
 		List<Future> flist = new LinkedList<Future>();
-		boolean canGo = false;
 		for (Account aa : list) {
-			if (aa.mid == 20346594) {
-				canGo = true;
-				System.out.println( "GO!" );
-			}
-			if (!canGo) {
-				System.out.println( "跳过 " + aa );
-				continue;
-			}
 			final Account a = aa;
 			Future<Void> f = es.submit( new Callable<Void>() {
 				public Void call() throws Exception {
-					FirefoxDriver fd = fdList.take();
+					WebDriver fd = fdList.take();
 					try {
 						doSignIn( a, fd );
 					} finally {
@@ -74,11 +68,11 @@ public class TestAutoSignIn {
 		}
 		for (Future f : flist)
 			f.get();
-		for (FirefoxDriver fd : fdList)
+		for (WebDriver fd : fdList)
 			fd.quit();
 	}
 
-	private void doSignIn(Account a, FirefoxDriver fd) throws InterruptedException {
+	private void doSignIn(Account a, WebDriver fd) throws InterruptedException {
 		fd.manage().deleteAllCookies();
 		//fd.get( "http://account.bilibili.com/ajax/miniLogin/minilogin" );
 		fd.get( "http://www.bilibili.com" );

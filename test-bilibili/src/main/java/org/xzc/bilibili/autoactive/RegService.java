@@ -63,7 +63,11 @@ public class RegService {
 
 	public Base1 getBase1() {
 		String s = hc.getAsString( "https://account.bilibili.com/answer/base" );
-		return JSON.toJavaObject( hc.getAsJSON( "https://account.bilibili.com/answer/getBaseQ" ), Base1.class );
+		String content = hc.getAsString( "https://account.bilibili.com/answer/getBaseQ" );
+		JSONObject json = JSON.parseObject( content );
+		if (json.getBooleanValue( "status" ))
+			return JSON.parseObject( content, Base1.class );
+		return null;
 	}
 
 	public String submitBase1(String url, List<Question> list) {
@@ -115,6 +119,7 @@ public class RegService {
 	}
 
 	private Map<String, String> question2AnswerMap = new HashMap<String, String>();
+
 	{
 		try {
 			List<String> lines = FileUtils.readLines( new File( "ans2.txt" ) );
@@ -142,14 +147,16 @@ public class RegService {
 				System.out.println( "找到一个答案" );
 				q.myAns = ans;
 			} else {*/
-				randomAns( q );
+			randomAns( q );
 			//	System.out.println( q );
-		//	}
+			//	}
 		}
 	}
 
 	public boolean answer2() {
 		Base2 b2 = getBase2();
+		if (b2.data == null)
+			return false;
 		//setToNextAns( b2.data );
 		autoAnswer2( b2.data );
 		String result = submitBase1( "https://account.bilibili.com/answer/checkPAns", b2.data );
@@ -158,12 +165,13 @@ public class RegService {
 		int id = Integer.parseInt( result.substring( result.lastIndexOf( '/' ) + 1 ) );
 		JSONObject json = hc.getAsJSON( "https://account.bilibili.com/ajax/answer/getCoolInfo?id=" + id );
 		int score = json.getJSONObject( "data" ).getIntValue( "score" );
-		System.out.println( "得分=" + score );
 		return score >= 60;
 	}
 
 	public boolean answer1() {
 		Base1 b1 = getBase1();
+		if (b1 == null)
+			return true;
 		while (setToNextAns( b1.data.questionList )) {
 			String result = submitBase1( "https://account.bilibili.com/answer/goPromotion", b1.data.questionList );
 			if (result.contains( "false" )) {
@@ -218,12 +226,12 @@ public class RegService {
 				.build();
 		String content = hc.asString( req );
 		//System.out.println( content );
-		return JSON.parseObject( content,Base2.class );
+		return JSON.parseObject( content, Base2.class );
 		//return JSON.toJavaObject( hc.asJSON( req ), Base2.class );
 	}
 
 	public boolean isOK() {
-		if(mainHtml==null){
+		if (mainHtml == null) {
 			mainHtml = hc.getAsString( "http://member.bilibili.com/main.html" );
 		}
 		return !mainHtml.contains( "我要回答问题激活" );

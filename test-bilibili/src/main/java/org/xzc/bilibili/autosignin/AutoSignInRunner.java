@@ -1,11 +1,12 @@
 package org.xzc.bilibili.autosignin;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;
@@ -44,55 +45,69 @@ public class AutoSignInRunner {
 		自动赚积分( dao.queryForEq( "currentExp", 0 ) );
 	}
 
-	private void 自动赚积分(List<Account> list) throws Exception {
+	private void 自动赚积分(final List<Account> list) throws Exception {
 		if (list.isEmpty())
 			return;
 		ExecutorService es = Executors.newFixedThreadPool( Math.min( 256, list.size() ) );
-		List<Future> futureList = new ArrayList<Future>();
+		final AtomicInteger count = new AtomicInteger( 0 );
+		final AtomicInteger count2 = new AtomicInteger( 0 );
+		final LinkedBlockingQueue<Account> accounts = new LinkedBlockingQueue<Account>();
 		for (Account aa : list) {
 			final Account a = aa;
-			Future<Void> f = es.submit( new Callable<Void>() {
+			es.submit( new Callable<Void>() {
 				public Void call() throws Exception {
-					BilibiliService2 bs = new BilibiliService2();
-					bs.setProxy( "202.195.192.197", 3128 );
-					bs.postConstruct();
-					while (true) {
-						try {
-							bs.clear();
-							bs.setDedeID( "3435989" );
-							bs.login( a );
-							if (!bs.isLogined()) {//登陆失败就清除它 并跳过
-								a.SESSDATA = null;
-								dao.update( a );
-								log.info( a + " 登录失败, 请手动检查." );
-								continue;
+					try {
+						int c2 = count2.incrementAndGet();
+						BilibiliService2 bs = new BilibiliService2();
+						bs.setProxy( "202.195.192.197", 3128 );
+						//bs.setProxy( "cache.sjtu.edu.cn", 8080);
+						bs.postConstruct();
+						while (true) {
+							try {
+								bs.clear();
+								bs.setDedeID( "3435989" );
+								bs.login0( a );
+								/*if (!bs.isLogined()) {//登陆失败就清除它 并跳过
+									a.SESSDATA = null;
+									dao.update( a );
+									log.info( a + " 登录失败, 请手动检查." );
+									continue;
+								}*/
+								//已经登陆了!
+								boolean result = bs.shareFirst();
+								if (!result)
+									System.out.println( "分享结果=" + result );
+								result = bs.reportWatch();
+								if (!result)
+									System.out.println( "报告观看=" + result );
+								bs.other();
+								Account a2 = bs.getUserInfo();//以a2的数据为标准
+								a2.userid = a.userid;
+								a2.password = a.password;
+								accounts.add( a2 );
+								System.out.println( a2 + " " + count.incrementAndGet() + "/" + list.size() );
+								break;
+							} catch (Exception e) {
+								e.printStackTrace();
 							}
-							//已经登陆了!
-							boolean result = bs.shareFirst();
-							if (!result)
-								System.out.println( "分享结果=" + result );
-							result = bs.reportWatch();
-							if (!result)
-								System.out.println( "报告观看=" + result );
-							bs.other();
-							Account a2 = bs.getUserInfo();//以a2的数据为标准
-							a2.userid = a.userid;
-							a2.password = a.password;
-							dao.update( a2 );
-							System.out.println( a2 );
-							break;
-						} catch (Exception e) {
-							e.printStackTrace();
 						}
+					} finally {
+						count2.decrementAndGet();
 					}
 					return null;
 				}
 			} );
-			futureList.add( f );
 		}
-		for (Future f : futureList)
-			f.get();
-		es.shutdownNow();
+		es.shutdown();
+		es.awaitTermination( 1, TimeUnit.HOURS );
+		dao.callBatchTasks( new Callable<Void>() {
+			public Void call() throws Exception {
+				for (Account a : accounts) {
+					dao.update( a );
+				}
+				return null;
+			}
+		} );
 	}
 
 }

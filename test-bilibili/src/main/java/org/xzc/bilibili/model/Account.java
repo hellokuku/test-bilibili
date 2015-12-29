@@ -56,6 +56,11 @@ public class Account {
 	public Account() {
 	}
 
+	public Account(String userid, String password) {
+		this.userid = userid;
+		this.password = password;
+	}
+
 	public Account(int mid, String SESSDATA) {
 		this.mid = mid;
 		this.SESSDATA = SESSDATA;

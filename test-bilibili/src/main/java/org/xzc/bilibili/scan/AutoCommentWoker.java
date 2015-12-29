@@ -35,21 +35,13 @@ public class AutoCommentWoker implements Runnable {
 	@Autowired
 	private ScanDB db;
 
-	private long lastCommentTime;//上一次的评论时间, 尽量不要太集中
-
 	public void run() {
-		lastCommentTime = System.currentTimeMillis();
-		//System.out.println( "自动评论线程已经启动!" );
 		int count = 0;
 		while (true) {
-			//System.out.println( "开始执行评论任务" );
-			//迭代状态 0表示一切正常 1表示本次迭代出现了验证码的问题(必须要睡觉60秒) 2禁言 3其他问题
-			int iterationResult = 0;
+			int iterationResult = 0;//迭代状态 0表示一切正常 1表示本次迭代出现了验证码的问题(必须要睡觉60秒) 2禁言 3其他问题
 			try {
-				//获得待评论的任务
-				List<CommentTask> taskList = db.getCommentTaskList();
-				//System.out.println( "开始执行自动评论任务, 任务数量=" + taskList.size() );
-				if (!taskList.isEmpty()) {
+				List<CommentTask> taskList = db.getCommentTaskList();//获得待评论的任务
+				if (!taskList.isEmpty()) {//非空
 					Map<Integer, CommentTask> ctMap = new HashMap<Integer, CommentTask>();
 					if (taskList.size() > 50) {
 						throw new IllegalArgumentException( "任务数量太大了!" );

@@ -1,6 +1,7 @@
 package org.xzc.bilibili.scan;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -13,10 +14,12 @@ import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestInterceptor;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -27,6 +30,7 @@ import org.xzc.bilibili.model.Result;
 import org.xzc.bilibili.model.Video;
 import org.xzc.bilibili.util.Utils;
 import org.xzc.http.HC;
+import org.xzc.http.Req;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -41,6 +45,8 @@ public class BilibiliService {
 	public static final String INTERFACE_HOST = "interface.bilibili.com";
 	public static final String MEMBER_IP = "61.164.47.167";
 	public static final String MEMBER_HOST = "member.bilibili.com";
+	public static final String ACCOUNT_HOST = "account.bilibili.com";
+	public static final String ACCOUNT_IP = "61.164.47.167";
 
 	private static Pattern RESULT_PATTERN = Pattern.compile( "abc\\(\"(.+)\"\\)" );
 
@@ -208,7 +214,7 @@ public class BilibiliService {
 		String content = hc.asString( req );
 		if (!content.contains( Integer.toString( a.mid ) ))//账号还没有登陆
 			return false;
-		req = RequestBuilder.get( "http://" + API_IP + "/myinfo")
+		req = RequestBuilder.get( "http://" + API_IP + "/myinfo" )
 				.addHeader( "Host", API_HOST )
 				.build();
 		String jsonStr = hc.asString( req );
@@ -304,5 +310,29 @@ public class BilibiliService {
 
 	public Account getAccount() {
 		return a;
+	}
+
+	public boolean login() {
+		try {
+			Req req = Req.post( "http://" + ACCOUNT_IP + "/ajax/miniLogin/login" )
+					.host( ACCOUNT_HOST )
+					.datas( "userid", a.userid, "pwd", a.password );
+			String content = hc.asString( req );
+			JSONObject json = JSON.parseObject( content );
+			if (json.getBooleanValue( "status" )) {
+				URIBuilder b = null;
+				b = new URIBuilder( json.getJSONObject( "data" ).getString( "crossDomain" ) );
+				for (NameValuePair nvp : b.getQueryParams()) {
+					if (nvp.getName().equals( "DedeUserID" ))
+						a.mid = Integer.parseInt( nvp.getValue() );
+					if (nvp.getName().equals( "SESSDATA" ))
+						a.SESSDATA = nvp.getValue();
+				}
+				return true;
+			}
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 }

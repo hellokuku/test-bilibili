@@ -31,8 +31,7 @@ public class Proxy {
 
 	@Override
 	public String toString() {
-		return "Proxy [ip=" + ip + ", port=" + port + ", success=" + success + ", duration=" + duration + ", updateAt="
-				+ updateAt + ", description=" + description + "]";
+		return ip + ":" + port + ", " + success + ", " + duration + ", " + description;
 	}
 
 	public Date getUpdateAt() {

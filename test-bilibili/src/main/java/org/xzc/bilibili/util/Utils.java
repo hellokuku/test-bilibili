@@ -2,6 +2,7 @@ package org.xzc.bilibili.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -22,6 +23,7 @@ public class Utils {
 	public static final String DATETIME_PATTER = "yyyy年MM月dd日HH时mm分ss秒";
 	private static final Logger log = Logger.getLogger( Utils.class );
 	private static final File LOG_FILE = new File( "error.log" );
+	public static final Charset UTF8 = Charset.forName( "utf8" );
 
 	public static void blockUntil(List<Future<?>> futureList) throws InterruptedException, ExecutionException {
 		for (Future<?> f : futureList)
