@@ -15,8 +15,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeUtils;
-import org.joda.time.MutableDateTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +26,8 @@ import org.xzc.bilibili.api2.BilibiliService3;
 import org.xzc.bilibili.config.DBConfig;
 import org.xzc.bilibili.model.Account;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.j256.ormlite.dao.RuntimeExceptionDao;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.stmt.UpdateBuilder;
@@ -73,16 +73,53 @@ public class AutoSignInRunner {
 		//自动赚积分_2( dao.queryBuilder().query() );
 
 		QueryBuilder<Account, Integer> qb = dao.queryBuilder();
-		qb.where().lt( "count", 3 );
+		//qb.where().lt( "count", 3 );
 		自动赚积分_2( qb.query() );
+
 	}
 
 	@Test
 	public void 新账号() throws Exception {
-		//自动赚积分( dao.queryForEq( "currentExp", 0 ) );
+		自动赚积分_2( dao.queryForEq( "currentExp", 0 ) );
+		//QueryBuilder<Account, Integer> qb = dao.queryBuilder();
+		//qb.where().isNull( "SESSDATA" );
+		//自动赚积分( qb.query() );
+	}
+
+	@Test
+	public void 设置密保() throws Exception {
 		QueryBuilder<Account, Integer> qb = dao.queryBuilder();
-		qb.where().isNull( "SESSDATA" );
-		自动赚积分( qb.query() );
+		qb.where().like( "userid", "%sina.com%" );
+		List<Account> list = qb.query();
+		int batch = 256;
+		ExecutorService es = Executors.newFixedThreadPool( batch );
+		final BilibiliService3 bs = new BilibiliService3();
+		bs.setProxy( "202.195.192.197", 3128 );
+		bs.setBatch( batch );
+		bs.init();
+		final AtomicInteger count = new AtomicInteger( 0 );
+		for (final Account a : list) {
+			es.submit( new Callable<Void>() {
+				public Void call() throws Exception {
+					while (true) {
+						try {
+							String result = bs.updateSafeQuestion( a );
+							JSONObject json = JSON.parseObject( result );
+							if (json.getBooleanValue( "status" )) {
+								count.incrementAndGet();
+								break;
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+					return null;
+				}
+			} );
+		}
+		es.shutdown();
+		es.awaitTermination( 1, TimeUnit.HOURS );
+		System.out.println( count.get() );
 	}
 
 	private void 自动赚积分_2(final List<Account> list) throws Exception {

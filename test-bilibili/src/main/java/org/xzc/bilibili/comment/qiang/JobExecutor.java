@@ -33,14 +33,14 @@ public class JobExecutor {
 			log.debug( String.format( "[%s] [%s] 开始执行, 模式=%d", jobCfg.getTag(),
 					DateTime.now().toString( Utils.DATETIME_PATTER ), mode ) );
 
-		if (mode == -1 || mode == 0 || mode == 2 || mode == 3) {
+		//if (mode == -1 || mode == 0 || mode == 2 || mode == 3) {
 			CommentExecutor myExecutor = CommentExecutorFactory.createCommentExecutor( jobCfg,
 					jobCfg.getCommentConfig().setTag( jobCfg.getTag() ), stop, last );
 			if (log.isDebugEnabled())
 				log.debug( jobCfg.getCommentConfig() );
 			myExecutor.run();
 			executorList.add( myExecutor );
-		} else {
+		/*} else {
 			if (jobCfg.getProxyList() != null)
 				for (Proxy proxy : jobCfg.getProxyList()) {//跑代理
 					CommentConfig cfg = jobCfg.getCommentConfig()
@@ -69,7 +69,7 @@ public class JobExecutor {
 			if (jobCfg.isSelf()) {
 				executorList.add( myExecutor );
 			}
-		}
+		}*/
 		if (log.isDebugEnabled())
 			log.debug( String.format( "[%s] 执行完毕", jobCfg.getTag() ) );
 		commentResultList = makeCommentResultList( executorList );

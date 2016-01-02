@@ -36,6 +36,10 @@ public class Req {
 		return this;
 	}
 
+	public Req headerss(Object... headers) {
+		return headers( new Params( headers ) );
+	}
+
 	public Req param(String name, Object value) {
 		rb.addParameter( name, value.toString() );
 		return this;

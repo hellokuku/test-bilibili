@@ -141,14 +141,30 @@ public class BilibiliService3 {
 	}
 
 	public void login2(Account a, ExpState exp) {
+		Req req;
 		if (a.access_key == null) {
 			Sign sign = new Sign( "appkey", Sign.appkey, "userid", a.userid, "pwd", a.password );
 			sign.getResult();
-			Req req = ApiUtils.api().get( "/login/v2?" + sign.getResult() );
+			req = ApiUtils.api().get( "/login/v2?" + sign.getResult() );
 			JSONObject json = hc.asJSON( req );
 			a.access_key = json.getString( "access_key" );
 		}
-		Req req = ApiUtils.api().get( "/myinfo?access_key=" + a.access_key );
+		req = ApiUtils.api().get( "/myinfo?access_key=" + a.access_key );
 		hc.asString( req );
+	}
+
+	public String updateSafeQuestion(Account a) {
+		Req req = ApiUtils.accounts().post( "/site/updateSafeQuestion" )
+				.account( a )
+				.header( "Origin", "https://account.bilibili.com" )
+				.header( "X-Requested-With", "XMLHttpRequest" )
+				.header( "Referer", "https://account.bilibili.com/site" )
+				.header( "User-Agent",
+						"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.87 Safari/537.36 QQBrowser/9.2.5584.400" )
+				.datas( "oldsafequestion", 1, "oldsafeanswer", a.name,
+						"newsafequestion", 0, "newsafeanswer", "",
+						"change_safe_qa", "false",
+						"can_change_safe_qa", 0 );
+		return hc.asString( req );
 	}
 }

@@ -187,11 +187,12 @@ public abstract class CommentExecutor extends Thread {
 
 							if (count1 % cfg.getInterval() == 0) {
 								System.out.println( content.length() > 100 ? "过长的文本" : content );
-								System.out.println( String.format( "[%s] [%s] count=%d diu=%d 已执行%d秒 上一次间隔=%d毫秒 host="+req.getURI().getHost(),
+								System.out.println( String.format(
+										"[%s] [%s] count=%d diu=%d 已执行%d秒 上一次间隔=%d毫秒 host=" + req.getURI().getHost(),
 										cfg.getTag(), DateTime.now().toString( Utils.DATETIME_PATTER ), count1,
 										diu.get(), ( now - begAt ) / 1000, now - llast ) );
 							}
-							WorkResult wr = workInternal( content,req);
+							WorkResult wr = workInternal( content, req, chc );
 							switch (wr) {
 							case DIU:
 								Utils.sleep( 500 );
@@ -218,6 +219,10 @@ public abstract class CommentExecutor extends Thread {
 			futureList.add( f );
 		}
 		Utils.blockUntil( futureList );
+	}
+
+	protected WorkResult workInternal(String content, HttpUriRequest req, CloseableHttpClient chc) {
+		return workInternal( content, req );
 	}
 
 	protected abstract WorkResult workInternal(String content, HttpUriRequest req);

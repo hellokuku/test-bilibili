@@ -553,6 +553,7 @@ public class 批量注册 {
 		List<String> urls_exists = FileUtils.readLines( URLS_FILE );
 		final LinkedBlockingQueue<String> cookies = new LinkedBlockingQueue<String>();
 		List<String> lines = FileUtils.readLines( EMAILS_COOKIES_FILE );
+		final Map<String, Integer> failCount = new HashMap<String, Integer>();
 		for (int i = 0; i < lines.size(); i += 2) {
 			String[] ss = lines.get( i ).split( " " );
 			String email = ss[0];
@@ -615,8 +616,13 @@ public class 批量注册 {
 							}
 						} catch (Exception e) {
 							e.printStackTrace();
-							//出了问题就放回去
-							cookies.offer( cookie );
+							Integer count = failCount.get( cookie );
+							count = count == null ? 1 : count + 1;
+							if (count < 10) {
+								//出了问题就放回去
+								cookies.offer( cookie );
+							}
+							failCount.put( cookie, count );
 						}
 					}
 					return null;

@@ -7,7 +7,6 @@ import java.util.Random;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -58,8 +57,9 @@ public class BatchOpeartionRunner {
 				try {
 					int type = r.nextInt( types.length );
 					//String content = bs.report( a, aid, rpid, type + 1, types[type] );
-					//String content = bs.report( a, aid, rpid, 0, "视频发布前就评论" );
-					String content = bs.report( a, aid, rpid, 2, "色情" );
+					//String content = bs.report( a, aid, rpid, type + 1, types[type] );
+					String content = bs.report( a, aid, rpid, 0, "视频发布前就评论" );
+					//String content = bs.report( a, aid, rpid, 2, "色情" );
 					JSONObject json = JSON.parseObject( content );
 					int code = json.getIntValue( "code" );
 					if (code == 0) {
@@ -99,9 +99,10 @@ public class BatchOpeartionRunner {
 		//http://api.bilibili.com/x/reply/info?rpid=72867827&oid=3406582&type=1
 		int maxCount = 10000;
 		int batch = 64;
-		int maxSeconds = 120;
-		final String aids = "av3477573";
-		final String rpids = "l_id_75273595";
+		
+		//final String aids = "av3477573";final String rpids = "l_id_75273595";
+		final String aids = "2573526";final String rpids = "35013384";
+		
 		//l_id_75273595
 		//l_id_75268356
 		//l_id_75263126
@@ -125,7 +126,6 @@ public class BatchOpeartionRunner {
 		for (Account a : list) {
 			schedule( ses, count, maxCount, bs, a, 0, aid, rpid );
 		}
-		Thread.sleep( maxSeconds * 1000 );
 		ses.shutdown();
 		ses.awaitTermination( 1, TimeUnit.HOURS );
 	}
