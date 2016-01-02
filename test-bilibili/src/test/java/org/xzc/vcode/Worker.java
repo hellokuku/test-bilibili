@@ -33,7 +33,7 @@ public class Worker implements IWorker {
 	/**
 	 * 这个方法是异步的
 	 */
-	public void doAfter(final String yzm) {
+	public void doAfterAsync(final String yzm) {
 		es.submit( new Callable<Void>() {
 			public Void call() throws Exception {
 				System.out.println( "提交表单!" );
@@ -66,6 +66,9 @@ public class Worker implements IWorker {
 	}
 
 	public void onReject() {
+	}
+
+	public void process(String ptag) {
 	}
 
 }

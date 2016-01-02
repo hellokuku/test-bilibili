@@ -42,14 +42,16 @@ public class TestAutoSignIn {
 	@Test
 	public void testAutoSignIn() throws InterruptedException, ExecutionException {
 		final LinkedBlockingQueue<WebDriver> fdList = new LinkedBlockingQueue<WebDriver>( 8 );
-		for (int i = 0; i < 8; ++i) {
+		for (int i = 0; i < 2; ++i) {
 			FirefoxProfile fp = new FirefoxProfile();
 			FirefoxBinary fb = new FirefoxBinary( new File( FIREFOX_PATH ) );
 			FirefoxDriver fd = new FirefoxDriver( fb, fp );
 			fdList.add( fd );
+			fd.get( "http://www.bilibili.com/" );
 		}
 		ExecutorService es = Executors.newFixedThreadPool( 8 );
-		List<Account> list = dao.queryForAll();
+		List<Account> list = dao.queryForEq( "userid", "duruofeixh19@163.com" );
+		//.queryForAll().subList( 0, 20 );
 		List<Future> flist = new LinkedList<Future>();
 		for (Account aa : list) {
 			final Account a = aa;
@@ -75,7 +77,7 @@ public class TestAutoSignIn {
 	private void doSignIn(Account a, WebDriver fd) throws InterruptedException {
 		fd.manage().deleteAllCookies();
 		//fd.get( "http://account.bilibili.com/ajax/miniLogin/minilogin" );
-		fd.get( "http://www.bilibili.com" );
+		//fd.get( "http://www.bilibili.com" );
 		Date d = DateTime.now().plusYears( 1 ).toDate();
 		fd.manage().addCookie( new Cookie( "DedeUserID", Integer.toString( a.mid ), ".bilibili.com", "/", d ) );
 		fd.manage().addCookie( new Cookie( "SESSDATA", a.SESSDATA, ".bilibili.com", "/", d ) );

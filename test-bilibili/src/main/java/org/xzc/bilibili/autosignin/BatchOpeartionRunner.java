@@ -1,12 +1,13 @@
 package org.xzc.bilibili.autosignin;
 
 import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -21,6 +22,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.xzc.bilibili.api2.BilibiliService2;
+import org.xzc.bilibili.api2.BilibiliService3;
 import org.xzc.bilibili.config.DBConfig;
 import org.xzc.bilibili.model.Account;
 import org.xzc.bilibili.util.HCs;
@@ -55,7 +57,9 @@ public class BatchOpeartionRunner {
 			public Void call() throws Exception {
 				try {
 					int type = r.nextInt( types.length );
-					String content = bs.report( a, aid, rpid, type + 1, types[type] );
+					//String content = bs.report( a, aid, rpid, type + 1, types[type] );
+					//String content = bs.report( a, aid, rpid, 0, "视频发布前就评论" );
+					String content = bs.report( a, aid, rpid, 2, "色情" );
 					JSONObject json = JSON.parseObject( content );
 					int code = json.getIntValue( "code" );
 					if (code == 0) {
@@ -96,8 +100,11 @@ public class BatchOpeartionRunner {
 		int maxCount = 10000;
 		int batch = 64;
 		int maxSeconds = 120;
-		final String aids = "av3413848";
-		final String rpids = "l_id_73042476";
+		final String aids = "av3477573";
+		final String rpids = "l_id_75273595";
+		//l_id_75273595
+		//l_id_75268356
+		//l_id_75263126
 		final int aid = aids.startsWith( "av" ) ? Integer.parseInt( aids.substring( 2 ) ) : Integer.parseInt( aids );
 		final int rpid = rpids.startsWith( "l_id_" ) ? Integer.parseInt( rpids.substring( 5 ) )
 				: Integer.parseInt( rpids );
@@ -123,13 +130,50 @@ public class BatchOpeartionRunner {
 		ses.awaitTermination( 1, TimeUnit.HOURS );
 	}
 
+	private void 维持赞(BilibiliService3 bs, int aid, int rpid, int finalLike) throws SQLException, InterruptedException {
+		QueryBuilder<Account, Integer> qb = dao.queryBuilder();
+		qb.where().like( "userid", "%sina.com%" );
+
+		LinkedList<Account> unused = new LinkedList<Account>( qb.query() );
+		LinkedList<Account> used = new LinkedList<Account>();
+
+		final AtomicInteger count = new AtomicInteger( 0 );
+
+		while (true) {
+			int like = bs.getLike( aid, rpid );
+			System.out.println( rpid + "现在的赞是" + like );
+			if (like < finalLike) {
+				Account a = unused.removeFirst();
+				int code = bs.replayAction( a, aid, rpid, 1 );
+				used.addLast( a );
+			} else if (like > finalLike) {
+				Account a = used.removeFirst();
+				int code = bs.replayAction( a, aid, rpid, 0 );
+				unused.addLast( a );
+			}
+			Thread.sleep( 1000 );
+		}
+	}
+
+	@Test
+	public void 维持赞() throws SQLException, InterruptedException {
+		final BilibiliService3 bs = new BilibiliService3();
+		bs.setProxy( "202.195.192.197", 3128 );
+		bs.init();
+		维持赞( bs, 3487736, 75042178, 99 );
+		维持赞( bs, 3487736, 75043175, 520 );
+		维持赞( bs, 3487736, 75042673, 450 );
+	}
+
 	@Test
 	public void 批量赞() throws Exception {
-		//zan( new ZanConfig( "av3421841", "l_id_73239570", 9999, 1 ,64) );
-		//zan( new ZanConfig( "av3471679", "l_id_74616042", 9999, 0 ,64) );
-		//zan( new ZanConfig( "av3471679", "l_id_74615380", 9999, 0 ,64) );
-		zan( "av3421841", "l_id_73225949", 210);
-		zan( "av3421841", "l_id_73239570", 386);
+		//zan( new ZanConfig( "av3487736", "l_id_75043175", 800, 1, 64 ) );
+		//zan( new ZanConfig( "av3487736", "l_id_75042178", 9999, 99, 16 ) );
+		zan( "av3487736", "l_id_75043175", 3344);
+		//zan( "av3487736", "l_id_75050273", 250 );
+		//zan( "av3487736", "l_id_75042178", 99 );
+		//zan( "av3487736", "l_id_75043175", 520 );
+		//zan( "av3487736", "l_id_75042673", 450 );
 	}
 
 	@After
@@ -158,7 +202,7 @@ public class BatchOpeartionRunner {
 		int rpid = ZanConfig.parseRpid( rpids );
 		int like = getLike( aid, rpid );
 		int diff = finalLike - like;
-		return new ZanConfig( aid, rpid, diff >= 0 ? diff : -diff, diff >= 0 ? 1 : 0 );
+		return new ZanConfig( aid, rpid, diff >= 0 ? diff : -diff, diff >= 0 ? 1 : 0, 1 );
 	}
 
 	private void zan(String aids, String rpids, int finalLike) throws Exception {
@@ -179,19 +223,18 @@ public class BatchOpeartionRunner {
 
 		ExecutorService es = Executors.newFixedThreadPool( Math.min( list.size(), zc.batch ) );
 		final AtomicInteger count = new AtomicInteger( 0 );
+		final BilibiliService3 bs = new BilibiliService3();
+		bs.setBatch( zc.batch );
+		bs.setProxy( "202.195.192.197", 3128 );
+		bs.init();
 		for (Account aa : list) {
 			final Account a = aa;
 			es.submit( new Callable<Void>() {
 				public Void call() throws Exception {
 					if (count.get() >= zc.maxCount)
 						return null;
-					BilibiliService2 bs = new BilibiliService2();
-					bs.setProxy( "202.195.192.197", 3128 );
-					bs.postConstruct();
-					bs.login0( a );
-					String content = bs.action( zc.aid, zc.rpid, zc.action );
-					JSONObject json = JSON.parseObject( content );
-					if (json.getIntValue( "code" ) == 0) {
+					int code = bs.replayAction( a, zc.aid, zc.rpid, zc.action );
+					if (code == 0) {
 						count.incrementAndGet();
 					}
 					return null;
@@ -200,6 +243,7 @@ public class BatchOpeartionRunner {
 		}
 		es.shutdown();
 		es.awaitTermination( 1, TimeUnit.HOURS );
+		System.out.println( "成功个数=" + count.get() );
 		System.out.println( zc + "现在的赞是" + getLike( zc ) );
 	}
 }

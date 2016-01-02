@@ -38,6 +38,7 @@ public class AutoCommentWoker implements Runnable {
 	public void run() {
 		int count = 0;
 		while (true) {
+			long beg = System.currentTimeMillis();
 			int iterationResult = 0;//迭代状态 0表示一切正常 1表示本次迭代出现了验证码的问题(必须要睡觉60秒) 2禁言 3其他问题
 			try {
 				List<CommentTask> taskList = db.getCommentTaskList();//获得待评论的任务
@@ -115,7 +116,7 @@ public class AutoCommentWoker implements Runnable {
 					e1.printStackTrace();
 				}
 			}
-
+			long end = System.currentTimeMillis();
 			try {
 				String text = null;
 				if (iterationResult == 0) {
@@ -129,7 +130,7 @@ public class AutoCommentWoker implements Runnable {
 				}
 				if (++count == 10) {
 					count = 0;
-					System.out.println( DateTime.now() + " 评论任务执行完毕. 结果是 " + text );
+					System.out.println( "本次执行耗时" + ( end - beg ) + "毫秒 " + DateTime.now() + " 评论任务执行完毕. 结果是 " + text );
 				}
 				if (iterationResult == 0) {
 					//System.out.println( "评论线程睡觉5秒" );

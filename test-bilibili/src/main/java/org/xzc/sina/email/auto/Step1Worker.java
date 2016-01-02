@@ -19,7 +19,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlImage;
 public class Step1Worker {
 	public final HtmlUnitDriver d;
 	public final File vcode;
-	private ExecutorService es;
+	private final ExecutorService es;
 	public final Object lock = new Object();
 
 	public Step1Worker(HtmlUnitDriver d, File vcode, ExecutorService es) {

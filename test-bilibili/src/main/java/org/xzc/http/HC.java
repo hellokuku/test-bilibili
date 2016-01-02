@@ -1,8 +1,5 @@
 package org.xzc.http;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
@@ -103,6 +100,25 @@ public class HC {
 				}
 			}
 		} );
+	}
+
+	public void consume(final HttpUriRequest req) {
+		safeRun( new SafeRunner<Void>() {
+			public Void run() throws Exception {
+				CloseableHttpResponse res = null;
+				try {
+					res = chc.execute( req );
+					EntityUtils.consumeQuietly( res.getEntity() );
+				} finally {
+					HttpClientUtils.closeQuietly( res );
+				}
+				return null;
+			}
+		} );
+	}
+
+	public void consume(Req req) {
+		consume( req.build() );
 	}
 
 }

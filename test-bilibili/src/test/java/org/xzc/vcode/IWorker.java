@@ -1,7 +1,7 @@
 package org.xzc.vcode;
 
 public interface IWorker {
-	public void doAfter(String yzm);//接着做
+	public void doAfterAsync(String yzm);//接着做
 
 	public String getTag();//获得tag
 
@@ -10,5 +10,7 @@ public interface IWorker {
 	public void initAsync();//初始化该worker
 
 	public void onReject();//该worker被拒绝了
-	
+
+	public void process(String ptag);
+
 }

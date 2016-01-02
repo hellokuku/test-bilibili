@@ -7,7 +7,6 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import org.apache.http.Header;
 import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
@@ -15,39 +14,30 @@ import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.protocol.HttpContext;
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.DateTimeFormatterBuilder;
 import org.xzc.bilibili.api2.reply.Reply;
+import org.xzc.bilibili.autosignin.ExpState;
 import org.xzc.bilibili.model.Account;
 import org.xzc.bilibili.model.Video;
 import org.xzc.bilibili.scan.Page;
 import org.xzc.http.HC;
-import org.xzc.http.Params;
 import org.xzc.http.Req;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 
 public class BilibiliService2 {
 	private static final Logger log = Logger.getLogger( BilibiliService2.class );
-	public static final String DEFAULT_IP = "61.164.47.167";//14.152.58.20
-	public static final String API_HOST = "api.bilibili.com";
-	public static final String API_IP = DEFAULT_IP;
-	public static final String ACCOUNT_HOST = "account.bilibili.com";
-	public static final String ACCOUNT_IP = DEFAULT_IP;
-	
-	public static final String MEMBER_HOST = "member.bilibili.com";
-	public static final String MEMBER_IP = DEFAULT_IP;
-
-	private String apiServerIP = API_IP;
-	private String accountServerIP = ACCOUNT_IP;
-	private String memberServerIP = MEMBER_IP;
 
 	//如果为true的话 会自动尝试加入cookie
 	private boolean autoCookie = true;
@@ -99,8 +89,8 @@ public class BilibiliService2 {
 
 	public Result<Page<Reply>> getReplyList(int aid, int page) {
 		String content = hc.asString(
-				Req.get( "http://" + apiServerIP + "/x/reply?type=1&sort=0&nohot=1&pn=" + page + "&oid=" + aid )
-						.host( API_HOST ) );
+				Req.get( "http://" + ApiUtils.API_IP + "/x/reply?type=1&sort=0&nohot=1&pn=" + page + "&oid=" + aid )
+						.host( ApiUtils.API_HOST ) );
 		JSONObject json = JSON.parseObject( content );
 		int code = json.getIntValue( "code" );
 		if (code != 0) {
@@ -125,11 +115,11 @@ public class BilibiliService2 {
 	}
 
 	public Account getUserInfo(Account a) {
-		return getUserInfo( Req.get( "http://" + API_IP + "/myinfo" ).host( API_HOST ).account( a ) );
+		return getUserInfo( Req.get( "http://" + ApiUtils.API_IP + "/myinfo" ).host( ApiUtils.API_HOST ).account( a ) );
 	}
 
 	public Result<Video> getVideo(int aid) {
-		String content = hc.asString( Req.get( "http://" + apiServerIP + "/x/video?aid=" + aid ).host( API_HOST ) );
+		String content = hc.asString( Req.get( "http://" + ApiUtils.API_IP+ "/x/video?aid=" + aid ).host( ApiUtils.API_HOST ) );
 		JSONObject json = JSON.parseObject( content );
 		int code = json.getIntValue( "code" );
 		if (code != 0) {
@@ -145,8 +135,8 @@ public class BilibiliService2 {
 	public boolean isLogined() {
 		if (DedeUserID == null || SESSDATA == null)
 			return false;
-		String content = hc.asString( Req.get( "http://" + memberServerIP + "/main.html" )
-				.host( MEMBER_HOST ) );
+		String content = hc.asString( Req.get( "http://" + ApiUtils.MEMBER_IP+ "/main.html" )
+				.host( ApiUtils.MEMBER_HOST ) );
 		return content.contains( DedeUserID );
 	}
 
@@ -162,8 +152,8 @@ public class BilibiliService2 {
 
 	public boolean login(String userid, String pwd) {
 		try {
-			Req req = Req.post( "http://" + accountServerIP + "/ajax/miniLogin/login" )
-					.host( ACCOUNT_HOST )
+			Req req = Req.post( "http://" + ApiUtils.ACCOUNT_IP+ "/ajax/miniLogin/login" )
+					.host( ApiUtils.ACCOUNT_HOST )
 					.datas( "userid", userid, "pwd", pwd );
 			String content = hc.asString( req );
 			JSONObject json = JSON.parseObject( content );
@@ -194,8 +184,35 @@ public class BilibiliService2 {
 	}
 
 	public void other() {
+		//JSONObject json = hc.getAsJSON( "https://account.bilibili.com/site/GetExpLog" );
+		//System.out.println( json.getJSONObject( "data" ).getJSONArray( "result" ).getJSONObject( 0 ) );
+		String mid = DedeUserID;
 		hc.getAsString( "http://www.bilibili.com/" );
-		hc.getAsString( "http://www.bilibili.com/video/av3431726/" );
+		hc.getAsString( "http://www.bilibili.com/video/av3471617/" );
+		hc.getAsString( "http://www.bilibili.com/api_proxy?app=tag&action=/tags/archive_list&aid=3471617&nomid=1" );
+		//hc.getAsString( "http://www.bilibili.com/api_proxy?app=tag&action=/tags/subscribe_list" );
+		/*hc.getAsString( "http://data.bilibili.com/v/web/web_page_view?mid=" + mid
+				+ "&fts=1451531556&url=http%253A%252F%252Fwww.bilibili.com%252Fvideo%252Fav3471617%252F&proid=1&ptype=1&other=&module=main&title=%25E4%25B9%2590%25E6%25AD%25A3%25E7%25BB%25AB%25E7%259A%2584%25E5%258D%2583%25E6%259C%25AC%25E6%25A8%25B1%25EF%25BC%2588%25E4%25B8%25AD%25E5%259B%25BD%25E9%2580%259A%25E5%258F%25B2%25E7%2589%2588%25E6%25AD%258C%25E8%25AF%258D%25EF%25BC%2589_MMD%25C2%25B73D_%25E5%258A%25A8%25E7%2594%25BB_bilibili_%25E5%2593%2594%25E5%2593%25A9%25E5%2593%2594%25E5%2593%25A9%25E5%25BC%25B9%25E5%25B9%2595%25E8%25A7%2586%25E9%25A2%2591%25E7%25BD%2591&ajaxtag=&ajaxid=&_=1451531555900" );
+		hc.getAsString( "http://data.bilibili.com/v/web/home_pic?mid=" + mid
+				+ "&fts=1451531556&url=http%253A%252F%252Fwww.bilibili.com%252Fvideo%252Fav3471617%252F&proid=1&ptype=1&other=&load=1&detail=&_=1451531555907" );
+		hc.getAsString( "http://data.bilibili.com/v/web/homepage_navigation?mid=" + mid
+				+ "&fts=1451531556&url=http%253A%252F%252Fwww.bilibili.com%252Fvideo%252Fav3471617%252F&proid=1&ptype=1&other=&optype=1&clickitem=&pagetype=13&_=1451531555913" );
+		hc.getAsString( "http://data.bilibili.com/v/web/web_underplayer_toolbar?mid=" + mid
+				+ "&fts=1451531556&url=http%253A%252F%252Fwww.bilibili.com%252Fvideo%252Fav3471617%252F&proid=1&ptype=1&other=&optype=2&clickid=&showid=4&_=1451531555918" );
+		hc.getAsString( "http://data.bilibili.com/v/web/home_tag_list_show?mid=" + mid
+				+ "&fts=1451531556&url=http%253A%252F%252Fwww.bilibili.com%252Fvideo%252Fav3471617%252F&proid=1&ptype=1&other=&pageid=3471617&pagetype=1&result=3&_=1451531555926" );
+		hc.getAsString( "http://www.bilibili.com/plus/widget/ajaxGetCaptchaKey.php?js&_=1451531556106" );
+		
+		hc.getAsString(
+				"http://interface.bilibili.com/count?key=baac268505a2e69e3c1e8f32&nr=1&aid=3471617&mid=892086&_=1451531555239" );
+		*/
+		hc.getAsString( "http://interface.bilibili.com/player?id=cid:5514894&aid=3471617" );
+		/*
+		hc.getAsString( "http://data.bilibili.com/v/flashplay/flash_player_play?mid=" + DedeUserID
+				+ "&fid=web%5Fplayer&title=%E4%B9%90%E6%AD%A3%E7%BB%AB%E7%9A%84%E5%8D%83%E6%9C%AC%E6%A8%B1%EF%BC%88%E4%B8%AD%E5%9B%BD%E9%80%9A%E5%8F%B2%E7%89%88%E6%AD%8C%E8%AF%8D%EF%BC%89&fver=20150901&avid=3471617&cid=5514894&pname=1&loop=2&quality=2" );
+		*/
+		//json = hc.getAsJSON( "https://account.bilibili.com/site/GetExpLog" );
+		//System.out.println( json.getJSONObject( "data" ).getJSONArray( "result" ).getJSONObject( 0 ) );
 	}
 
 	private int timeout = 15000;
@@ -242,8 +259,8 @@ public class BilibiliService2 {
 	}
 
 	public String report(Account a, int aid, int rpid, int reason, String content) {
-		Req req = Req.post( "http://" + API_IP + "/x/reply/report?jsonp=jsonp" )
-				.host( API_HOST )
+		Req req = Req.post( "http://" + ApiUtils.API_IP + "/x/reply/report?jsonp=jsonp" )
+				.host( ApiUtils.API_HOST )
 				.datas( "oid", aid, "type", 1, "rpid", rpid, "reason", reason, "content", content )
 				.account( a );
 		return hc.asString( req );
@@ -278,8 +295,8 @@ public class BilibiliService2 {
 	}
 
 	public boolean shareFirst(Account a) {
-		return shareFirst( Req.post( "http://" + apiServerIP + "/x/share/first" )
-				.host( API_HOST )
+		return shareFirst( Req.post( "http://" + ApiUtils.API_IP+ "/x/share/first" )
+				.host( ApiUtils.API_HOST )
 				.datas( "id", DedeID, "type", 0, "jsonp", "json" )
 				.account( a ) );
 	}
@@ -328,4 +345,25 @@ public class BilibiliService2 {
 		return hc.asString( req );
 	}
 
+	public ExpState getExpState() {
+		String content = hc.getAsString( "https://account.bilibili.com/site/GetExpLog" );
+		JSONObject json = json = JSON.parseObject( content );
+		JSONArray ja = json.getJSONObject( "data" ).getJSONArray( "result" );
+		int today = DateTime.now().getDayOfYear();
+		ExpState es = new ExpState();
+		DateTimeFormatter dtf = new DateTimeFormatterBuilder().appendPattern( "yyyy-MM-dd HH:mm:ss" ).toFormatter();
+		for (int i = 0; i < ja.size(); ++i) {
+			JSONObject jo = ja.getJSONObject( i );
+			String reason = jo.getString( "reason" );
+			DateTime time = DateTime.parse( jo.getString( "time" ), dtf );
+			int doy = time.getDayOfYear();
+			if (today == doy) {
+				es.login = es.login || "登录奖励".equals( reason );
+				es.share = es.share || "分享视频链接被点击奖励".equals( reason );
+				es.video = es.video || "观看视频奖励".equals( reason );
+			}
+		}
+		es.updateCount();
+		return es;
+	}
 }

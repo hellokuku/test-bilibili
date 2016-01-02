@@ -28,12 +28,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpException;
-import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestInterceptor;
-import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.config.RequestConfig.Builder;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.impl.client.BasicCookieStore;
@@ -67,6 +64,7 @@ import org.xzc.bilibili.proxy.Proxy;
 import org.xzc.bilibili.util.HCs;
 import org.xzc.http.HC;
 import org.xzc.http.Req;
+import org.xzc.vcode.PositionManager;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -126,9 +124,39 @@ public class 批量注册 {
 	}
 
 	@Test
+	public void 步骤1_辅助注册新浪邮箱_策略5() throws Exception {
+		int batch = 9;
+		PositionManager pm = new PositionManager();
+		pm.setBatch( batch );
+		pm.init();
+		ExecutorService es = Executors.newFixedThreadPool( 16 );
+		final AtomicInteger count = new AtomicInteger( 0 );
+		Step1Callback2 cb = new Step1Callback2() {
+			public void callback(String email, String password, String cookie, int status) throws Exception {
+				if (status == 0) {
+					System.out.println( email + " " + password + " " + count.incrementAndGet() );
+					FileUtils.writeStringToFile( new File( EMAILS_COOKIES_FILENAME ),
+							email + " " + password + "\r\n" + cookie + "\r\n",
+							true );
+				} else {
+					System.out.println( "状态=" + status );
+				}
+			}
+		};
+
+		for (int i = 0; i < 16; ++i) {
+			Step1Worker2 sw = new Step1Worker2( "Worker" + i, pm, es, cb );
+			sw.initAsync();
+		}
+		pm.loop();
+		es.shutdown();
+		es.awaitTermination( 1, TimeUnit.HOURS );
+	}
+
+	@Test
 	public void 步骤1_辅助注册新浪邮箱_策略4() throws Exception {
 		LinkedList<Step1Worker> swlist = new LinkedList<Step1Worker>();
-		int batch = 6;
+		int batch = 9;
 		ExecutorService es = Executors.newFixedThreadPool( batch );
 		final AtomicBoolean stop = new AtomicBoolean( false );
 		for (int i = 0; i < batch; ++i) {
@@ -461,8 +489,9 @@ public class 批量注册 {
 			String[] ss = lines.get( i ).split( " " );
 			emails.add( ss[0] );
 		}
+		emails.removeAll( sentSetist );//移除已经完成的
 		final int total = emails.size();
-		int batch = 6;
+		int batch = 3;
 		ExecutorService es = Executors.newFixedThreadPool( batch );
 		final LinkedBlockingQueue<Step2Worker> cfgQ = new LinkedBlockingQueue<Step2Worker>( batch );
 		for (int i = 0; i < batch; ++i) {
@@ -587,7 +616,7 @@ public class 批量注册 {
 						} catch (Exception e) {
 							e.printStackTrace();
 							//出了问题就放回去
-							//cookies.offer( cookie );
+							cookies.offer( cookie );
 						}
 					}
 					return null;
@@ -726,8 +755,8 @@ public class 批量注册 {
 			System.out.println( url );
 		System.out.println( "有" + urls.size() + "个账号" );
 		QueryBuilder<Proxy, Integer> qb = proxyDao.queryBuilder();
-		//qb.where().eq( "success", true );
-		//qb.orderBy( "duration", true );
+		qb.where().eq( "success", true );
+		qb.orderBy( "duration", true );
 		List<Proxy> proxyList = qb.query();
 		System.out.println( "有" + proxyList.size() + "个代理" );
 		ExecutorService es = Executors.newFixedThreadPool( Math.min( proxyList.size(), 64 ) );

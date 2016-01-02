@@ -1,6 +1,9 @@
 package org.xzc.bilibili.model;
 
+import java.util.Date;
+
 import com.alibaba.fastjson.annotation.JSONField;
+import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
@@ -46,11 +49,17 @@ public class Account {
 	public String SESSDATA;
 
 	@DatabaseField
+	public int count;
+
+	@DatabaseField(dataType = DataType.DATE_STRING)
+	public Date updateAt;
+
+	@DatabaseField
 	public int fid;
 
 	@Override
 	public String toString() {
-		return "[" + mid + ", " + name + ", " + userid + ", " + currentExp + "]";
+		return "[" + mid + ",  " + name + ", " + password + ", " + userid + ", " + currentExp + "]";
 	}
 
 	public Account() {

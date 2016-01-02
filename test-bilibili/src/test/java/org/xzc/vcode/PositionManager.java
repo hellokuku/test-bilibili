@@ -1,5 +1,6 @@
 package org.xzc.vcode;
 
+import java.io.File;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.log4j.Logger;
@@ -31,7 +32,7 @@ public class PositionManager implements IPositionManager {
 
 	public void init() {
 		for (int i = 0; i < batch; ++i)
-			unbindedPositionList.add( new Position( "p" + i ) );
+			unbindedPositionList.add( new Position( "p" + i, new File( "vcode_" + i + ".png" ) ) );
 	}
 
 	public void loop() throws Exception {
@@ -41,7 +42,7 @@ public class PositionManager implements IPositionManager {
 	public void loop(Decider de) throws Exception {
 		LOOP: while (true) {
 			IPosition p = bindedPositionList.take();//拿到一个已经绑定的p
-			log.info( "获得p " + p.getTag() );
+			//log.info( "获得p " + p.getTag() );
 			try {
 				Result r = de.accept( p );
 				switch (r) {
@@ -56,7 +57,7 @@ public class PositionManager implements IPositionManager {
 					break LOOP;
 				}
 			} finally {
-				log.info( "解绑p " + p.getTag() );
+				//log.info( "解绑p " + p.getTag() );
 				p.unbindWorker();
 				unbindedPositionList.put( p );//将p解绑
 			}

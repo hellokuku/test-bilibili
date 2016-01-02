@@ -1,34 +1,38 @@
 package org.xzc.vcode;
 
+import java.io.File;
 import java.nio.charset.Charset;
-import java.util.Scanner;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 public class Position implements IPosition {
-	
+
 	private static final Logger log = Logger.getLogger( Position.class );
 	private static final Charset UTF8 = Charset.forName( "utf8" );
 	private IWorker worker;
-	private String hint;
+	//private String hint;
 	private String tag;
+	private File file;
 
-	public Position(String tag) {
+	public Position(String tag, File file) {
 		this.tag = tag;
+		this.file = file;
 	}
 
 	public void bindWorker(IWorker worker) {
-		this.worker = worker;
-		byte[] data = worker.getVCodeData();
-		hint = new String( data, UTF8 );
+		try {
+			this.worker = worker;
+			byte[] data = worker.getVCodeData();
+			FileUtils.writeByteArrayToFile( file, data );
+		} catch (Exception e) {
+			throw new RuntimeException( e );
+		}
+		//hint = new String( data, UTF8 );
 	}
 
 	public void process() {
-		log.info( "为 " + worker.getTag() + " 输入验证码" );
-		System.out.println( "请输入验证码, 提示=" + hint );
-		Scanner scanner = new Scanner( System.in );
-		String yzm = scanner.nextLine();
-		worker.doAfter( yzm );
+		worker.process( tag );
 	}
 
 	public void unbindWorker() {

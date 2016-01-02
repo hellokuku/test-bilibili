@@ -108,4 +108,5 @@ public class Sign {
 		String sign = new Sign( params ).getSign();
 		rb.addParameter( "sign", sign );
 	}
+
 }
