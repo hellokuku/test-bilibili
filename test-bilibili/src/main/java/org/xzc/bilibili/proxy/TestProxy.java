@@ -48,8 +48,21 @@ public class TestProxy {
 		//System.out.println( ps.getProxyList().size() );
 		//ps.directlyConnect();
 		//doUpdate( proxyDao.queryForEq( "success", false ) );
-		doUpdate( proxyDao.queryForEq( "success", true ) );
-		doUpdate( ps.getProxyList() );
+		//proxyDao.executeRaw( "delete from proxy" );
+		//doUpdate( proxyDao.queryForEq( "success", true ) );
+		addAll( ps.getProxyList() );
+	}
+
+	private void addAll(final List<Proxy> proxyList) {
+		proxyDao.callBatchTasks( new Callable<Void>() {
+			public Void call() throws Exception {
+				for (Proxy p : proxyList) {
+					p.setSuccess( true );
+					proxyDao.createOrUpdate( p );
+				}
+				return null;
+			}
+		} );
 	}
 
 	@Test

@@ -71,7 +71,7 @@ public class CommentRunner {
 
 	private static void 策略1() throws SchedulerException {
 		CommentJobConfig jobCfg00 = new CommentJobConfig()
-				.setMode( 4 );
+				.setMode( 0 );
 		CommentConfig cfg00 = new CommentConfig()
 				.thread( 1, 10 )
 				.setServerIP( "61.164.47.167" )
@@ -79,11 +79,12 @@ public class CommentRunner {
 				.setTimeout( 5000 )
 				.cookie( "19480366", "f3e878e5,1454146071,675652f4" );
 
-		addJob( jobCfg00, cfg00, "传颂之物", 3501550, "第一个一月番?", new DateTime( 2016, 1, 2, 0, 0 ),
-				new DateTime( 2016, 1, 3, 0, 0 ) );
+		addJob( jobCfg00, cfg00, "JK", 3515557, "没想到这竟然是半年泡面番.", new DateTime( 2016, 1, 5, 0, 5 ),
+				new DateTime( 2016, 1, 5, 0, 6 ) );
 
 		jobCfg00 = jobCfg00.clone().setMode( 3 );
 		cfg00 = cfg00.clone().thread( 1, 1 );
+		
 		addJobs( jobCfg00, cfg00 );
 	}
 
@@ -103,7 +104,7 @@ public class CommentRunner {
 						dt.plusMinutes( 1 ) )
 				.addCommentJob( "一拳超人", 3407473, "测试测试测试3", dt.plusSeconds( 8 ),
 						dt.plusMinutes( 1 ) )
-				.addCommentJob( "传颂之物", 3501550, "第一个一月番?", new DateTime( 2016, 1, 3, 2, 0 ),
-						new DateTime( 2016, 1, 3, 2, 1 ) );
+				.addCommentJob( "JK", 3515557, "没想到这竟然是半年泡面番.", new DateTime( 2016, 1, 5, 0, 5 ),
+						new DateTime( 2016, 1, 5, 0, 6 ) );
 	}
 }

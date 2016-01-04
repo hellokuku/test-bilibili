@@ -37,7 +37,7 @@ public class Step1Worker2 implements IWorker {
 		d = new HtmlUnitDriver( BrowserVersion.FIREFOX_38, true );
 	}
 
-	private static final int TIMEOUT = 1800;
+	private static final int TIMEOUT = 600;
 
 	private void doAfter(String yzm) {
 		try {

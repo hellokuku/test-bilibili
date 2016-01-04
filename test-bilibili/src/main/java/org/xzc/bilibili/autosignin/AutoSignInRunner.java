@@ -73,7 +73,7 @@ public class AutoSignInRunner {
 		//自动赚积分_2( dao.queryBuilder().query() );
 
 		QueryBuilder<Account, Integer> qb = dao.queryBuilder();
-		//qb.where().lt( "count", 3 );
+		qb.where().lt( "count", 3 );
 		自动赚积分_2( qb.query() );
 
 	}
@@ -89,9 +89,10 @@ public class AutoSignInRunner {
 	@Test
 	public void 设置密保() throws Exception {
 		QueryBuilder<Account, Integer> qb = dao.queryBuilder();
-		qb.where().like( "userid", "%sina.com%" );
+		qb.where().eq( "currentExp", 0 );
+		//qb.where().lt( "count", 3 );
 		List<Account> list = qb.query();
-		int batch = 256;
+		int batch = 4;
 		ExecutorService es = Executors.newFixedThreadPool( batch );
 		final BilibiliService3 bs = new BilibiliService3();
 		bs.setProxy( "202.195.192.197", 3128 );
@@ -101,6 +102,7 @@ public class AutoSignInRunner {
 		for (final Account a : list) {
 			es.submit( new Callable<Void>() {
 				public Void call() throws Exception {
+					int exceptionCount = 0;
 					while (true) {
 						try {
 							String result = bs.updateSafeQuestion( a );
@@ -111,6 +113,10 @@ public class AutoSignInRunner {
 							}
 						} catch (Exception e) {
 							e.printStackTrace();
+							if (++exceptionCount == 10) {
+								System.out.println( a );
+								break;
+							}
 						}
 					}
 					return null;
@@ -135,7 +141,7 @@ public class AutoSignInRunner {
 		final AtomicInteger count = new AtomicInteger( 0 );
 		final LinkedBlockingQueue<Account> accounts = new LinkedBlockingQueue<Account>();
 		final Map<Integer, ExpState> expStateMap = Collections.synchronizedMap( new HashMap<Integer, ExpState>() );
-
+		final Map<Integer, Integer> expCount = new HashMap<Integer, Integer>();
 		for (Account aa : list) {
 			final Account a = aa;
 			es.submit( new Callable<Void>() {
@@ -155,7 +161,15 @@ public class AutoSignInRunner {
 							expStateMap.put( a.mid, exp );
 							break;
 						} catch (Exception e) {
-							e.printStackTrace();
+							//e.printStackTrace();
+							Integer count = expCount.get( a.mid );
+							count = count == null ? 1 : count + 1;
+							if (count < 10)
+								expCount.put( a.mid, count );
+							else {
+								System.out.println( "放弃 " + a );
+								break;
+							}
 						}
 					}
 					return null;

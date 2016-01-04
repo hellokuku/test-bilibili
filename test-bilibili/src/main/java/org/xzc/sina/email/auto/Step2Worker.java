@@ -23,13 +23,14 @@ public class Step2Worker {
 	public void downloadVCodeAsync() throws IOException {
 		es.submit( new Callable<Void>() {
 			public Void call() throws Exception {
-				FileUtils.writeByteArrayToFile( vcode, hc.getAsByteArray( "https://account.bilibili.com/captcha" ) );
+				//FileUtils.writeByteArrayToFile( vcode, hc.getAsByteArray( "https://account.bilibili.com/captcha" ) );
+				FileUtils.writeByteArrayToFile( vcode, hc.getAsByteArray( "http://account.bilibili.com/captcha" ) );
 				return null;
 			}
 		} );
 	}
 
-	private static String URL = "https://account.bilibili.com/register/mail";
+	private static String URL = "http://account.bilibili.com/register/mail";
 
 	public void doAfter(final String email, final String yzm, final Step2Callback cb) throws IOException {
 		es.submit( new Callable<Void>() {

@@ -137,7 +137,9 @@ public class BilibiliService3 {
 	public int getLike(int aid, int rpid) {
 		Req req = ApiUtils.api().get( "/x/reply/info" )
 				.datas( "oid", aid, "type", 1, "rpid", rpid );
-		return hc.asJSON( req ).getJSONObject( "data" ).getIntValue( "like" );
+		String content=hc.asString( req );
+		System.out.println( content );
+		return JSON.parseObject( content ).getJSONObject( "data" ).getIntValue( "like" );
 	}
 
 	public void login2(Account a, ExpState exp) {

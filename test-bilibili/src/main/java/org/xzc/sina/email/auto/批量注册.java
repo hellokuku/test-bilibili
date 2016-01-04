@@ -6,6 +6,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -491,10 +492,11 @@ public class 批量注册 {
 		}
 		emails.removeAll( sentSetist );//移除已经完成的
 		final int total = emails.size();
-		int batch = 3;
+		int batch = 9;
 		ExecutorService es = Executors.newFixedThreadPool( batch );
 		final LinkedBlockingQueue<Step2Worker> cfgQ = new LinkedBlockingQueue<Step2Worker>( batch );
 		for (int i = 0; i < batch; ++i) {
+			//HC hc = HCs.makeHC( "202.120.17.158", 2076, false );
 			HC hc = HCs.makeHC( false );
 			File vcode = new File( "vcode_" + i + ".png" );
 			Step2Worker cfg = new Step2Worker( hc, vcode, es );
@@ -739,6 +741,76 @@ public class 批量注册 {
 	}
 
 	@Test
+	public void 步骤4_激活哔哩哔哩并绑定账号_策略3() throws Exception {
+		List<String> urls0 = FileUtils.readLines( URLS_FILE );
+		final LinkedBlockingQueue<String> urls = new LinkedBlockingQueue<String>();
+		for (String url : urls0) {
+			String email = StringUtils.substringBetween( url, "email=", "&time=" );
+			if (dao.queryForEq( "userid", email ).isEmpty())
+				urls.add( url );
+		}
+
+		final int successSize = urls.size();
+		final List<String> successUrls = Collections.synchronizedList( new ArrayList<String>() );
+
+		final Map<String, String> passwordMap = new HashMap<String, String>();
+		List<String> lines = FileUtils.readLines( EMAILS_COOKIES_FILE );
+		for (int i = 0; i < lines.size(); i += 2) {
+			String[] ss = lines.get( i ).split( " " );
+			passwordMap.put( ss[0], ss[1] );
+		}
+		System.out.println( "有" + urls.size() + "个账号" );
+		QueryBuilder<Proxy, Integer> qb = proxyDao.queryBuilder();
+		//qb.where().eq( "success", true );
+		List<Proxy> proxyList = new ArrayList<Proxy>();
+		//proxyList.add( null );
+		proxyList.addAll( qb.query() );
+		System.out.println( "有" + proxyList.size() + "个代理" );
+		ExecutorService es = Executors.newFixedThreadPool( Math.min( proxyList.size(), 256 ) );
+		final AtomicInteger proxyCount = new AtomicInteger( proxyList.size() );
+		final AtomicInteger successCount = new AtomicInteger( 0 );
+		for (final Proxy p : proxyList) {
+			es.submit( new Callable<Void>() {
+				public Void call() throws Exception {
+					//System.out.println( "现在使用 " + p );
+					HC hc = HCs.makeHC( p );
+					LinkedList<String> myurls = new LinkedList<String>( urls );
+					try {
+						while (!myurls.isEmpty() && successCount.get() < successSize) {
+							String url = myurls.getFirst();
+							String email = StringUtils.substringBetween( url, "email=", "&time=" );
+							String password = passwordMap.get( email );
+							int result = 激活( hc, url, email, password );
+							if (result == 0) {
+								myurls.removeFirst();
+								System.out.println(
+										email + " 激活成功 " + successCount.incrementAndGet() + "/" + successSize );
+							} else if (result == 1) {
+								myurls.removeFirst();
+								System.out.println( email + " 已经被激活了 " + successCount.get() + "/" + successSize );
+							} else if (result == 2) {
+								break;
+							} else if (result == 3) {
+								break;
+							} else if (result == 4) {
+							} else {
+								myurls.removeFirst();
+								break;
+							}
+						}
+					} finally {
+						System.out.println( "还有" + proxyCount.decrementAndGet() + "个代理" );
+						hc.close();
+					}
+					return null;
+				}
+			} );
+		}
+		es.shutdown();
+		es.awaitTermination( 1, TimeUnit.HOURS );
+	}
+
+	@Test
 	public void 步骤4_激活哔哩哔哩并绑定账号_策略2() throws Exception {
 		List<String> urls0 = FileUtils.readLines( URLS_FILE );
 		final LinkedBlockingQueue<String> urls = new LinkedBlockingQueue<String>();
@@ -757,15 +829,18 @@ public class 批量注册 {
 			String[] ss = lines.get( i ).split( " " );
 			passwordMap.put( ss[0], ss[1] );
 		}
-		for (String url : urls)
-			System.out.println( url );
 		System.out.println( "有" + urls.size() + "个账号" );
 		QueryBuilder<Proxy, Integer> qb = proxyDao.queryBuilder();
 		qb.where().eq( "success", true );
-		qb.orderBy( "duration", true );
-		List<Proxy> proxyList = qb.query();
+		//qb.orderBy( "duration", true );
+		List<Proxy> proxyList = new ArrayList<Proxy>();
+		proxyList.add( null );
+		proxyList.addAll( qb.query() );
+		//List<Proxy> proxyList =new ArrayList<Proxy>();
+		//proxyList.add( null );
 		System.out.println( "有" + proxyList.size() + "个代理" );
-		ExecutorService es = Executors.newFixedThreadPool( Math.min( proxyList.size(), 64 ) );
+		ExecutorService es = Executors.newFixedThreadPool( Math.min( proxyList.size(), 256 ) );
+		final AtomicInteger proxyCount = new AtomicInteger( proxyList.size() );
 		for (Proxy p0 : proxyList) {
 			final Proxy p = p0;
 			es.submit( new Callable<Void>() {
@@ -805,6 +880,7 @@ public class 批量注册 {
 							}
 						}
 					} finally {
+						System.out.println( "还有" + proxyCount.decrementAndGet() + "个代理" );
 						hc.close();
 					}
 					return null;
@@ -843,7 +919,7 @@ public class 批量注册 {
 					Account a = new Account();
 					a.userid = email;
 					a.password = password;
-					dao.create( a );
+					dao.createIfNotExists( a );
 					return 1;
 				}
 				if (content.contains( "本IP已经注册" ))
@@ -914,7 +990,7 @@ public class 批量注册 {
 			bs.postConstruct();
 			bslist.add( bs );
 		}
-		List<Account> list = dao.queryForEq( "mid", 0 );
+		List<Account> list = dao.queryForEq( "currentExp", 0 );
 		System.out.println( list.size() + "个" );
 		ExecutorService es = Executors.newFixedThreadPool( batch );
 		final LinkedBlockingQueue<Account> accounts = new LinkedBlockingQueue<Account>();

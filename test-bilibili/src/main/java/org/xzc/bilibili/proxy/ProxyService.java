@@ -158,7 +158,7 @@ public class ProxyService {
 	}
 
 	private void kuaidili(String baseUrl, List<Proxy> list) {
-		for (int page = 1; page <= 2; ++page) {
+		for (int page = 1; page <= 1; ++page) {
 			String url = baseUrl + page;
 			String content = asString( url );
 			Document d = Jsoup.parse( content );
@@ -178,7 +178,7 @@ public class ProxyService {
 	}
 
 	private void xici(String baseUrl, List<Proxy> list) {
-		for (int page = 1; page <= 2; ++page) {
+		for (int page = 1; page <= 1; ++page) {
 			String url = baseUrl + page;
 			String content = asString( url );
 			Document d = Jsoup.parse( content );
