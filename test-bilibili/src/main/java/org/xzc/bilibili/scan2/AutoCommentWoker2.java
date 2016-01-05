@@ -72,9 +72,12 @@ public class AutoCommentWoker2 implements Runnable {
 				}
 				if (++count == 10) {
 					count = 0;
-					System.out.println( "当前的自动评论任务数量="+taskList.size() );
+					System.out.println( "当前的自动评论任务数量=" + taskList.size() );
 				}
-				Utils.sleep( 5000 );
+				if (taskList.isEmpty())
+					Utils.sleep( 10000 );
+				else
+					Utils.sleep( 1000 );
 			} catch (Exception e) {
 				e.printStackTrace();
 				Utils.log( e.getMessage() );
