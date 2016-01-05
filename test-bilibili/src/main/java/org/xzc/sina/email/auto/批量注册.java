@@ -32,8 +32,10 @@ import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -64,6 +66,7 @@ import org.xzc.bilibili.model.Account;
 import org.xzc.bilibili.proxy.Proxy;
 import org.xzc.bilibili.util.HCs;
 import org.xzc.http.HC;
+import org.xzc.http.Params;
 import org.xzc.http.Req;
 import org.xzc.vcode.PositionManager;
 
@@ -122,6 +125,36 @@ public class 批量注册 {
 		}
 		DomElement de = (DomElement) _getElementp.invoke( e );
 		return de;
+	}
+
+	@Test
+	public void 步骤1_辅助注册海南邮箱_策略6() throws Exception {
+		int batch=3;
+		PositionManager pm = new PositionManager();
+		pm.setBatch( batch );
+		pm.init();
+		ExecutorService es = Executors.newFixedThreadPool( batch );
+		final AtomicInteger count = new AtomicInteger( 0 );
+		Step1Callback2 cb = new Step1Callback2() {
+			public void callback(String email, String password, String cookie, int status) throws Exception {
+				if (status == 0) {
+					System.out.println( email + " " + password + " " + count.incrementAndGet() );
+					FileUtils.writeStringToFile( new File( EMAILS_COOKIES_FILENAME ),
+							email + " " + password + "\r\n" + cookie + "\r\n",
+							true );
+				} else {
+					System.out.println( "状态=" + status );
+				}
+			}
+		};
+
+		for (int i = 0; i < batch; ++i) {
+			Step1Worker3 sw = new Step1Worker3( "Worker" + i, pm, es, cb );
+			sw.initAsync();
+		}
+		pm.loop();
+		es.shutdown();
+		es.awaitTermination( 1, TimeUnit.HOURS );
 	}
 
 	@Test
@@ -492,7 +525,7 @@ public class 批量注册 {
 		}
 		emails.removeAll( sentSetist );//移除已经完成的
 		final int total = emails.size();
-		int batch = 9;
+		int batch = 3;
 		ExecutorService es = Executors.newFixedThreadPool( batch );
 		final LinkedBlockingQueue<Step2Worker> cfgQ = new LinkedBlockingQueue<Step2Worker>( batch );
 		for (int i = 0; i < batch; ++i) {
@@ -545,6 +578,114 @@ public class 批量注册 {
 			sb.append( c.getName() + "=" + c.getValue() + ";" );
 		}
 		return sb.toString();
+	}
+
+	@Test
+	public void 步骤3_海南邮箱获取哔哩哔哩的urls() throws Exception {
+		int batch = 16;
+		ExecutorService es = Executors.newFixedThreadPool( batch );
+
+		List<String> urls_exists = FileUtils.readLines( URLS_FILE );
+		final LinkedBlockingQueue<String> usernameAndPassword = new LinkedBlockingQueue<String>();
+		List<String> lines = FileUtils.readLines( EMAILS_COOKIES_FILE );
+		final Map<String, Integer> failCount = new HashMap<String, Integer>();
+		for (int i = 0; i < lines.size(); i += 2) {
+			String[] ss = lines.get( i ).split( " " );
+			String email = ss[0];
+			boolean exists = false;
+			for (String url : urls_exists)
+				if (url.contains( email )) {
+					exists = true;
+					break;
+				}
+			if (!exists)
+				usernameAndPassword.add( lines.get( i ) );
+		}
+
+		System.out.println( "个数" + usernameAndPassword.size() );
+		final List<String> urls = Collections.synchronizedList( new ArrayList<String>() );
+
+		for (int i = 0; i < batch; ++i) {
+			//启动一个工作者
+			es.submit( new Callable<Void>() {
+				public Void call() throws Exception {
+					HC hc = HCs.makeHC( false );
+					while (true) {
+						String uap = usernameAndPassword.poll();
+						if (uap == null)
+							break;
+						String[] ss = uap.split( " " );
+						String email = ss[0];
+						String username = StringUtils.substringBefore( email, "@" );
+						String password = ss[1];
+						Req req = Req.post( "http://mail.hainan.net/webmailhainan/login_submit.jsp" )
+								.params( "doLogin", true,
+										"redirectStr", "Index",
+										"username", username,
+										"hostname", "hainan.net",
+										"password", password,
+										"x", 45, "y", 28 );
+						CloseableHttpResponse res = hc.asRes( req );
+						int loginResult = -1;
+						try {
+							int code = res.getStatusLine().getStatusCode();
+							if (code == 302) {
+								String location = res.getFirstHeader( "Location" ).getValue();
+								if (location.equals( "http://mail.hainan.net/webmailhainan/Index" )) {
+									loginResult = 1;
+								} else if (location
+										.equals( "http://mail.hainan.net/webmailhainan/passwordprotection/web/hainan_mibao.jsp" )) {
+									loginResult = 2;
+								}
+							}
+						} finally {
+							HttpClientUtils.closeQuietly( res );
+						}
+
+						if (loginResult == 2) {
+							req = Req.post(
+									"http://mail.hainan.net/webmailhainan/passwordprotection/web/hainanMibaoResult.jsp" )
+									.datas( new Params(
+											"psd_question", "您最喜欢的数字是？",
+											"psd_answer", "1",
+											"pwd_ok_btn", "确定" ).encoding( "gb2312" ) );
+							String content = hc.asString( req );
+							if (!( content.contains( "您已成功设置密保" ) || content.contains( "您已设置过密保" ) )) {
+								System.out.println( "密保步骤失败" );
+								System.out.println( content );
+								loginResult = 3;
+							} else
+								loginResult = 1;
+						}
+						if (loginResult == 1) {
+							String content = hc.getAsString( "http://mail.hainan.net/webmailhainan/mailfolder.jsp" );
+							String fn = StringUtils.substringBetween( content,
+									"o.chkName=\"chk-0_verify%40mail.bilibili.tv\";o.chkValue=\"",
+									"|new\";o.popBKColor=" );
+							if (fn != null) {
+								req = Req.get( "http://mail.hainan.net/webmailhainan/mailshow.jsp" )
+										.params( "mid", fn, "fid", "new" );
+								hc.consume( req );
+								req = Req.get( "http://mail.hainan.net/webmailhainan/mailshowpart.jsp" )
+										.params( "fn", fn + ".internal.html", "mid", fn, "charset", "UTF-8" );
+								hc.consume( req );
+								content = hc.asString( req );
+								String url = StringUtils.substringBetween( content, "<a href=\"", "\"" );
+								urls.add( url );
+							} else {
+								System.out.println( "没有找到信" );
+							}
+						}
+						req = Req.post( "http://mail.hainan.net/webmailhainan/logout.jsp" );
+						hc.consume( req );
+					}
+					return null;
+				}
+			} );
+		}
+		es.shutdown();
+		es.awaitTermination( 1, TimeUnit.HOURS );
+		FileUtils.writeLines( URLS_FILE, urls, true );
 	}
 
 	@Test
@@ -775,6 +916,7 @@ public class 批量注册 {
 					//System.out.println( "现在使用 " + p );
 					HC hc = HCs.makeHC( p );
 					LinkedList<String> myurls = new LinkedList<String>( urls );
+					Collections.shuffle( myurls );
 					try {
 						while (!myurls.isEmpty() && successCount.get() < successSize) {
 							String url = myurls.getFirst();
@@ -787,7 +929,7 @@ public class 批量注册 {
 										email + " 激活成功 " + successCount.incrementAndGet() + "/" + successSize );
 							} else if (result == 1) {
 								myurls.removeFirst();
-								System.out.println( email + " 已经被激活了 " + successCount.get() + "/" + successSize );
+								//System.out.println( email + " 已经被激活了 " + successCount.get() + "/" + successSize );
 							} else if (result == 2) {
 								break;
 							} else if (result == 3) {

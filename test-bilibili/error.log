@@ -55,3 +55,5 @@ Fri Dec 18 10:23:16 CST 2015
 
 syntax error, pos 1
 java.sql.SQLException: no such column: 'msg'
+Tue Jan 05 23:27:15 CST 2016
+can not cast to Date, value : 2016-01-05 18:10

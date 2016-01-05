@@ -37,16 +37,17 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 public class BilibiliService {
-	public static final String SPACE_IP = "113.105.152.207";
+	public static final String DEFAULT_IP = "218.205.74.9";
+	public static final String SPACE_IP = DEFAULT_IP;
 	public static final String SPACE_HOST = "space.bilibili.com";
-	public static final String API_IP = "61.164.47.167";
+	public static final String API_IP =DEFAULT_IP;
 	public static final String API_HOST = "api.bilibili.com";
-	public static final String INTERFACE_IP = "61.164.47.167";
+	public static final String INTERFACE_IP = DEFAULT_IP;
 	public static final String INTERFACE_HOST = "interface.bilibili.com";
-	public static final String MEMBER_IP = "61.164.47.167";
+	public static final String MEMBER_IP = DEFAULT_IP;
 	public static final String MEMBER_HOST = "member.bilibili.com";
 	public static final String ACCOUNT_HOST = "account.bilibili.com";
-	public static final String ACCOUNT_IP = "61.164.47.167";
+	public static final String ACCOUNT_IP = DEFAULT_IP;
 
 	private static Pattern RESULT_PATTERN = Pattern.compile( "abc\\(\"(.+)\"\\)" );
 

@@ -37,10 +37,17 @@ public class Params {
 		return params.isEmpty();
 	}
 
+	private String encoding = "utf-8";
+
+	public Params encoding(String encoding) {
+		this.encoding = encoding;
+		return this;
+	}
+
 	public UrlEncodedFormEntity toEntity() {
 		UrlEncodedFormEntity e = null;
 		try {
-			e = new UrlEncodedFormEntity( params, "utf-8" );
+			e = new UrlEncodedFormEntity( params, encoding );
 		} catch (UnsupportedEncodingException e1) {
 			e1.printStackTrace();
 		}

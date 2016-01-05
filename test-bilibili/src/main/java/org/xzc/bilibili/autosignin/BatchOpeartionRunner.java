@@ -160,7 +160,7 @@ public class BatchOpeartionRunner {
 		final BilibiliService3 bs = new BilibiliService3();
 		bs.setProxy( "202.195.192.197", 3128 );
 		bs.init();
-		维持赞( bs, 3513230, 75711868, 20 );
+		维持赞( bs, 3515557, 75819075, 20 );
 		//维持赞( bs, 3487736, 75043175, 520 );
 		//维持赞( bs, 3487736, 75042673, 450 );
 	}
@@ -169,7 +169,7 @@ public class BatchOpeartionRunner {
 	public void 批量赞() throws Exception {
 		//zan( new ZanConfig( "av3487736", "l_id_75043175", 800, 1, 64 ) );
 		//zan( new ZanConfig( "av3487736", "l_id_75042178", 9999, 99, 16 ) );
-		zan( "3513230", "75711868", 20);
+		//zan( "3515557", "75819075", 20);
 		//zan( "av3487736", "l_id_75050273", 250 );
 		//zan( "av3487736", "l_id_75042178", 99 );
 		//zan( "av3487736", "l_id_75043175", 520 );

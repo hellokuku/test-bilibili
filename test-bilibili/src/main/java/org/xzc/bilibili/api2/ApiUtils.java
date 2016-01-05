@@ -35,7 +35,7 @@ public class ApiUtils {
 		return new ReqBuilder( API_IP, API_HOST );
 	}
 
-	public static ReqBuilder accounts() {
+	public static ReqBuilder account() {
 		return new ReqBuilder( ACCOUNT_IP, ACCOUNT_HOST );
 	}
 

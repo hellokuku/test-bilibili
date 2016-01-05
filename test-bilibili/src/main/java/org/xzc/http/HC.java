@@ -1,5 +1,6 @@
 package org.xzc.http;
 
+import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
@@ -119,6 +120,26 @@ public class HC {
 
 	public void consume(Req req) {
 		consume( req.build() );
+	}
+
+	public byte[] asByteArray(Req req) {
+		return asByteArray( req.build() );
+	}
+
+	public CloseableHttpResponse asRes(final HttpUriRequest req) {
+		return safeRun( new SafeRunner<CloseableHttpResponse>() {
+			public CloseableHttpResponse run() throws Exception {
+				return chc.execute( req );
+			}
+		} );
+	}
+
+	public CloseableHttpResponse asRes(Req req) {
+		return asRes( req.build() );
+	}
+
+	public String asString(Req req, String encoding) {
+		return asString( req.build(), encoding );
 	}
 
 }

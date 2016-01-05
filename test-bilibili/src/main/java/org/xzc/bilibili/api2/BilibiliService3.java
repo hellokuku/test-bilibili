@@ -1,11 +1,15 @@
 package org.xzc.bilibili.api2;
 
+import java.net.URISyntaxException;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.apache.http.HttpHost;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -15,6 +19,7 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.DateTimeFormatterBuilder;
 import org.xzc.bilibili.autosignin.ExpState;
 import org.xzc.bilibili.model.Account;
+import org.xzc.bilibili.model.Video;
 import org.xzc.bilibili.util.Sign;
 import org.xzc.http.HC;
 import org.xzc.http.Req;
@@ -88,7 +93,7 @@ public class BilibiliService3 {
 	}
 
 	public ExpState getExpState(Account a) {
-		Req req = ApiUtils.accounts().get( "/site/GetExpLog" ).account( a );
+		Req req = ApiUtils.account().get( "/site/GetExpLog" ).account( a );
 		String content = hc.asString( req );
 		JSONObject json = JSON.parseObject( content );
 		JSONArray ja = json.getJSONObject( "data" ).getJSONArray( "result" );
@@ -136,8 +141,8 @@ public class BilibiliService3 {
 
 	public int getLike(int aid, int rpid) {
 		Req req = ApiUtils.api().get( "/x/reply/info" )
-				.datas( "oid", aid, "type", 1, "rpid", rpid );
-		String content=hc.asString( req );
+				.params( "oid", aid, "type", 1, "rpid", rpid );
+		String content = hc.asString( req );
 		System.out.println( content );
 		return JSON.parseObject( content ).getJSONObject( "data" ).getIntValue( "like" );
 	}
@@ -156,7 +161,7 @@ public class BilibiliService3 {
 	}
 
 	public String updateSafeQuestion(Account a) {
-		Req req = ApiUtils.accounts().post( "/site/updateSafeQuestion" )
+		Req req = ApiUtils.account().post( "/site/updateSafeQuestion" )
 				.account( a )
 				.header( "Origin", "https://account.bilibili.com" )
 				.header( "X-Requested-With", "XMLHttpRequest" )
@@ -167,6 +172,68 @@ public class BilibiliService3 {
 						"newsafequestion", 0, "newsafeanswer", "",
 						"change_safe_qa", "false",
 						"can_change_safe_qa", 0 );
+		return hc.asString( req );
+	}
+
+	public Video getVideo(int aid) {
+		Req req = ApiUtils.api().get( "/x/video?aid=" + aid );
+		JSONObject json = hc.asJSON( req );
+		if (json.getIntValue( "code" ) == 0) {
+			JSONObject v = json.getJSONObject( "data" );
+			v.put( "create", v.getString( "create" ) + ":00" );
+			return JSON.toJavaObject( v, Video.class );
+		} else
+			return null;
+	}
+
+	public boolean isCommentEmpty(int aid) {
+		Req req = ApiUtils.api().get( "/x/reply" )
+				.params(
+						"type", 1,
+						"sort", 0,
+						"oid", aid,
+						"pn", 1,
+						"nohot", 1 );
+		JSONObject json = hc.asJSON( req );
+		return json.getJSONObject( "data" ).getJSONObject( "page" ).getIntValue( "count" ) == 0;
+	}
+
+	public boolean isLogin(Account a) {
+		if (a.SESSDATA == null)
+			return false;
+		Req req = ApiUtils.member().get( "/main.html" );
+		String content = hc.asString( req );
+		return content.contains( Integer.toString( a.mid ) );
+	}
+
+	public boolean login(Account a) {
+		if (isLogin( a ))
+			return true;
+		try {
+			Req req = ApiUtils.account().post( "/ajax/miniLogin/login" )
+					.datas( "userid", a.userid, "pwd", a.password );
+			JSONObject json = hc.asJSON( req );
+			if (json.getBooleanValue( "status" )) {
+				URIBuilder b = null;
+				b = new URIBuilder( json.getJSONObject( "data" ).getString( "crossDomain" ) );
+				for (NameValuePair nvp : b.getQueryParams()) {
+					if (nvp.getName().equals( "SESSDATA" )) {
+						a.SESSDATA = nvp.getValue();
+						return isLogin( a );
+					}
+				}
+			}
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	public String reply(Account a, int aid, String msg) {
+		Req req = ApiUtils.api()
+				.post( "/x/reply/add" )
+				.account( a )
+				.datas( "type", 1, "oid", aid, "message", msg );
 		return hc.asString( req );
 	}
 }

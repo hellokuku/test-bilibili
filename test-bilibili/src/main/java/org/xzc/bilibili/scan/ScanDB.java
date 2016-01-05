@@ -48,7 +48,7 @@ public class ScanDB {
 		//获得最大的aix
 		try {
 			String str = videoDao.queryBuilder().selectRaw( "max(aid)" ).queryRawFirst()[0];
-			return str == null ? defaultValue : Integer.parseInt( str );
+			return str == null ? defaultValue : Math.max( defaultValue, Integer.parseInt( str ) );
 		} catch (Exception e) {
 			throw new RuntimeException( e );
 		}

@@ -2,24 +2,33 @@ package org.xzc.bilibili.api;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.zip.ZipException;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.Header;
 import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.util.EntityUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,6 +36,7 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.xzc.bilibili.config.DBConfig;
+import org.xzc.bilibili.util.HCs;
 import org.xzc.http.HC;
 import org.xzc.http.Params;
 import org.xzc.http.Req;
@@ -253,26 +263,149 @@ public class TestApi {
 	}
 
 	@Test
-	public void 新浪注册() throws IOException {
-		Req req = Req.post( "https://mail.sina.com.cn/register/regmail.php" )
-				.datas(
-						"act", 1,
-						"agreement", "on",
-						"email", "sdfgojgce@sina.com",
-						"psw", "70862045",
-						"imgvcode", "2kbsq",
-						"showcode", "imgCodeEN",
-						"swfimgsk", "11dc099f8261af6912b27231307b44202",
-						"forbin", "9b20ee626b2035663aeb57b70d12ea36_14511898452",
-						"extcode", "373db6f057413689e4a42619a062e8332"
-						)
-				.headers( new Params(
-						"Origin", "https://mail.sina.com.cn",
-						"Referer", "https://mail.sina.com.cn/register/regmail.php"
-						//"Cookie",
-						//"U_TRS1=00000067.79c7aba.56500038.2d66bd5e; vjuids=-35419a1d1.15128819dd5.0.367802fa; SGUID=1448083760969_92952915; SINAGLOBAL=59.78.22.103_1448113933.128070; UOR=www.baidu.com,finance.sina.com.cn,; store1=0; vjlast=1451114354; lxlrtst=1451108041_o; lxlrttp=1451108041; freeName=oztogojgce@sina.com; sso_info=v02m4a4vZu3qbSbtp2vmqado5mSlLSMh42pm6aErpi2va2Jp5S9kJWVjpWElYOWl4WDkLORoZW1pa2Ns420mpWZlZmylLORgpSzkYKZq52jtLE=; SUB=_2AkMhIs8zdcNhrAZZmPERyWriZI1H-jjGiefBAH_uJURLHRgXWReHR3vJ-h6xITozm3LQ8k03ug..; SUBP=0033WrSXqPxfM72wWs9jqgMF55529P9D9W5o7.nda9U1sJij81yl9jb.; U_TRS2=00000067.85da4807.567f6651.110350b4; usrmd=usrmdinst_2; Apache=59.78.22.103_1451189843.250662; PHPSESSID=tv0lgd5os33u9stpd5j88v4gj2; SMCHECKMAIL=6962b0878ffe9b0b19451fc7756d0f1c; SWM_IMG=4fff33aaf6e35d5e490e6b8477ab4d46; ULV=1451189847723:31:26:2:59.78.22.103_1451189843.250662:1451189843332"
-						) );
+	public void 某邮箱注册() throws IOException {
+		HC hc = HCs.makeHC( false );
+		String username = "ceshiceshi7";
+		String password = "70862045";
+		Req req = Req.get( "http://mail.hainan.net/webmailhainan/tianyaValidateCode.jsp" )
+				.header( "Referer", "http://mail.hainan.net/webmailhainan/register.jsp" );
+		FileUtils.writeByteArrayToFile( new File( "vcode_0.png" ),
+				hc.asByteArray( req ) );
+		Scanner scanner = new Scanner( System.in );
+		System.out.println( "请输入验证码" );
+		String vcode = scanner.nextLine();
+
+		req = Req.post( "http://mail.hainan.net/webmailhainan/hn_adduser.jsp" )
+				.datas( "email_text", username,
+						"email_type", "hainan.net",
+						"pwd", password,
+						"pwd_again", password,
+						"phone_number", "",
+						"codetext", vcode );
+		CloseableHttpResponse res = hc.asRes( req );
+		try {
+			int code = res.getStatusLine().getStatusCode();
+			if (code == 200) {
+				String content = EntityUtils.toString( res.getEntity() );
+				System.out.println( "验证码不对" );
+			} else if (code == 302) {
+				Header h = res.getFirstHeader( "Location" );
+				if (h != null) {
+					String location = h.getValue();
+					if (location.startsWith( "http://mail.hainan.net/webmailhainan/login.jsp" )) {
+						System.out.println( URI.create( location ).getQuery() );
+					} else if (location.startsWith( "http://mail.hainan.net/webmailhainan/login_submit.jsp" )) {
+						System.out.println( "注册成功" );
+					} else {
+						System.out.println( "注册失败 " + location );
+					}
+				}
+			} else {
+				System.out.println( "其他问题" );
+			}
+		} finally {
+			HttpClientUtils.closeQuietly( res );
+		}
+		/*
+		req = Req.get( "http://mail.hainan.net/webmailhainan/login_submit.jsp" )
+			.params( "doLogin", true,
+					"username", username,
+					"password", password,
+					"redirectStr", "mail.jsp",
+					"hostname", "hainan.net" );
+		System.out.println( req.build().getURI().toString() );
 		String content = hc.asString( req );
-		System.out.println( JSON.parseObject( content) );
+		System.out.println( content );
+		if (!content.contains( "请您输入密保" )) {
+		System.out.println( content );
+		System.out.println( "第1步失败" );
+		return;
+		}
+		//重定向到get http://mail.hainan.net/webmailhainan/login_submit.jsp?doLogin=true&username=cehiceshi2&password=70862045&redirectStr=mail.jsp&hostname=hainan.net
+		//重定向到 http://mail.hainan.net/webmailhainan/passwordprotection/web/hainan_mibao.jsp
+		req = Req.post( "http://mail.hainan.net/webmailhainan/passwordprotection/web/hainanMibaoResult.jsp" )
+			.datas( new Params(
+					"psd_question", "您最喜欢的数字是？",
+					"psd_answer", "1",
+					"pwd_ok_btn", "确定" ).encoding( "gb2312" ) );
+		content = hc.asString( req );
+		if (!( content.contains( "您已成功设置密保" ) || content.contains( "您已设置过密保" ) )) {
+		System.out.println( "第2步失败" );
+		System.out.println( content );
+		return;
+		}
+		/*req = Req.get( "http://mail.hainan.net/webmailhainan/passwordprotection/web/raffleHainanyou.jsp?username="
+			+ username );
+		content = hc.asString( req );
+		if (!content.contains( "0,0,*,0,0,0,0,0,0" )) {
+		System.out.println( "第3步失败" );
+		return;
+		}*/
+	}
+
+	@Test
+	public void 某邮箱登陆() throws IOException {
+		HC hc = HCs.makeHC( false );
+		String username = "ceshiceshi5";
+		String password = "70862045";
+		Req req = Req.post( "http://mail.hainan.net/webmailhainan/login_submit.jsp" )
+				.params( "doLogin", true,
+						"redirectStr", "Index",
+						"username", username,
+						"hostname", "hainan.net",
+						"password", password,
+						"x", 45, "y", 28 );
+		CloseableHttpResponse res = hc.asRes( req );
+		int loginResult = -1;
+		try {
+			int code = res.getStatusLine().getStatusCode();
+			if (code == 302) {
+				String location = res.getFirstHeader( "Location" ).getValue();
+				if (location.equals( "http://mail.hainan.net/webmailhainan/Index" )) {
+					loginResult = 1;
+				} else if (location
+						.equals( "http://mail.hainan.net/webmailhainan/passwordprotection/web/hainan_mibao.jsp" )) {
+					loginResult = 2;
+				}
+			}
+		} finally {
+			HttpClientUtils.closeQuietly( res );
+		}
+		System.out.println( "登陆结果 " + loginResult );
+		if (loginResult == 2) {
+			req = Req.post( "http://mail.hainan.net/webmailhainan/passwordprotection/web/hainanMibaoResult.jsp" )
+					.datas( new Params(
+							"psd_question", "您最喜欢的数字是？",
+							"psd_answer", "1",
+							"pwd_ok_btn", "确定" ).encoding( "gb2312" ) );
+			String content = hc.asString( req );
+			if (!( content.contains( "您已成功设置密保" ) || content.contains( "您已设置过密保" ) )) {
+				System.out.println( "密保步骤失败" );
+				System.out.println( content );
+				return;
+			}
+			loginResult = 1;
+		}
+		if (loginResult == 1) {
+			String content = hc.getAsString( "http://mail.hainan.net/webmailhainan/mailfolder.jsp" );
+			String fn = StringUtils.substringBetween( content,
+					"o.chkName=\"chk-0_verify%40mail.bilibili.tv\";o.chkValue=\"",
+					"|new\";o.popBKColor=" );
+			if (fn != null) {
+				req = Req.get( "http://mail.hainan.net/webmailhainan/mailshow.jsp" )
+						.params( "mid", fn, "fid", "new" );
+				hc.consume( req );
+				req = Req.get( "http://mail.hainan.net/webmailhainan/mailshowpart.jsp" )
+						.params( "fn", fn + ".internal.html", "mid", fn, "charset", "UTF-8" );
+				hc.consume( req );
+				content = hc.asString( req );
+				String url = StringUtils.substringBetween( content, "<a href=\"", "\"" );
+				System.out.println( url );
+			} else {
+				System.out.println( "没有找到信" );
+			}
+		}
+		req = Req.post( "http://mail.hainan.net/webmailhainan/logout.jsp" );
+		hc.consume( req );
 	}
 }
