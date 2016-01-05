@@ -119,6 +119,8 @@ public class BilibiliService3 {
 		Req req = ApiUtils.api().get( "/myinfo" ).account( a );
 		JSONObject json = hc.asJSON( req );
 		JSONObject level_info = json.getJSONObject( "level_info" );
+		a.mid = json.getIntValue( "mid" );
+		a.name = json.getString( "uname" );
 		a.coins = json.getIntValue( "coins" );
 		a.currentLevel = level_info.getIntValue( "current_level" );
 		a.currentMin = level_info.getIntValue( "current_min" );

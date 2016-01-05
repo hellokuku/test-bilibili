@@ -33,9 +33,9 @@ public class AutoCommentWoker2 implements Runnable {
 		bs.init();
 		if (!bs.login( a )) {
 			throw new IllegalStateException( "未登录! " + a );
-		} else {
-			System.out.println( a + " 初始化成功!" );
 		}
+		bs.getUserInfo( a );
+		System.out.println( a + " 初始化成功!" );
 
 		int count = 0;
 		while (true) {
