@@ -1,6 +1,6 @@
 package org.xzc.bilibili.scan2;
 
-import javax.annotation.Resource;
+import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
@@ -11,10 +11,7 @@ import org.xzc.bilibili.model.Video;
 import org.xzc.bilibili.scan.CommentService;
 import org.xzc.bilibili.scan.ScanDB;
 import org.xzc.bilibili.task.CommentTask;
-import org.xzc.bilibili.util.HCs;
 import org.xzc.bilibili.util.Utils;
-import org.xzc.http.HC;
-import org.xzc.http.Req;
 
 /**
  * 视频扫描器
@@ -64,6 +61,7 @@ public class VideoScanner2 {
 					count = 100;
 					System.out.println( "添加视频 " + video );
 				}
+				video.updateAt=new Date();
 				//添加到数据库
 				db.add( video );
 
