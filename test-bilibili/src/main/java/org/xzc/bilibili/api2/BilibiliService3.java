@@ -219,12 +219,15 @@ public class BilibiliService3 {
 				URIBuilder b = null;
 				b = new URIBuilder( json.getJSONObject( "data" ).getString( "crossDomain" ) );
 				for (NameValuePair nvp : b.getQueryParams()) {
+					if (nvp.getName().equals( "DedeUserID" )) {
+						a.mid = Integer.parseInt( nvp.getValue() );
+					}
 					if (nvp.getName().equals( "SESSDATA" )) {
 						a.SESSDATA = nvp.getValue();
-						return isLogin( a );
 					}
 				}
 			}
+			return isLogin( a );
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
