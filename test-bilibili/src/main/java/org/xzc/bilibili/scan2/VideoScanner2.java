@@ -58,7 +58,7 @@ public class VideoScanner2 {
 					db.createIfNotExists( new CommentTask( aid, msg ) );
 				}
 				if (++count == 100) {
-					count = 100;
+					count = 0;
 					System.out.println( "添加视频 " + video );
 				}
 				video.updateAt=new Date();
