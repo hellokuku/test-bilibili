@@ -203,7 +203,7 @@ public class BilibiliService3 {
 	public boolean isLogin(Account a) {
 		if (a.SESSDATA == null)
 			return false;
-		Req req = ApiUtils.member().get( "/main.html" );
+		Req req = ApiUtils.member().get( "/main.html" ).account( a );
 		String content = hc.asString( req );
 		return content.contains( Integer.toString( a.mid ) );
 	}
@@ -215,6 +215,7 @@ public class BilibiliService3 {
 			Req req = ApiUtils.account().post( "/ajax/miniLogin/login" )
 					.datas( "userid", a.userid, "pwd", a.password );
 			JSONObject json = hc.asJSON( req );
+			System.out.println( json );
 			if (json.getBooleanValue( "status" )) {
 				URIBuilder b = null;
 				b = new URIBuilder( json.getJSONObject( "data" ).getString( "crossDomain" ) );
