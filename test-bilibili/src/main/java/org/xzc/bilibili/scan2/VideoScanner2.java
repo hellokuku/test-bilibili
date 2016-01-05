@@ -32,6 +32,7 @@ public class VideoScanner2 {
 
 	public void scan() {
 		BilibiliService3 bs = new BilibiliService3();
+		bs.setProxy( "202.120.17.158", 2076 );
 		bs.init();
 		int aid = db.getMaxAid( 3521521 ) + 1;//aid起点
 		if (log.isTraceEnabled())

@@ -3,7 +3,7 @@ package org.xzc.bilibili.api2;
 import org.xzc.http.Req;
 
 public class ApiUtils {
-	public static final String DEFAULT_IP = "61.164.47.167";//14.152.58.20 61.164.47.167
+	public static final String DEFAULT_IP = "218.205.74.9";//14.152.58.20 61.164.47.167
 	public static final String API_HOST = "api.bilibili.com";
 	public static final String API_IP = DEFAULT_IP;
 	public static final String ACCOUNT_HOST = "account.bilibili.com";
