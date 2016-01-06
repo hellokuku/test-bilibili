@@ -48,10 +48,9 @@ public class AutoCommentWoker2 implements Runnable {
 					if (taskList.size() > 50) {
 						throw new IllegalArgumentException( "任务数量太大了!" );
 					}
-
 					for (CommentTask ct : taskList) {
 						Video v = db.getVideo( ct.aid );
-						String msg = commentService.getComment( v );
+						String msg = ct.msg == null ? commentService.getComment( v ) : ct.msg;
 						if (msg == null) {//没有提供对该视频的评论, 那么就将它标记为放弃
 							System.out.println( "没有提供评论, 失败 " + v );
 							ct.status = 2;
@@ -64,7 +63,8 @@ public class AutoCommentWoker2 implements Runnable {
 							ct.status = code == 0 ? 1 : 0;
 							if (code == 0 || r.nextInt( 10 ) == 0)
 								System.out.println(
-										"耗时=" + ( end - beg ) + " 尝试对aid=" + v.aid + " 评论 " + msg + ", 结果是" + result );
+										"耗时=" + ( end - beg ) + " 尝试对aid=" + v.aid + " 评论 " + msg + ", 结果是"
+												+ result );
 						}
 						ct.updateAt = now;
 					}
