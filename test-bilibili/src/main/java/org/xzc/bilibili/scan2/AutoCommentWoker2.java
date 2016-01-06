@@ -36,10 +36,7 @@ public class AutoCommentWoker2 implements Runnable {
 		BilibiliService3 bs = new BilibiliService3();
 		bs.setProxy( "202.120.17.158", 2076 );
 		bs.init();
-		if (!bs.login( a )) {
-			throw new IllegalStateException( "未登录! " + a );
-		}
-		bs.getUserInfo( a );
+		bs.initAccount( a );
 		System.out.println( a + " 初始化成功!" );
 		Random r = new Random();
 		int count = 0;
