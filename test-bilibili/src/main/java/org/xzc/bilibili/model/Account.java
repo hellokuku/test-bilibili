@@ -59,7 +59,7 @@ public class Account {
 
 	@Override
 	public String toString() {
-		return "[" + mid + ",  " + name + ", " + password + ", " + userid + ", " + currentExp + "]";
+		return "[" + mid + ",  " + name + ", " + password + ", " + userid + ", " + currentExp + ", " + fid + "]";
 	}
 
 	public Account() {

@@ -786,6 +786,7 @@ fatten
 fault
 favor
 favorite
+favourite
 fear
 feast
 feather

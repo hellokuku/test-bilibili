@@ -12,6 +12,8 @@ public class ApiUtils {
 	public static final String MEMBER_IP = DEFAULT_IP;
 	public static final String INTERFACE_HOST = "interface.bilibili.com";
 	public static final String INTERFACE_IP = DEFAULT_IP;
+	private static final String SPACE_HOST = "space.bilibili.com";
+	private static final String SPACE_IP = DEFAULT_IP;
 
 	public static class ReqBuilder {
 		private String ip;
@@ -45,6 +47,10 @@ public class ApiUtils {
 
 	public static ReqBuilder member() {
 		return new ReqBuilder( MEMBER_IP, MEMBER_HOST );
+	}
+
+	public static ReqBuilder space() {
+		return new ReqBuilder( SPACE_IP, SPACE_HOST );
 	}
 
 }

@@ -7,27 +7,21 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.zip.ZipException;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
-import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.config.CookieSpecs;
-import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -52,14 +46,8 @@ public class TestApi {
 
 	@Before
 	public void before() {
-		RequestConfig rc = RequestConfig.custom().setCookieSpec( CookieSpecs.IGNORE_COOKIES ).build();
-		PoolingHttpClientConnectionManager p = new PoolingHttpClientConnectionManager();
-		p.setMaxTotal( 200 );
-		p.setDefaultMaxPerRoute( 100 );
-		HttpHost proxy = new HttpHost( "202.195.192.197", 3128 );
-		proxy = null;
-		chc = HttpClients.custom().setProxy( proxy ).setDefaultRequestConfig( rc ).setConnectionManager( p ).build();
-		hc = new HC( chc );
+		//hc = HCs.makeHC( 20000, 1024, "202.195.192.197", 3128, true );
+		hc = HCs.makeHC( 20000, 1024, null, 3128, true );
 	}
 
 	@After
@@ -143,7 +131,8 @@ public class TestApi {
 		System.out.println( content );
 	}
 
-	private ExecutorService es;// = Executors.newFixedThreadPool( 1024 );
+	//private ExecutorService es = Executors.newFixedThreadPool( 1024 );
+	private ExecutorService es = Executors.newFixedThreadPool( 512 );
 
 	private AtomicInteger count = new AtomicInteger( 0 );
 	private AtomicInteger total = new AtomicInteger( 0 );
@@ -157,9 +146,9 @@ public class TestApi {
 				if (total0 % 500000 == 0) {
 					System.out.println( total0 + " " + action );
 				}
-				HttpUriRequest req = RequestBuilder.post( "http://api.bilibili.com/x" + action ).build();
+				HttpUriRequest req = RequestBuilder.get( "http://api.bilibili.com/x" + action ).build();
 				String content = hc.asString( req ).trim();
-				if (!content.equals( "404 page not found" )) {
+				if (!content.equals( "404 page not found" ) && !content.equals( "Fatal: API error" )) {
 					System.out.println( action );
 				}
 				count.decrementAndGet();
@@ -167,30 +156,51 @@ public class TestApi {
 		} );
 	}
 
+	private boolean stop = false;
+
 	private void dfs(String action, int z) throws InterruptedException {
-		if (z == 2)
-			return;
 		for (String w : wordList) {
 			String na = action + "/" + w;
 			while (count.get() > 100000) {
 				Thread.sleep( 1000 );
 			}
+			if (z + 1 < 1)
+				dfs( na, z + 1 );
 			doAction( na, z + 1 );
-			dfs( na, z + 1 );
 		}
+		if (z == 0)
+			stop = true;
 	}
 
-	/*add
-	del
-	hide
-	info
-	jump
-	show*/
+	/*
+	 * /reply/add
+	/reply/count
+	/reply/hide
+	/reply/info
+	/reply/jump
+	/reply/report
+	/reply/reply
+	/reply/action
+	/reply/show
+	/reply
+	/reply/del
+	 */
+	@Test
 	public void findReply() throws InterruptedException, IOException, URISyntaxException {
+		// history
+		// video
+		// reply
+		// share
+		// favourite
+		// app
 		wordList = FileUtils.readLines( new File( getClass().getClassLoader().getResource( "words.txt" ).toURI() ) );
+		//favourite history feedback
 		dfs( "", 0 );
-		es.awaitTermination( 1, TimeUnit.DAYS );
+		while (!stop) {
+			Thread.sleep( 1000 );
+		}
 		es.shutdown();
+		es.awaitTermination( 1, TimeUnit.HOURS );
 	}
 
 	@Test
@@ -250,16 +260,17 @@ public class TestApi {
 		System.out.println( result );
 	}
 
+	@Test
 	public void test2() throws Exception {
-		// "19480366", "f3e878e5,1451143184,7458bb46",
-		//HttpUriRequest req1 = makeCommentRequest1( "19557513", "315c6283%2C1451530664%2C92401ca4", "45229",
-		//		"测试测试测试测1" );
-		//HttpUriRequest req2 = makeCommentRequest2( "19557513", "315c6283%2C1451530664%2C92401ca4", "45229",
-		//		"测试测试测试测2" );
-		//只跟SESSDATA有关!
-		HttpUriRequest req3 = makeCommentRequest3( "0", "315c6283%2C1451530664%2C92401ca4", "45229",
-				"2" );
-		System.out.println( hc.asString( req3 ) );
+		String cookie = "DedeUserID=19557477; SESSDATA=dba5edc0%2C1452607703%2C195ba25d;";
+		Req req = Req.post( "http://api.bilibili.com/x/reply/show" )
+				.header( "Cookie", cookie )
+				.datas(
+						"type",-1,
+						"oid", -1,
+						"rpid", -1 );
+		String content = hc.asString( req );
+		System.out.println( content );
 	}
 
 	@Test

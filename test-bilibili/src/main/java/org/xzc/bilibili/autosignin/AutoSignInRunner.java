@@ -46,20 +46,6 @@ public class AutoSignInRunner {
 	@Autowired
 	private RuntimeExceptionDao<Account, Integer> dao;
 
-	public void 修复() throws Exception {
-		dao.callBatchTasks( new Callable<Void>() {
-			public Void call() throws Exception {
-				List<Account> list = dao.queryForAll();
-				Date now = new Date();
-				for (Account a : list) {
-					a.updateAt = now;
-					dao.update( a );
-				}
-				return null;
-			}
-		} );
-	}
-
 	@Test
 	public void 所有() throws Exception {
 		//更新一波

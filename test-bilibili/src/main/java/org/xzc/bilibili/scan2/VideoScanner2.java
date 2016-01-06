@@ -49,7 +49,7 @@ public class VideoScanner2 {
 					}
 				}
 				if (video == null) {
-					Utils.blockUntil( "达到边界", DateTime.now().plusSeconds( 120 ), 30000 );
+					Utils.blockUntil( "达到边界", DateTime.now().plusSeconds( 120 ), 120000 );
 					continue;
 				}
 

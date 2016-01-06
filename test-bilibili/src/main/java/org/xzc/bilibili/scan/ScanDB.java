@@ -169,4 +169,18 @@ public class ScanDB {
 		commentTaskDao.createIfNotExists( commentTask );
 	}
 
+	public void update(CommentTask ct) {
+		commentTaskDao.update( ct );
+	}
+
+	public void update(final List<CommentTask> taskList) {
+		commentTaskDao.callBatchTasks( new Callable<Void>() {
+			public Void call() throws Exception {
+				for (CommentTask ct : taskList)
+					commentTaskDao.update( ct );
+				return null;
+			}
+		} );
+	}
+
 }
